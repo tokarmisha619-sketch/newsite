@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <title>Защита от вирусов — Проект Миши</title>
+    <style>
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; line-height: 1.6; padding: 20px; background-color: #eef2f3; color: #333; }
+        .container { max-width: 800px; margin: auto; background: white; padding: 30px; border-radius: 15px; box-shadow: 0 5px 15px rgba(0,0,0,0.1); }
+        h1 { color: #c0392b; border-bottom: 2px solid #c0392b; padding-bottom: 10px; }
+        h2 { color: #2980b9; }
+        .warning-box { background: #fff3cd; border: 1px solid #ffeeba; padding: 15px; border-radius: 8px; margin: 20px 0; color: #856404; }
+        .tips-list { background: #d4edda; padding: 20px; border-radius: 8px; border-left: 5px solid #28a745; }
+        footer { margin-top: 40px; padding-top: 20px; border-top: 2px solid #eee; font-size: 1.1em; }
+        .friends { color: #16a085; font-weight: bold; }
+        .author { color: #2980b9; font-weight: bold; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Как обойти вирусы и защитить ПК</h1>
+        <p>Добро пожаловать! На этом сайте мы рассказываем, как не дать вирусам шанс испортить ваш компьютер.</p>
+
+        <div class="warning-box">
+            <strong>ВНИМАНИЕ:</strong> Вирусы часто прячутся под видом картинок или документов. Всегда смотри на то, что идет после точки в названии файла!
+        </div>
+
+        <h2>Как распознать вирус?</h2>
+        <div class="tips-list">
+            <ul>
+                <li><strong>Двойные расширения:</strong> Если файл называется <code>песня.mp3.exe</code> — это 100% вирус.</li>
+                <li><strong>Странные ссылки:</strong> Не переходи по ссылкам от незнакомых людей в Дискорде или Телеграме.</li>
+                <li><strong>Защита:</strong> Всегда держи Windows Defender включенным.</li>
+            </ul>
+        </div>
+
+        <footer>
+            <p><strong>Автор проекта:</strong> <span class="author">Миша</span></p>
+            <p>Идею поддерживают: <span class="friends">Игнат Кипоть, Кирилл</span></p>
+        </footer>
+    </div>
+</body>
+</html>
