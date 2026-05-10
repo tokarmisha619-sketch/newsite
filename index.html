@@ -5,35 +5,101 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Защита от вирусов — Проект Миши</title>
     <style>
-        body { font-family: sans-serif; line-height: 1.6; padding: 20px; background-color: #f0f2f5; color: #333; }
-        .container { max-width: 700px; margin: auto; background: white; padding: 25px; border-radius: 12px; box-shadow: 0 4px 10px rgba(0,0,0,0.1); }
-        h1 { color: #e74c3c; text-align: center; }
-        h2 { color: #2c3e50; border-left: 5px solid #3498db; padding-left: 10px; }
-        .warning { background: #fff3cd; padding: 15px; border-radius: 8px; border: 1px solid #ffeeba; margin: 20px 0; }
-        footer { margin-top: 30px; padding-top: 15px; border-top: 1px solid #ddd; font-size: 1.1em; }
-        .names { color: #2980b9; font-weight: bold; }
+        body { font-family: 'Courier New', Courier, monospace; line-height: 1.6; padding: 20px; background-color: #1a1a1a; color: #00ff00; transition: 0.5s; }
+        .container { max-width: 800px; margin: auto; background: #222; padding: 25px; border: 2px solid #00ff00; border-radius: 12px; box-shadow: 0 0 15px #00ff00; }
+        h1 { color: #00ff00; text-align: center; text-transform: uppercase; font-size: 2em; text-shadow: 2px 2px #000; }
+        h2 { color: #00ff00; border-bottom: 1px solid #00ff00; padding-bottom: 10px; margin-top: 30px; }
+        .warning { background: #330000; padding: 15px; border-radius: 8px; border: 1px solid #ff0000; margin: 20px 0; color: #ff0000; font-weight: bold; }
+        
+        .wiki-section { background: #1a1a1a; padding: 20px; border-radius: 8px; margin-top: 20px; border: 1px solid #444; height: 350px; overflow-y: scroll; text-align: justify; }
+        .wiki-section::-webkit-scrollbar { width: 10px; }
+        .wiki-section::-webkit-scrollbar-thumb { background: #00ff00; border-radius: 5px; }
+
+        .contact-box { background: #333; padding: 20px; border-radius: 8px; margin-top: 20px; border: 1px dashed #00ff00; text-align: center; }
+        .tg-button { display: inline-block; background: #0088cc; color: white; padding: 12px 24px; text-decoration: none; border-radius: 5px; font-weight: bold; margin-top: 10px; transition: 0.3s; }
+        .tg-button.disabled { background: #555 !important; cursor: not-allowed; opacity: 0.6; }
+        
+        footer { margin-top: 40px; padding-top: 20px; border-top: 1px solid #00ff00; font-size: 1.1em; }
+        .names { color: #0080ff; font-weight: bold; }
+        button { background: #00ff00; color: black; border: none; padding: 10px 20px; cursor: pointer; font-weight: bold; border-radius: 5px; margin-top: 10px; }
+        #timer { color: #ffcc00; font-size: 0.9em; margin-top: 5px; display: none; }
     </style>
 </head>
 <body>
     <div class="container">
-        <h1>Как обойти вирусы: Главные правила</h1>
-        <p>Привет! Это сайт Миши, где мы учим защищать свой комп от зловредных программ.</p>
-
+        <h1>КИБЕР-ЗАЩИТА: МИША, ИГНАТ И КИРИЛЛ</h1>
+        
         <div class="warning">
-            <strong>ВАЖНО:</strong> Никогда не открывай файлы с двойным расширением, например <code>картинка.jpg.exe</code>. Это почти всегда вирус!
+            ВНИМАНИЕ: База данных угроз обновлена. Система под защитой команды Миши.
         </div>
 
-        <h2>Три правила безопасности:</h2>
-        <ul>
-            <li>Не качай читы или моды с непонятных сайтов.</li>
-            <li>Всегда проверяй, что качаешь, через антивирус.</li>
-            <li>Не переходи по ссылкам «Вы выиграли приз» в браузере.</li>
-        </ul>
+        <button onclick="checkSystem()">Сканировать систему</button>
+        <p id="status">Статус: Ожидание...</p>
+
+        <h2>ПОЛНАЯ ЭНЦИКЛОПЕДИЯ ВИРУСОВ</h2>
+        <div class="wiki-section">
+            <p><strong>Вирус</strong> — это вредоносный код, который ломает систему или ворует данные. Вот основные типы:</p>
+            <h3>1. Трояны</h3><p>Маскируются под игры или полезные программы. Дают хакеру доступ к твоему ПК.</p>
+            <h3>2. Шифровальщики</h3><p>Блокируют все файлы и требуют деньги (выкуп). Крайне опасны!</p>
+            <h3>3. Майнеры</h3><p>Грузят видеокарту на 100%, чтобы зарабатывать деньги хакеру. Комп начинает сильно тормозить.</p>
+            <h3>4. Стиллеры</h3><p>Воруют пароли от Дискорда, ТГ, игр и банковских карт за одну секунду.</p>
+            <h3>5. Черви</h3><p>Сами ползают по интернету и заражают всех подряд без твоего ведома.</p>
+            <p><strong>СОВЕТ ОТ МИШИ:</strong> Видишь файл .exe там, где должна быть картинка? УДАЛЯЙ!</p>
+        </div>
+
+        <div class="contact-box">
+            <h2>СВЯЗЬ С АВТОРОМ</h2>
+            <p>Есть вопрос? Пиши Мише в Telegram:</p>
+            <!-- ВПИШИ СВОЙ НОМЕР ВМЕСТО 380XXXXXXXXX НИЖЕ -->
+            <a href="https://t.me" id="tg-link" target="_blank" class="tg-button" onclick="activateAntiSpam(event)">ОТПРАВИТЬ ОТЧЕТ В TG</a>
+            <p id="timer">Защита от спама: <span id="seconds">30</span> сек.</p>
+            <p style="font-size: 0.8em; margin-top: 10px; color: #888;">Связь по номеру: +380980068421</p>
+        </div>
+
+        <button onclick="toggleTheme()" style="margin-top: 20px;">ТЕМНЫЙ/СВЕТЛЫЙ РЕЖИМ</button>
 
         <footer>
-            <p><strong>Автор проекта:</strong> <span class="names">Миша</span></p>
-            <p>Идею поддерживают: <span class="names">Игнат Кипоть, Кирилл</span></p>
+            <p><strong>РАЗРАБОТЧИК:</strong> <span class="names">Миша</span></p>
+            <p><strong>ПОДДЕРЖКА:</strong> <span class="names">Игнат Кипоть, Кирилл</span></p>
         </footer>
     </div>
+
+    <script>
+        function activateAntiSpam(event) {
+            const link = document.getElementById('tg-link');
+            const timerText = document.getElementById('timer');
+            const secondsSpan = document.getElementById('seconds');
+            if (link.classList.contains('disabled')) { event.preventDefault(); return; }
+            link.classList.add('disabled');
+            timerText.style.display = 'block';
+            let timeLeft = 30;
+            const countdown = setInterval(() => {
+                timeLeft--;
+                secondsSpan.innerText = timeLeft;
+                if (timeLeft <= 0) {
+                    clearInterval(countdown);
+                    link.classList.remove('disabled');
+                    timerText.style.display = 'none';
+                    secondsSpan.innerText = 30;
+                }
+            }, 1000);
+        }
+
+        function checkSystem() {
+            let status = document.getElementById('status');
+            status.innerHTML = "ИДЕТ ПРОВЕРКА...";
+            setTimeout(() => {
+                status.innerHTML = "✅ ВИРУСОВ НЕТ. ТЫ ПОД ЗАЩИТОЙ КОМАНДЫ МИШИ!";
+                status.style.color = "#00ff00";
+            }, 2500);
+        }
+
+        function toggleTheme() {
+            let body = document.body;
+            let isDark = (body.style.backgroundColor === "rgb(26, 26, 26)" || body.style.backgroundColor === "");
+            body.style.backgroundColor = isDark ? "#ffffff" : "#1a1a1a";
+            body.style.color = isDark ? "#333333" : "#00ff00";
+        }
+    </script>
 </body>
 </html>
