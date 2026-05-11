@@ -1,4 +1,4 @@
-<!DOCTYPE html><html><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0"><title>КИБЕР-ШТАБ: ADMIN FULL</title><style>
+<!DOCTYPE html><html><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0"><title>КИБЕР-ШТАБ: ULTIMATE</title><style>
 body{font-family:monospace;background:#000;color:#0f0;margin:0;padding:10px;overflow-x:hidden}
 #matrix-canvas{position:fixed;top:0;left:0;width:100%;height:100%;z-index:-1;opacity:0.2}
 #login-overlay{position:fixed;top:0;left:0;width:100%;height:100%;background:#000;z-index:1000;display:flex;align-items:center;justify-content:center}
@@ -16,15 +16,12 @@ input{background:#000;color:#0f0;border:1px solid #0f0;padding:8px;border-radius
 </style></head><body><canvas id="matrix-canvas"></canvas>
 <div id="win-popup" class="win-notif"></div>
 
-<!-- АДМИН-ПАНЕЛЬ (ВХОД ПО КЛИКУ НА ИМЯ) -->
 <div id="admin-modal" style="display:none; position:fixed; top:50%; left:50%; transform:translate(-50%,-50%); background:#111; border:3px solid #0f0; padding:15px; z-index:3000; width:280px; text-align:center; box-shadow:0 0 50px #0f0; border-radius:15px;">
     <h3 style="color:#0f0; margin-top:0;">ROOT: МИША</h3>
     <button onclick="addScore(1e15)">💎 +1 КВАДРИЛЛИОН</button>
     <button onclick="btc += 999999; updateUI()" style="background:#f7931a; color:#fff;">₿ БЕЗЛИМИТ BTC</button>
-    <button onclick="getAdminRTX6000()" style="background:#fc0; color:#000;">🔥 RTX 6000 (10МЛРД)</button>
-    <button onclick="getAdminRTX7000()" style="background:#f0f; color:#fff;">🌌 RTX 7000 (50МЛРД)</button>
     <button onclick="getAdminRTX8000()" style="background:linear-gradient(90deg, #f00, #0f0, #00f); color:#fff;">👑 RTX 8000 (КВИНТ.)</button>
-    <button onclick="localStorage.removeItem('m_board_final'); location.reload();" style="background:#f00; color:#fff;">🗑️ ОЧИСТИТЬ ТОП</button>
+    <button onclick="clearLeaderboard()" style="background:#f00; color:#fff;">🗑️ ОЧИСТИТЬ ТОП</button>
     <button onclick="closeAdmin()" style="margin-top:10px;">ВЫХОД</button>
 </div>
 
@@ -57,21 +54,28 @@ input{background:#000;color:#0f0;border:1px solid #0f0;padding:8px;border-radius
 
 <div class="box" style="border-color:#fc0"><h3>🏆 ТОП-5 ХАКЕРОВ</h3><div id="board" style="text-align:left;font-size:0.9em"></div></div>
 
-<div class="wiki-section"><h3>📕 ЭНЦИКЛОПЕДИЯ (12 ТИПОВ)</h3><p><b>1.Трояны:</b> Скрытый доступ.🐴</p><hr><p><b>12.Блокеры:</b> Бан экрана.🚫</p></div>
+<div class="wiki-section">
+    <h3>📕 ЭНЦИКЛОПЕДИЯ (12 ТИПОВ)</h3>
+    <p><b>1.Трояны:</b> Скрытый доступ.🐴</p><hr>
+    <p><b>2.Шифровальщики:</b> Выкуп.🔐</p><hr>
+    <p><b>3.Майнеры:</b> Кража мощности.⛏️</p><hr>
+    <p><b>4.Стиллеры:</b> Кража паролей.🕵️</p><hr>
+    <p><b>5.Бэкдоры:</b> Черный ход.🚪</p><hr>
+    <p><b>6.Адвари:</b> Реклама.📢</p><hr>
+    <p><b>7.Фишинг:</b> Подделки.🎣</p><hr>
+    <p><b>8.Руткиты:</b> Глубоко в ядре.👻</p><hr>
+    <p><b>9.Черви:</b> Сетевые вирусы.🐛</p><hr>
+    <p><b>10.Шпионы:</b> Слежка.👁️</p><hr>
+    <p><b>11.Бомбы:</b> Удаление по дате.💣</p><hr>
+    <p><b>12.Блокеры:</b> Бан экрана.🚫</p>
+</div>
 <footer style="text-align:center;font-size:0.8em;color:#666">DEV: МИША | SUP: ЕГОР, ИГНАТ, КИРИЛЛ</footer></div>
 
 <script>
 let score=0,autoP=0,clickP=1,btc=0,mineMode='xp',userName='';
 function loadData(){score=Number(localStorage.getItem('m_sc_final'))||0;autoP=Number(localStorage.getItem('m_au_final'))||0;clickP=Number(localStorage.getItem('m_cl_final'))||1;btc=parseFloat(localStorage.getItem('m_btc'))||0;}
 function confirmAccess(){let i=document.getElementById('user-login').value.trim();if(i.length<2)return;userName=i;document.getElementById('login-overlay').style.display='none';document.getElementById('main-content').style.filter='none';document.getElementById('main-content').style.pointerEvents='auto';document.getElementById('display-name').innerText=userName.toUpperCase();loadData();updateUI()}
-function fmt(n){
-    if(n>=1e18)return (n/1e18).toFixed(2)+'Квинт';
-    if(n>=1e15)return (n/1e15).toFixed(2)+'Квдр';
-    if(n>=1e12)return (n/1e12).toFixed(1)+'Трлн';
-    if(n>=1e9)return (n/1e9).toFixed(1)+'Млрд';
-    if(n>=1e6)return (n/1e6).toFixed(1)+'М';
-    return Math.floor(n);
-}
+function fmt(n){if(n>=1e18)return (n/1e18).toFixed(2)+'Квинт';if(n>=1e15)return (n/1e15).toFixed(2)+'Квдр';if(n>=1e12)return (n/1e12).toFixed(1)+'Трлн';if(n>=1e9)return (n/1e9).toFixed(1)+'Млрд';if(n>=1e6)return (n/1e6).toFixed(1)+'М';return Math.floor(n)}
 function updateUI(){
     document.getElementById('score-text').innerText=fmt(score);
     document.getElementById('auto-val').innerText=fmt(autoP);
@@ -89,15 +93,19 @@ function showWin(txt,p){let pop=document.getElementById('win-popup');pop.innerHT
 function usePromo(){if(prompt("КОД:")==="MISHA2024"){score+=1e6;updateUI()}}
 function transferXP(){let t=document.getElementById('target-p').value.trim();if(score>=1e7){score-=1e7;alert("ОТПРАВЛЕНО!");updateUI()}}
 
-function openAdminPanel() {
-    if(prompt("PASSWORD:")==="misha777") document.getElementById('admin-modal').style.display='block';
-}
-
+function openAdminPanel() { if(prompt("PASS:")==="misha777") document.getElementById('admin-modal').style.display='block'; }
 function addScore(n){score+=n;updateUI()}
-function getAdminRTX6000(){autoP+=1e10;showWin("RTX 6000", 1e10);updateUI()}
-function getAdminRTX7000(){autoP+=5e10;showWin("RTX 7000", 5e10);updateUI()}
 function getAdminRTX8000(){autoP+=1e18;showWin("👑 RTX 8000 GOD", 1e18);updateUI()}
 function closeAdmin(){document.getElementById('admin-modal').style.display='none'}
+
+// ИСПРАВЛЕННОЕ УДАЛЕНИЕ ТОПА
+function clearLeaderboard() {
+    if(confirm("Очистить ТОП игроков?")) {
+        localStorage.removeItem('m_board_final');
+        drawBoard(); // Обновляем топ без перезагрузки всей страницы
+        alert("ТОП ОЧИЩЕН!");
+    }
+}
 
 function drawBoard(){
     let r=JSON.parse(localStorage.getItem('m_board_final'))||[];
