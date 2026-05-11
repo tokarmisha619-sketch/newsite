@@ -8,7 +8,7 @@
         body { font-family: 'Courier New', Courier, monospace; line-height: 1.6; padding: 20px; background-color: #000; color: #00ff00; margin: 0; overflow-x: hidden; }
         #matrix-canvas { position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: -1; opacity: 0.3; }
         .container { max-width: 800px; margin: 20px auto; background: rgba(26, 26, 26, 0.9); padding: 25px; border: 2px solid #00ff00; border-radius: 12px; box-shadow: 0 0 20px #00ff00; position: relative; z-index: 1; }
-        h1 { color: #00ff00; text-align: center; text-transform: uppercase; font-size: 2em; text-shadow: 2px 2px #000; margin-bottom: 20px; }
+        h1 { color: #00ff00; text-align: center; text-transform: uppercase; font-size: 1.8em; text-shadow: 2px 2px #000; margin-bottom: 20px; }
         h2 { color: #00ff00; border-bottom: 1px solid #00ff00; padding-bottom: 10px; margin-top: 30px; }
         .warning { background: rgba(51, 0, 0, 0.8); padding: 15px; border-radius: 8px; border: 1px solid #ff0000; margin: 20px 0; color: #ff0000; font-weight: bold; text-align: center; }
         .wiki-section { background: #1a1a1a; padding: 20px; border-radius: 8px; margin-top: 20px; border: 1px solid #444; height: 350px; overflow-y: scroll; text-align: justify; }
@@ -23,10 +23,12 @@
         #progress-container { width: 100%; background: #333; height: 12px; margin-top: 15px; display: none; border-radius: 6px; overflow: hidden; border: 1px solid #00ff00; }
         #progress-bar { width: 0%; height: 100%; background: #00ff00; box-shadow: 0 0 10px #00ff00; }
         
-        /* Стиль кликера */
+        /* Стили Кликера */
         .clicker-box { background: rgba(0,255,0,0.05); padding: 15px; border-radius: 8px; border: 1px double #00ff00; margin-top: 20px; text-align: center; }
         #click-btn { width: 80px; height: 80px; border-radius: 50%; border: 3px solid #00ff00; background: #000; color: #00ff00; font-size: 1.5em; cursor: pointer; transition: transform 0.1s; margin-top: 10px; }
         #click-btn:active { transform: scale(0.9); }
+        input { background: #000; color: #00ff00; border: 1px solid #00ff00; padding: 8px; border-radius: 4px; font-family: monospace; outline: none; }
+        hr { border: 0; border-top: 1px solid #444; margin: 15px 0; }
     </style>
 </head>
 <body>
@@ -48,34 +50,43 @@
             <div id="click-power" style="font-size: 2.5em; font-weight: bold; color: #fff; text-shadow: 0 0 10px #00ff00;">0</div>
             <p style="margin: 5px 0;">Уровень: <span id="hacker-level" style="font-weight: bold;">Новичок</span></p>
             <button onclick="mineData()" id="click-btn">⚡</button>
+
+            <!-- Поле рекорда (появится после 10 кликов) -->
+            <div id="record-input" style="display: none; margin-top: 15px; padding-top: 10px; border-top: 1px dashed #00ff00;">
+                <input type="text" id="player-name" placeholder="Твое имя" maxlength="15">
+                <button onclick="saveRecord()" style="width: auto; padding: 8px 15px; font-size: 0.8em; margin-top: 5px;">В ТОП 🏆</button>
+            </div>
+
+            <div id="leaderboard" style="margin-top: 15px; font-size: 0.9em; text-align: left; color: #00ff00; background: rgba(0,0,0,0.3); border-radius: 5px; padding: 10px;">
+                <!-- Сюда попадут лидеры -->
+            </div>
         </div>
 
         <h2>ПОЛНАЯ ЭНЦИКЛОПЕДИЯ УГРОЗ</h2>
         <div class="wiki-section">
             <h3>1. Трояны 🐴</h3><p>Маскируются под игры. Дают хакеру доступ к твоему ПК.</p>
             <h3>2. Шифровальщики 🔐</h3><p>Блокируют файлы и требуют выкуп.</p>
-            <h3>3. Майнеры ⛏️</h3><p>Грузят видеокарту на 100%. Комп тормозит.</p>
-            <h3>4. Стиллеры 🕵️</h3><p>Воруют пароли от Discord, Telegram и игр.</p>
-            <h3>5. Бэкдоры (Backdoor) 🚪</h3><p>Создают секретный вход для хакера.</p>
-            <h3>6. Адвари (Adware) 📢</h3><p>Заваливают браузер рекламой.</p>
-            <h3>7. Фишинг 🎣</h3><p>Поддельные сайты для кражи логинов.</p>
-            <h3>8. Руткиты (Rootkit) 👻</h3><p>Прячутся глубоко в Windows.</p>
-            <h3>9. Черви 🐛</h3><p>Сами заражают всех через интернет.</p>
+            <h3>3. Майнеры ⛏️</h3><p>Воруют мощность видеокарты. Комп тормозит.</p>
+            <h3>4. Стиллеры 🕵️</h3><p>Воруют пароли от Discord, Telegram и банков.</p>
+            <h3>5. Бэкдоры 🚪</h3><p>Скрытый вход для хакера в любое время.</p>
+            <h3>6. Адвари 📢</h3><p>Рекламный спам во всех окнах.</p>
+            <h3>7. Фишинг 🎣</h3><p>Сайты-подделки для кражи паролей.</p>
+            <h3>8. Руткиты 👻</h3><p>Прячутся в ядре системы, их сложно найти.</p>
+            <h3>9. Черви 🐛</h3><p>Сами ползают по интернету и заражают всех.</p>
         </div>
 
-        <h2 style="color: #ffcc00; border-color: #ffcc00;">ТОП-4 ОПАСНЫХ ВИРУСОВ</h2>
+        <h2 style="color: #ffcc00; border-color: #ffcc00;">ТОП-10 ОПАСНЫХ ВИРУСОВ</h2>
         <div class="wiki-section" style="border-color: #ffcc00;">
             <p><strong>1. Creeper (1971)</strong> — Самый первый вирус.</p><hr>
             <p><strong>2. Brain (1986)</strong> — Первый вирус для ПК.</p><hr>
-            <p><strong>3. Morris Worm (1988)</strong> — Чуть не сломал интернет.</p><hr>
-            <p><strong>4. WannaCry (2017)</strong> — Масштабная атака шифровальщика.</p>
+            <p><strong>3. Morris Worm (1988)</strong> — Чуть не уничтожил интернет.</p><hr>
+            <p><strong>4. WannaCry (2017)</strong> — Атака на весь мир.</p>
         </div>
 
         <div class="contact-box">
-            <h2>СВЯЗЬ С АВТОРОМ</h2>
+            <h2>СВЯЗЬ С МИШЕЙ</h2>
             <a href="https://t.me" id="tg-link" target="_blank" class="tg-button" onclick="activateAntiSpam(event)">ОТПРАВИТЬ ОТЧЕТ В TG</a>
             <p id="timer" style="display:none; color: #ffcc00;">Защита от спама: <span id="seconds">10</span> сек.</p>
-            <p style="font-size: 0.8em; margin-top: 10px; color: #888;">+380980068421</p>
         </div>
 
         <footer>
@@ -84,11 +95,11 @@
     </div>
 
     <script>
-        // МАТРИЦА
+        // --- МАТРИЦА ---
         const canvas = document.getElementById('matrix-canvas');
         const ctx = canvas.getContext('2d');
         canvas.width = window.innerWidth; canvas.height = window.innerHeight;
-        const characters = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+        const characters = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ#$@";
         const fontSize = 16;
         const columns = canvas.width / fontSize;
         const drops = [];
@@ -105,18 +116,22 @@
         }
         setInterval(drawMatrix, 33);
 
-        // ЛОГИКА КЛИКЕРА С СОХРАНЕНИЕМ
+        // --- ЛОГИКА КЛИКЕРА ---
         let score = localStorage.getItem('hackerScore') ? parseInt(localStorage.getItem('hackerScore')) : 0;
         
         function updateDisplay() {
             document.getElementById('click-power').innerText = score;
             let level = document.getElementById('hacker-level');
+            let recordBox = document.getElementById('record-input');
+
+            if (score >= 10) recordBox.style.display = "block"; // Показать ввод имени
+
             if (score < 50) { level.innerText = "Новичок"; level.style.color = "#00ff00"; }
             else if (score >= 50 && score < 200) { level.innerText = "Ученик Миши"; level.style.color = "#0080ff"; }
             else if (score >= 200 && score < 1000) { level.innerText = "Кибер-Защитник"; level.style.color = "#ffcc00"; }
             else if (score >= 1000) { level.innerText = "МАСТЕР ХАКЕР"; level.style.color = "#ff0000"; }
+            showLeaderboard();
         }
-        updateDisplay();
 
         function mineData() {
             score++;
@@ -124,7 +139,26 @@
             updateDisplay();
         }
 
-        // СКАНЕР
+        function saveRecord() {
+            let name = document.getElementById('player-name').value || "Аноним";
+            let records = JSON.parse(localStorage.getItem('hackerLeaderboard')) || [];
+            records.push({ name: name, score: score });
+            records.sort((a, b) => b.score - a.score);
+            records = records.slice(0, 5); // Только лучшие 5
+            localStorage.setItem('hackerLeaderboard', JSON.stringify(records));
+            document.getElementById('player-name').value = "";
+            showLeaderboard();
+        }
+
+        function showLeaderboard() {
+            let records = JSON.parse(localStorage.getItem('hackerLeaderboard')) || [];
+            let board = document.getElementById('leaderboard');
+            if (records.length === 0) { board.innerHTML = "Таблица пуста"; return; }
+            board.innerHTML = "<strong>🏆 ТОП ИГРОКОВ:</strong><br>" + 
+                records.map((r, i) => `${i+1}. ${r.name} — ${r.score} XP`).join('<br>');
+        }
+
+        // --- СКАНЕР ---
         function checkSystem() {
             let status = document.getElementById('status');
             let btn = document.getElementById('scan-btn');
@@ -135,18 +169,17 @@
             let interval = setInterval(() => {
                 if (width >= 100) {
                     clearInterval(interval);
-                    status.innerHTML = "✅ СИСТЕМА ПОД ЗАЩИТОЙ МИШИ.";
+                    status.innerHTML = "✅ ВИРУСОВ НЕ ОБНАРУЖЕНО.";
                     status.style.color = "#00ff00";
                     btn.disabled = false;
                 } else {
                     width++; pBar.style.width = width + "%";
-                    status.innerHTML = "АНАЛИЗ: " + width + "%";
-                    status.style.color = "#ffcc00";
+                    status.innerHTML = "ПРОВЕРКА: " + width + "%";
                 }
             }, 50);
         }
 
-        // ТАЙМЕР TG
+        // --- ТАЙМЕР TG ---
         function activateAntiSpam(event) {
             const link = document.getElementById('tg-link');
             const timerText = document.getElementById('timer');
@@ -159,6 +192,9 @@
                 if (timeLeft <= 0) { clearInterval(countdown); link.classList.remove('disabled'); timerText.style.display = 'none'; }
             }, 1000);
         }
+
+        // Запуск при загрузке
+        updateDisplay();
     </script>
 </body>
 </html>
