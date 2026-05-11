@@ -20,10 +20,13 @@
         footer { margin-top: 40px; padding-top: 20px; border-top: 1px solid #00ff00; font-size: 1.1em; text-align: center; }
         .names { color: #0080ff; font-weight: bold; }
         button { background: #00ff00; color: black; border: none; padding: 12px 20px; cursor: pointer; font-weight: bold; border-radius: 5px; width: 100%; font-size: 1em; text-transform: uppercase; transition: 0.3s; }
-        #timer { color: #ffcc00; font-size: 0.9em; margin-top: 5px; display: none; }
-        hr { border: 0; border-top: 1px solid #444; margin: 15px 0; }
         #progress-container { width: 100%; background: #333; height: 12px; margin-top: 15px; display: none; border-radius: 6px; overflow: hidden; border: 1px solid #00ff00; }
-        #progress-bar { width: 0%; height: 100%; background: #00ff00; box-shadow: 0 0 10px #00ff00; transition: width 0.1s; }
+        #progress-bar { width: 0%; height: 100%; background: #00ff00; box-shadow: 0 0 10px #00ff00; }
+        
+        /* Стиль кликера */
+        .clicker-box { background: rgba(0,255,0,0.05); padding: 15px; border-radius: 8px; border: 1px double #00ff00; margin-top: 20px; text-align: center; }
+        #click-btn { width: 80px; height: 80px; border-radius: 50%; border: 3px solid #00ff00; background: #000; color: #00ff00; font-size: 1.5em; cursor: pointer; transition: transform 0.1s; margin-top: 10px; }
+        #click-btn:active { transform: scale(0.9); }
     </style>
 </head>
 <body>
@@ -32,10 +35,19 @@
         <h1>КРАСНАЯ УГРОЗА: МИША, ИГНАТ И КИРИЛЛ</h1>
         <div class="warning">СИСТЕМА ПОД ЗАЩИТОЙ КОМАНДЫ МИШИ</div>
 
+        <!-- СКАНЕР -->
         <div style="background: rgba(0,0,0,0.5); padding: 15px; border-radius: 8px; border: 1px solid #00ff00;">
             <button onclick="checkSystem()" id="scan-btn">ЗАПУСТИТЬ ПРОВЕРКУ</button>
             <div id="progress-container"><div id="progress-bar"></div></div>
             <p id="status" style="text-align: center; margin-top: 10px;">Статус: Ожидание...</p>
+        </div>
+
+        <!-- КЛИКЕР -->
+        <div class="clicker-box">
+            <h3 style="margin: 0; color: #00ff00;">КЛИКЕР ХАКЕРСКОЙ МОЩИ</h3>
+            <div id="click-power" style="font-size: 2.5em; font-weight: bold; color: #fff; text-shadow: 0 0 10px #00ff00;">0</div>
+            <p style="margin: 5px 0;">Уровень: <span id="hacker-level" style="font-weight: bold;">Новичок</span></p>
+            <button onclick="mineData()" id="click-btn">⚡</button>
         </div>
 
         <h2>ПОЛНАЯ ЭНЦИКЛОПЕДИЯ УГРОЗ</h2>
@@ -51,24 +63,18 @@
             <h3>9. Черви 🐛</h3><p>Сами заражают всех через интернет.</p>
         </div>
 
-        <h2 style="color: #ffcc00; border-color: #ffcc00;">ТОП-10 ОПАСНЫХ ВИРУСОВ</h2>
+        <h2 style="color: #ffcc00; border-color: #ffcc00;">ТОП-4 ОПАСНЫХ ВИРУСОВ</h2>
         <div class="wiki-section" style="border-color: #ffcc00;">
-            <p><strong>1. Creeper (1971) 👻</strong> — Самый первый вирус.</p><hr>
-            <p><strong>2. Brain (1986) 🧠</strong> — Первый вирус для ПК.</p><hr>
-            <p><strong>3. Morris Worm (1988) 🐛</strong> — Чуть не сломал интернет.</p><hr>
-            <p><strong>4. CIH / Chernobyl (1998) ☢️</strong> — Портил железо.</p><hr>
-            <p><strong>5. ILOVEYOU (2000) ❤️</strong> — Ущерб на 10 миллиардов $.</p><hr>
-            <p><strong>6. Sasser (2004) 🔄</strong> — Выключал больницы и банки.</p><hr>
-            <p><strong>7. Mydoom (2004) 📧</strong> — Рекорд скорости рассылки.</p><hr>
-            <p><strong>8. Conficker (2008) 💂</strong> — Заразил миллионы компьютеров.</p><hr>
-            <p><strong>9. Stuxnet (2010) ⚙️</strong> — Первое кибер-оружие.</p><hr>
-            <p><strong>10. WannaCry (2017) 🔒</strong> — Масштабная атака шифровальщика.</p>
+            <p><strong>1. Creeper (1971)</strong> — Самый первый вирус.</p><hr>
+            <p><strong>2. Brain (1986)</strong> — Первый вирус для ПК.</p><hr>
+            <p><strong>3. Morris Worm (1988)</strong> — Чуть не сломал интернет.</p><hr>
+            <p><strong>4. WannaCry (2017)</strong> — Масштабная атака шифровальщика.</p>
         </div>
 
         <div class="contact-box">
             <h2>СВЯЗЬ С АВТОРОМ</h2>
             <a href="https://t.me" id="tg-link" target="_blank" class="tg-button" onclick="activateAntiSpam(event)">ОТПРАВИТЬ ОТЧЕТ В TG</a>
-            <p id="timer">Защита от спама: <span id="seconds">10</span> сек.</p>
+            <p id="timer" style="display:none; color: #ffcc00;">Защита от спама: <span id="seconds">10</span> сек.</p>
             <p style="font-size: 0.8em; margin-top: 10px; color: #888;">+380980068421</p>
         </div>
 
@@ -99,6 +105,25 @@
         }
         setInterval(drawMatrix, 33);
 
+        // ЛОГИКА КЛИКЕРА С СОХРАНЕНИЕМ
+        let score = localStorage.getItem('hackerScore') ? parseInt(localStorage.getItem('hackerScore')) : 0;
+        
+        function updateDisplay() {
+            document.getElementById('click-power').innerText = score;
+            let level = document.getElementById('hacker-level');
+            if (score < 50) { level.innerText = "Новичок"; level.style.color = "#00ff00"; }
+            else if (score >= 50 && score < 200) { level.innerText = "Ученик Миши"; level.style.color = "#0080ff"; }
+            else if (score >= 200 && score < 1000) { level.innerText = "Кибер-Защитник"; level.style.color = "#ffcc00"; }
+            else if (score >= 1000) { level.innerText = "МАСТЕР ХАКЕР"; level.style.color = "#ff0000"; }
+        }
+        updateDisplay();
+
+        function mineData() {
+            score++;
+            localStorage.setItem('hackerScore', score);
+            updateDisplay();
+        }
+
         // СКАНЕР
         function checkSystem() {
             let status = document.getElementById('status');
@@ -110,7 +135,7 @@
             let interval = setInterval(() => {
                 if (width >= 100) {
                     clearInterval(interval);
-                    status.innerHTML = "✅ СИСТЕМА ЧИСТА. УГРОЗ НЕ ОБНАРУЖЕНО.";
+                    status.innerHTML = "✅ СИСТЕМА ПОД ЗАЩИТОЙ МИШИ.";
                     status.style.color = "#00ff00";
                     btn.disabled = false;
                 } else {
@@ -121,7 +146,7 @@
             }, 50);
         }
 
-        // ТАЙМЕР
+        // ТАЙМЕР TG
         function activateAntiSpam(event) {
             const link = document.getElementById('tg-link');
             const timerText = document.getElementById('timer');
