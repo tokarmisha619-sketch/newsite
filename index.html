@@ -3,119 +3,208 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>КИБЕР-ШТАБ: МИША И ЕГОР</title>
+    <title>КИБЕР-ЦЕНТР МИШИ: FULL & DR EDITION</title>
     <style>
         body { font-family: 'Courier New', Courier, monospace; line-height: 1.6; padding: 20px; background-color: #000; color: #00ff00; margin: 0; overflow-x: hidden; }
         #matrix-canvas { position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: -1; opacity: 0.3; }
-        .container { max-width: 800px; margin: 20px auto; background: rgba(20, 20, 20, 0.95); padding: 25px; border: 2px solid #00ff00; border-radius: 12px; box-shadow: 0 0 20px #00ff00; position: relative; z-index: 1; }
-        h1 { color: #00ff00; text-align: center; text-transform: uppercase; font-size: 1.5em; text-shadow: 2px 2px #000; }
+        #login-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #000; z-index: 100; display: flex; align-items: center; justify-content: center; }
+        .login-box { border: 2px solid #00ff00; padding: 30px; border-radius: 12px; box-shadow: 0 0 20px #00ff00; text-align: center; background: #000; }
+        #main-content { filter: blur(15px); transition: 1s; pointer-events: none; }
+        .container { max-width: 800px; margin: 20px auto; background: rgba(10, 10, 10, 0.95); padding: 25px; border: 2px solid #00ff00; border-radius: 12px; position: relative; z-index: 1; }
         .box { background: rgba(0,255,0,0.05); padding: 15px; border-radius: 8px; border: 1px double #00ff00; margin-top: 15px; text-align: center; }
         #click-btn { width: 90px; height: 90px; border-radius: 50%; border: 4px solid #00ff00; background: #000; color: #00ff00; font-size: 2em; cursor: pointer; transition: 0.1s; outline: none; }
-        #click-btn:active { transform: scale(0.9); }
-        .shop-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 10px; }
-        .upgrade-card { background: rgba(0,0,0,0.5); border: 1px solid #00ff00; padding: 10px; border-radius: 5px; display: flex; flex-direction: column; justify-content: space-between; }
         button { background: #00ff00; color: #000; border: none; padding: 8px; font-weight: bold; cursor: pointer; border-radius: 5px; text-transform: uppercase; }
-        button:disabled { background: #555 !important; color: #888; cursor: not-allowed; }
-        input { background: #000; color: #00ff00; border: 1px solid #00ff00; padding: 8px; border-radius: 4px; font-family: monospace; outline: none; margin: 5px; width: 80%; }
-        .wiki-section { background: #1a1a1a; padding: 20px; border-radius: 8px; margin-top: 20px; border: 1px solid #444; height: 300px; overflow-y: scroll; text-align: justify; }
-        .wiki-section::-webkit-scrollbar { width: 10px; }
-        .wiki-section::-webkit-scrollbar-thumb { background: #00ff00; border-radius: 5px; }
-        hr { border: 0; border-top: 1px solid #444; margin: 15px 0; }
+        input { background: #000; color: #00ff00; border: 1px solid #00ff00; padding: 10px; border-radius: 4px; font-family: monospace; outline: none; margin: 5px 0; width: 80%; text-align: center; }
+        #dr-banner { display: none; background: linear-gradient(45deg, #ff00ff, #00ffff); color: white; padding: 15px; text-align: center; font-weight: bold; border-radius: 8px; margin-bottom: 15px; border: 2px solid white; animation: neon 1.5s ease-in-out infinite alternate; }
+        .wiki-section { background: #1a1a1a; padding: 20px; border-radius: 8px; margin-top: 20px; border: 1px solid #444; height: 250px; overflow-y: scroll; text-align: justify; }
+        .ach-card { border: 1px solid #444; padding: 5px; font-size: 0.65em; opacity: 0.2; border-radius: 5px; text-align: center; }
+        .ach-card.unlocked { opacity: 1; border-color: #ffcc00; color: #fff; box-shadow: 0 0 10px #ffcc00; }
         footer { margin-top: 30px; text-align: center; font-size: 0.9em; border-top: 1px solid #00ff00; padding-top: 10px; }
-        .names { color: #0080ff; font-weight: bold; }
+        @keyframes neon { from { box-shadow: 0 0 5px #ff00ff; } to { box-shadow: 0 0 20px #00ffff; } }
     </style>
 </head>
 <body>
     <canvas id="matrix-canvas"></canvas>
-    <div class="container">
-        <h1>КРИПТО-ШТАБ: МИША, ЕГОР, ИГНАТ, КИРИЛЛ</h1>
+    <div id="login-overlay"><div class="login-box"><h2>ID CONFIRMATION</h2><input type="text" id="user-login" placeholder="ВАШЕ ИМЯ..."><br><button onclick="confirmAccess()">ВХОД</button></div></div>
 
-        <!-- БЛОК ДОБЫЧИ -->
+    <div id="main-content" class="container">
+        <div id="dr-banner">🎂 ПРАЗДНИК ЕГОРА (До 13 мая) 🎂<br>ВСЕ БУСТЫ БЕСПЛАТНЫ! Код: EGOR_DR</div>
+        
+        <h1>СИСТЕМА: <span id="display-name">...</span></h1>
+
+        <!-- КЛИКЕР -->
         <div class="box">
             <h2 id="score-text" style="font-size: 3em; margin: 0;">0</h2>
             <p id="lvl-text" style="color: #ffcc00; font-weight: bold;">ХАКЕР 0 LVL</p>
             <button onclick="mineData()" id="click-btn">⚡</button>
-            <p>Авто: +<span id="auto-val">0</span>/сек</p>
-            <div id="market-status" style="font-size: 0.8em; padding: 5px; color: #0f0;">Биржа: Стабильна</div>
+            <p>Авто: +<span id="auto-val">0</span>/сек | Клик: +<span id="click-val">1</span></p>
+            <p id="ant-status" style="font-size: 0.8em; color: #00ffff;">📡 Ожидание сигнала...</p>
         </div>
 
-        <!-- ПРОМОКОДЫ -->
-        <div class="box" style="border-color: #0080ff;">
-            <h3 style="color: #0080ff; margin: 0;">🔑 ПРОМОКОД</h3>
-            <input type="text" id="promo-input" placeholder="Введите код...">
-            <button onclick="usePromo()" style="background: #0080ff; color: white; width: auto; padding: 10px 20px;">ОК</button>
-            <p id="promo-msg" style="font-size: 0.8em; margin-top: 5px;"></p>
-        </div>
-
-        <!-- ПЕРЕВОД XP -->
-        <div class="box" style="border-color: #fff;">
-            <h3 style="color: #fff; margin: 0;">📤 ПЕРЕДАТЬ XP ДРУГУ</h3>
-            <input type="text" id="target-player" placeholder="Имя получателя">
-            <input type="number" id="transfer-amount" placeholder="Сумма XP">
-            <button onclick="transferXP()" style="background: #fff; color: #000;">ОТПРАВИТЬ ДАННЫЕ</button>
-            <p id="transfer-status" style="font-size: 0.8em; margin-top: 5px;"></p>
-        </div>
-
-        <!-- БИТКОИН -->
-        <div class="box" style="border-color: #f7931a; background: rgba(247, 147, 26, 0.1);">
+        <!-- КРИПТО И ПЕРЕВОДЫ -->
+        <div class="box" style="border-color: #f7931a;">
             <h3 style="color: #f7931a; margin: 0;">₿ BITCOIN ТЕРМИНАЛ</h3>
-            <div id="btc-balance" style="font-size: 1.5em; color: #fff;">0.00 BTC</div>
-            <p>Курс: <span id="btc-price" style="color: #f7931a;">100.0М</span> XP</p>
-            <button onclick="buyBTC()" style="background: #f7931a; color: white;">КУПИТЬ 1 BTC</button>
-            <button onclick="sellBTC()" style="background: white; color: #f7931a;">ПРОДАТЬ 1 BTC</button>
+            <div id="btc-balance">0.00 BTC</div>
+            <p>Курс: <span id="btc-price">100.0М</span> XP</p>
+            <button onclick="buyBTC()" style="background: #f7931a; color: white;">КУПИТЬ</button>
+            <button onclick="sellBTC()" style="background: white; color: #f7931a;">ПРОДАТЬ</button>
+        </div>
+
+        <div class="box" style="border-color: #fff;">
+            <h3 style="color: #fff; margin: 0;">📤 ПЕРЕДАТЬ XP</h3>
+            <input type="text" id="target-player" placeholder="Имя получателя">
+            <input type="number" id="transfer-amount" placeholder="Сумма">
+            <button onclick="transferXP()">ОТПРАВИТЬ</button>
         </div>
 
         <!-- МАГАЗИН -->
         <div class="box" style="border-color: #ff00ff;">
-            <h3>📦 МАГАЗИН</h3>
-            <div class="shop-grid">
-                <div class="upgrade-card"><span>📟 Видеокарта (+5/сек)</span><p>Цена: 100</p><button onclick="buy('auto')">КУПИТЬ</button></div>
-                <div class="upgrade-card" style="border-color: #00ffff;"><span>🌌 Квантовый ПК (+50к/сек)</span><p>Цена: 1М</p><button onclick="buy('quant')">КУПИТЬ</button></div>
+            <h3>🛒 МАГАЗИН (АКЦИЯ 100%)</h3>
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
+                <div style="border: 1px solid #444; padding: 5px;">
+                    <p style="font-size: 0.7em;">GTX 1070 (+5/с)</p>
+                    <p id="cost-auto" style="color: #ff00ff;">0</p>
+                    <button onclick="buy('auto')">ВЗЯТЬ</button>
+                </div>
+                <div style="border: 1px solid #444; padding: 5px;">
+                    <p style="font-size: 0.7em;">КВАНТ ПК (+50к/с)</p>
+                    <p id="cost-quant" style="color: #ff00ff;">0</p>
+                    <button onclick="buy('quant')">ВЗЯТЬ</button>
+                </div>
             </div>
+            <button onclick="buyRTX()" style="margin-top: 10px; background: #ff00ff; color: white;">ОТКРЫТЬ КЕЙС RTX (0 XP)</button>
         </div>
 
-        <!-- ТОП -->
+        <!-- ДОСТИЖЕНИЯ -->
         <div class="box" style="border-color: #ffcc00;">
-            <h3 style="color: #ffcc00; margin: 0;">🏆 ТОП ИГРОКОВ</h3>
-            <input type="text" id="my-name" placeholder="Твое имя" maxlength="12">
-            <button onclick="saveRec()">ЗАПИСАТЬСЯ</button>
-            <div id="board" style="text-align: left; margin-top: 10px; font-size: 0.9em;"></div>
+            <h3>🏆 ДОСТИЖЕНИЯ</h3>
+            <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 5px;">
+                <div id="ach-1" class="ach-card">🤝 СДЕЛКА</div>
+                <div id="ach-2" class="ach-card">💰 МИЛЛИОН</div>
+                <div id="ach-legend" class="ach-card">🔒 ???</div>
+            </div>
         </div>
 
         <!-- ЭНЦИКЛОПЕДИЯ -->
         <h2 style="text-align: center;">📕 ЭНЦИКЛОПЕДИЯ ВИРУСОВ</h2>
         <div class="wiki-section">
-            <h3 style="color: #00ffff;">АКТУАЛЬНО В 2025</h3>
-            <p><strong>• ИИ-Полиморф:</strong> Вирус, меняющий свой код каждую секунду.</p><hr>
-            <p><strong>• Фейк-Капча:</strong> Крадет пароли через кнопку "Я не робот".</p><hr>
-            <p><strong>• Панда-Майнер:</strong> Скрытая добыча крипты в картинках.</p><hr>
-            <h3 style="color: #ff0000;">КЛАССИКА</h3>
-            <p><strong>1. Трояны:</strong> Прячутся в играх. 🐴</p><hr>
+            <h3 style="color: #00ffff;">УГРОЗЫ 2025</h3>
+            <p><strong>• ИИ-Полиморф:</strong> Вирус, меняющий код сам.</p><hr>
+            <p><strong>• Фейк-Капча:</strong> Крадет пароли через "Я не робот".</p><hr>
+            <h3>КЛАССИКА</h3>
+            <p><strong>1. Трояны:</strong> Маскируются под игры. 🐴</p><hr>
             <p><strong>2. Шифровальщики:</strong> Блокируют файлы за выкуп. 🔐</p><hr>
-            <p><strong>3. Майнеры:</strong> Воруют ресурсы ПК. ⛏️</p><hr>
-            <p><strong>4. Стиллеры:</strong> Крадут пароли за секунду. 🕵️</p><hr>
-            <p><strong>5. Бэкдоры:</strong> Тайный вход для хакера. 🚪</p>
+            <p><strong>3. Майнеры:</strong> Воруют ресурсы ПК хакеру. ⛏️</p>
         </div>
 
         <footer>
-            <p>DEVELOPER: <span class="names">МИША</span></p>
-            <p>SUPPORT: <span class="names">ЕГОР, ИГНАТ, КИРИЛЛ</span></p>
+            <p>DEV: <span style="color: #0080ff;">МИША</span> | SUPPORT: ЕГОР, ИГНАТ, КИРИЛЛ</p>
         </footer>
     </div>
 
     <script>
-        // SMART LOAD
-        const keys = ['m_sc_final', 'hackerScore', 'm_sc', 'm_score'];
+        let userName = localStorage.getItem('m_user_name');
         let score = 0; let autoP = 0; let clickP = 1;
         let btcBalance = parseFloat(localStorage.getItem('m_btc')) || 0;
-        let usedPr = JSON.parse(localStorage.getItem('m_pr')) || [];
         let btcPrice = 100000000;
-        let marketMod = 1.0;
+        let isDR = false;
 
-        keys.forEach(k => { let s = parseInt(localStorage.getItem(k)) || 0; if (s > score) score = s; });
-        autoP = parseInt(localStorage.getItem('m_au_final')) || 0;
+        function checkDR() {
+            let d = new Date();
+            if (d.getMonth() === 4 && (d.getDate() === 11 || d.getDate() === 12)) {
+                document.getElementById('dr-banner').style.display = 'block';
+                isDR = true;
+            }
+        }
 
-        // MATRIX
+        function confirmAccess() {
+            let input = document.getElementById('user-login').value.trim();
+            if (input.length < 2) return;
+            userName = input;
+            localStorage.setItem('m_user_name', userName);
+            document.getElementById('login-overlay').style.display = 'none';
+            document.getElementById('main-content').style.filter = 'none';
+            document.getElementById('main-content').style.pointerEvents = 'auto';
+            document.getElementById('display-name').innerText = userName.toUpperCase();
+            loadMaxData(); updateUI();
+        }
+
+        function loadMaxData() {
+            const keys = ['m_sc_final', 'hackerScore', 'm_sc', 'm_score'];
+            keys.forEach(k => { let s = parseInt(localStorage.getItem(k)) || 0; if (s > score) score = s; });
+            autoP = parseInt(localStorage.getItem('m_au_final')) || 0;
+            clickP = parseInt(localStorage.getItem('m_cl_final')) || 1;
+        }
+
+        function fmt(n) {
+            if (n >= 1e9) return (n / 1e9).toFixed(1) + 'Млрд';
+            if (n >= 1e6) return (n / 1e6).toFixed(1) + 'М';
+            if (n >= 1e3) return (n / 1e3).toFixed(1) + 'к';
+            return Math.floor(n);
+        }
+
+        function updateUI() {
+            document.getElementById('score-text').innerText = fmt(score);
+            document.getElementById('auto-val').innerText = fmt(autoP);
+            document.getElementById('click-val').innerText = clickP;
+            document.getElementById('btc-balance').innerText = btcBalance.toFixed(2) + " BTC";
+            document.getElementById('btc-price').innerText = fmt(btcPrice);
+            document.getElementById('lvl-text').innerText = "УРОВЕНЬ: ХАКЕР " + Math.floor(score/100000) + " LVL";
+            
+            if (score >= 1e6) document.getElementById('ach-2').classList.add('unlocked');
+            if (score >= 1e8) { let leg = document.getElementById('ach-legend'); leg.classList.add('unlocked'); leg.innerText = "🔮 ЛЕГЕНДА"; }
+
+            localStorage.setItem('m_sc_final', score);
+            localStorage.setItem('m_au_final', autoP);
+            localStorage.setItem('m_cl_final', clickP);
+            localStorage.setItem('m_btc', btcBalance);
+            drawBoard();
+        }
+
+        function mineData() { score += clickP; updateUI(); }
+        
+        function buy(t) {
+            let cost = isDR ? 0 : (t==='auto' ? 100 : 1000000);
+            if(score >= cost) {
+                score -= cost;
+                if(t==='auto') autoP += 5;
+                if(t==='quant') autoP += 50000;
+                updateUI();
+            }
+        }
+
+        function buyRTX() {
+            let cost = isDR ? 0 : 50000;
+            if(score >= cost) {
+                score -= cost;
+                let r = Math.random()*100;
+                let p = r < 15 ? 5000 : (r < 50 ? 1500 : 500);
+                autoP += p; updateUI();
+            }
+        }
+
+        function buyBTC() { if(score >= btcPrice){ score -= btcPrice; btcBalance += 1; updateUI(); } }
+        function sellBTC() { if(btcBalance >= 1){ btcBalance -= 1; score += btcPrice; updateUI(); } }
+
+        function transferXP() {
+            let name = document.getElementById('target-player').value.trim();
+            let am = parseInt(document.getElementById('transfer-amount').value);
+            if(score >= am && am > 0) {
+                let r = JSON.parse(localStorage.getItem('m_board_final')) || [];
+                let i = r.findIndex(p => p.name.toLowerCase() === name.toLowerCase());
+                if(i !== -1){ score -= am; r[i].score += am; localStorage.setItem('m_board_final', JSON.stringify(r)); updateUI(); }
+            }
+        }
+
+        function drawBoard() {
+            let r = JSON.parse(localStorage.getItem('m_board_final')) || [];
+            let ex = r.findIndex(p => p.name.toLowerCase() === (userName || "").toLowerCase());
+            if(userName) { if(ex !== -1) { if(score > r[ex].score) r[ex].score = score; } else { r.push({name: userName, score: score}); } }
+            r.sort((a,b) => b.score - a.score);
+            localStorage.setItem('m_board_final', JSON.stringify(r.slice(0, 10)));
+            document.getElementById('board').innerHTML = r.map((p, i) => `${i+1}. ${p.name}: ${fmt(p.score)}`).join('<br>');
+        }
+
         const mC = document.getElementById('matrix-canvas'); const mX = mC.getContext('2d');
         mC.width = window.innerWidth; mC.height = window.innerHeight;
         const chars = "0123456789ABCDEF"; const drops = Array(Math.floor(mC.width/16)).fill(1);
@@ -128,88 +217,11 @@
             });
         }
         setInterval(drawM, 33);
-
-        function fmt(n) {
-            if (n >= 1e9) return (n / 1e9).toFixed(1) + 'Млрд';
-            if (n >= 1e6) return (n / 1e6).toFixed(1) + 'М';
-            if (n >= 1e3) return (n / 1e3).toFixed(1) + 'к';
-            return Math.floor(n);
-        }
-
-        function updateUI() {
-            document.getElementById('score-text').innerText = fmt(score);
-            document.getElementById('auto-val').innerText = fmt(autoP);
-            document.getElementById('btc-balance').innerText = btcBalance.toFixed(2) + " BTC";
-            document.getElementById('btc-price').innerText = fmt(btcPrice);
-            document.getElementById('lvl-text').innerText = "ХАКЕР " + Math.floor(score/100000) + " LVL";
-            localStorage.setItem('m_sc_final', score);
-            localStorage.setItem('m_au_final', autoP);
-            localStorage.setItem('m_btc', btcBalance);
-            localStorage.setItem('m_pr', JSON.stringify(usedPr));
-            drawBoard();
-        }
-
-        // БИРЖА
-        setInterval(() => {
-            let d = new Date(); let seed = d.getFullYear() * 1000 + (d.getMonth() + 1) * 100 + d.getDate();
-            let chance = Math.abs(Math.sin(seed + score) * 100);
-            btcPrice = 50000000 + Math.random() * 150000000;
-            let status = document.getElementById('market-status');
-            if (chance < 30) { marketMod = 0.6; status.innerText = "📉 АКЦИЯ: ЦЕНЫ -40%"; status.style.color = "#f0f"; }
-            else { marketMod = 1.0; status.innerText = "🟢 РЫНОК СТАБИЛЕН"; status.style.color = "#0f0"; }
-            updateUI();
-        }, 15000);
-
-        function mineData() { score += clickP; updateUI(); }
-        function buy(t) {
-            if(t==='auto' && score >= 100*marketMod){ score -= 100*marketMod; autoP += 5; }
-            if(t==='quant' && score >= 1e6*marketMod){ score -= 1e6*marketMod; autoP += 50000; }
-            updateUI();
-        }
-
-        function buyBTC() { if(score >= btcPrice){ score -= btcPrice; btcBalance += 1; updateUI(); } }
-        function sellBTC() { if(btcBalance >= 1){ btcBalance -= 1; score += btcPrice; updateUI(); } }
-
-        function usePromo() {
-            let val = document.getElementById('promo-input').value.toUpperCase().trim();
-            let msg = document.getElementById('promo-msg');
-            if(usedPr.includes(val)){ msg.innerText="❌ УЖЕ БЫЛО"; return; }
-            if(val==="MISHA2025"){ score+=50000; usedPr.push(val); msg.innerText="✅ +50к XP!"; }
-            else if(val==="EGOR"){ score+=100000; usedPr.push(val); msg.innerText="✅ +100к от Егора!"; }
-            else if(val==="HACKER"){ score+=1000000; usedPr.push(val); msg.innerText="✅ МИЛЛИОН XP!"; }
-            else { msg.innerText="❌ ОШИБКА"; }
-            document.getElementById('promo-input').value = ""; updateUI();
-        }
-
-        function transferXP() {
-            let target = document.getElementById('target-player').value.trim();
-            let amount = parseInt(document.getElementById('transfer-amount').value);
-            let status = document.getElementById('transfer-status');
-            if(score < amount) { status.innerText="❌ Мало XP"; return; }
-            let recs = JSON.parse(localStorage.getItem('m_board_final')) || [];
-            let idx = recs.findIndex(r => r.name.toLowerCase() === target.toLowerCase());
-            if(idx !== -1){ score -= amount; recs[idx].score += amount; localStorage.setItem('m_board_final', JSON.stringify(recs)); status.innerText="✅ Успешно!"; updateUI(); }
-            else { status.innerText="❌ Игрок не в ТОПе"; }
-        }
-
-        function saveRec() {
-            let n = document.getElementById('my-name').value.trim() || "Аноним";
-            let recs = JSON.parse(localStorage.getItem('m_board_final')) || [];
-            let ex = recs.findIndex(r => r.name.toLowerCase() === n.toLowerCase());
-            if (ex !== -1) { if (score > recs[ex].score) recs[ex].score = score; }
-            else { recs.push({ name: n, score: score }); }
-            recs.sort((a,b) => b.score - a.score);
-            localStorage.setItem('m_board_final', JSON.stringify(recs.slice(0, 10)));
-            updateUI();
-        }
-
-        function drawBoard() {
-            let recs = JSON.parse(localStorage.getItem('m_board_final')) || [];
-            document.getElementById('board').innerHTML = recs.map((r, i) => `${i+1}. ${r.name}: ${fmt(r.score)}`).join('<br>');
-        }
-
         setInterval(() => { if(autoP > 0){ score += autoP; updateUI(); } }, 1000);
-        updateUI();
+        setInterval(() => { btcPrice = 50000000 + Math.random() * 150000000; updateUI(); }, 15000);
+        
+        checkDR();
+        if (userName) { document.getElementById('user-login').value = userName; confirmAccess(); }
     </script>
 </body>
 </html>
