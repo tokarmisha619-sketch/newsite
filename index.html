@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>КИБЕР-ЦЕНТР МИШИ: ПОЛНАЯ ВЕРСИЯ</title>
+    <title>КИБЕР-ЦЕНТР МИШИ: SUPER COMPUTER EDITION</title>
     <style>
         body { font-family: 'Courier New', Courier, monospace; line-height: 1.6; padding: 20px; background-color: #000; color: #00ff00; margin: 0; overflow-x: hidden; }
         #matrix-canvas { position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: -1; opacity: 0.3; }
@@ -14,76 +14,91 @@
         #click-btn:active { transform: scale(0.9); }
         .shop-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 10px; }
         .upgrade-card { background: rgba(0,0,0,0.5); border: 1px solid #00ff00; padding: 10px; border-radius: 5px; display: flex; flex-direction: column; justify-content: space-between; }
-        button { background: #00ff00; color: #000; border: none; padding: 8px; font-weight: bold; cursor: pointer; border-radius: 5px; }
+        button { background: #00ff00; color: #000; border: none; padding: 8px; font-weight: bold; cursor: pointer; border-radius: 5px; text-transform: uppercase; }
         button:disabled { background: #555 !important; cursor: not-allowed; opacity: 0.5; }
-        .wiki-section { background: #1a1a1a; padding: 20px; border-radius: 8px; margin-top: 20px; border: 1px solid #444; height: 350px; overflow-y: scroll; text-align: justify; }
-        input { background: #000; color: #00ff00; border: 1px solid #00ff00; padding: 8px; border-radius: 4px; font-family: monospace; outline: none; }
+        .wiki-section { background: #1a1a1a; padding: 20px; border-radius: 8px; margin-top: 20px; border: 1px solid #444; height: 300px; overflow-y: scroll; text-align: justify; }
+        .wiki-section::-webkit-scrollbar { width: 10px; }
+        .wiki-section::-webkit-scrollbar-thumb { background: #00ff00; border-radius: 5px; }
         hr { border: 0; border-top: 1px solid #444; margin: 10px 0; }
+        .ach-card { border: 1px solid #444; padding: 5px; font-size: 0.65em; opacity: 0.2; transition: 0.5s; border-radius: 5px; text-align: center; font-weight: bold; }
+        .ach-card.unlocked { opacity: 1; border-color: #ffcc00; box-shadow: 0 0 8px #ffcc00; background: rgba(255,204,0,0.1); color: #fff; }
+        #ach-legend.unlocked { border-color: #ff00ff !important; box-shadow: 0 0 15px #ff00ff !important; background: rgba(255,0,255,0.2) !important; color: #ff00ff !important; }
+        footer { margin-top: 30px; text-align: center; font-size: 0.9em; border-top: 1px solid #00ff00; padding-top: 10px; }
+        .names { color: #0080ff; font-weight: bold; }
     </style>
 </head>
 <body>
     <canvas id="matrix-canvas"></canvas>
     <div class="container">
-        <h1>ХАКЕРСКИЙ ШТАБ: МИША, ИГНАТ, КИРИЛЛ</h1>
+        <h1>ХАКЕРСКИЙ ШТАБ МИШИ</h1>
 
-        <!-- ДОБЫЧА -->
         <div class="box">
             <h2 id="score-text" style="font-size: 3em; margin: 0;">0</h2>
-            <p id="lvl-text" style="color: #ffcc00; font-weight: bold;">Статус: Новичок</p>
+            <p id="lvl-text" style="color: #ffcc00; font-weight: bold;">ХАКЕР 0 LVL</p>
             <button onclick="mineData()" id="click-btn">⚡</button>
             <p>Клик: +<span id="click-val">1</span> | Авто: +<span id="auto-val">0</span>/сек</p>
-            <div id="market-status" style="font-size: 0.8em; padding: 5px; border-radius: 5px;">Биржа...</div>
         </div>
 
-        <!-- ПРОМОКОДЫ -->
-        <div class="box" style="border-color: #0080ff;">
-            <h4 style="color: #0080ff; margin: 0 0 10px 0;">🔑 ПРОМОКОД</h4>
-            <input type="text" id="promo-input" placeholder="Код..." style="width: 50%;">
-            <button onclick="usePromo()" style="background: #0080ff; color: white;">ОК</button>
-            <p id="promo-msg" style="font-size: 0.7em; margin-top: 5px;"></p>
-        </div>
-
-        <!-- МАГАЗИН -->
         <div class="box" style="border-color: #ff00ff;">
-            <h3 style="color: #ff00ff; margin: 0;">📦 МАГАЗИН И КЕЙСЫ</h3>
+            <h3>📦 МАГАЗИН И БУСТЫ</h3>
             <div class="shop-grid">
                 <div class="upgrade-card"><span>🔥 Софт (+1 клик)</span><p id="cost-click">--</p><button id="btn-click" onclick="buy('click')">КУПИТЬ</button></div>
                 <div class="upgrade-card"><span>📟 Видеокарта (+5/сек)</span><p id="cost-auto">--</p><button id="btn-auto" onclick="buy('auto')">КУПИТЬ</button></div>
-                <div class="upgrade-card" style="border-color: #00ffff;"><span>🌌 Квантовый ПК</span><p id="cost-quant">--</p><button id="btn-quant" onclick="buy('quant')">+50к/сек</button></div>
-                <div class="upgrade-card" style="border-color: #ff00ff;"><span>🌈 КЕЙС RTX</span><p>Цена: 50к</p><button id="btn-rtx" onclick="buyRTX()">ОТКРЫТЬ</button></div>
+                <div class="upgrade-card" style="border-color: #00ffff; grid-column: span 2;">
+                    <span>🌌 КВАНТОВЫЙ СУПЕРКОМПЬЮТЕР (+50к/сек)</span>
+                    <p id="cost-quant">Цена: 1М</p>
+                    <button id="btn-quant" onclick="buy('quant')">АКТИВИРОВАТЬ</button>
+                </div>
+                <div class="upgrade-card" style="border-color: #ff00ff; grid-column: span 2;">
+                    <span>🌈 КЕЙС RTX (РАНДОМ)</span>
+                    <button id="btn-rtx" onclick="buyRTX()">ОТКРЫТЬ (50к)</button>
+                </div>
             </div>
-            <p id="rtx-msg" style="font-size: 0.8em; color: #ff00ff; margin-top: 10px; font-weight: bold;"></p>
+            <p id="rtx-msg" style="font-size: 0.8em; color: #ff00ff; margin-top: 5px; font-weight: bold;"></p>
         </div>
 
-        <!-- ЭНЦИКЛОПЕДИЯ -->
-        <h2 style="text-align: center;">📕 ПОЛНАЯ БАЗА УГРОЗ</h2>
+        <div class="box" style="border-color: #ffcc00;">
+            <h3>🏆 ДОСТИЖЕНИЯ</h3>
+            <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 5px;">
+                <div id="ach-1" class="ach-card">🤝 СДЕЛКА</div>
+                <div id="ach-2" class="ach-card">💰 МИЛЛИОН</div>
+                <div id="ach-legend" class="ach-card">🔒 ???</div>
+            </div>
+        </div>
+
+        <h2 style="text-align: center;">📕 БАЗА ЗНАНИЙ</h2>
         <div class="wiki-section">
-            <h3 style="color: #00ffff;">НОВИНКИ 2025</h3>
-            <p><strong>• ИИ-Полиморф:</strong> Вирус на нейросетях. Меняет свой код сам, чтобы антивирус его не узнал.</p><hr>
-            <p><strong>• Фейк-Капча:</strong> Крадет пароли, когда ты жмешь кнопку "Я не робот".</p><hr>
-            <p><strong>• Панда-Майнер:</strong> Прячется в картинках животных и тайно добывает крипту.</p><hr>
-            
-            <h3 style="color: #ff0000;">ВСЕ ТИПЫ ВИРУСОВ</h3>
-            <p><strong>1. Трояны:</strong> Маскируются под игры. Открывают доступ хакеру.</p><hr>
-            <p><strong>2. Шифровальщики:</strong> Блокируют файлы и требуют деньги за ключ.</p><hr>
-            <p><strong>3. Майнеры:</strong> Воруют ресурсы ПК для заработка хакера.</p><hr>
-            <p><strong>4. Стиллеры:</strong> За секунду крадут пароли из браузеров и соцсетей.</p><hr>
-            <p><strong>5. Бэкдоры:</strong> Тайный вход в систему для управления твоим ПК.</p><hr>
-            <p><strong>6. Адвари:</strong> Бесконечная реклама и баннеры везде.</p><hr>
-            <p><strong>7. Фишинг:</strong> Сайты-клоны для кражи логинов.</p><hr>
-            <p><strong>8. Руткиты:</strong> Прячутся в самом сердце Windows, их сложно найти.</p><hr>
-            <p><strong>9. Черви:</strong> Сами ползают по интернету и заражают всех.</p><hr>
-            <p><strong>10. Шпионы:</strong> Следят через камеру и записывают звук.</p><hr>
-            <p><strong>11. Бомбы:</strong> Срабатывают в определенную дату и удаляют всё.</p><hr>
-            <p><strong>12. Блокировщики:</strong> Закрывают доступ к рабочему столу.</p>
+            <h3 style="color: #00ffff;">УГРОЗЫ 2025</h3>
+            <p><strong>• ИИ-Полиморф:</strong> Вирус на базе нейросетей, который меняет свой код сам.</p><hr>
+            <p><strong>• Фейк-Капча:</strong> Крадет пароли через кнопку "Я не робот".</p><hr>
+            <p><strong>• Панда-Майнер:</strong> Скрытая добыча крипты в картинках животных.</p><hr>
+            <h3 style="color: #ff0000;">КЛАССИКА</h3>
+            <p><strong>1. Трояны:</strong> Маскируются под игры. 🐴</p><hr>
+            <p><strong>2. Шифровальщики:</strong> Блокируют файлы за выкуп. 🔐</p><hr>
+            <p><strong>3. Майнеры:</strong> Воруют ресурсы ПК хакеру. ⛏️</p><hr>
+            <p><strong>4. Стиллеры:</strong> Крадут пароли за секунду. 🕵️</p>
         </div>
 
         <footer>
-            <p>DEV: <span style="color:#00ff00;">МИША</span> | 2025 EDITION</p>
+            <p>DEVELOPER: <span class="names">МИША</span> | SUPPORT: <span class="names">ИГНАТ, КИРИЛЛ</span></p>
         </footer>
     </div>
 
     <script>
+        // --- УМНОЕ ВОССТАНОВЛЕНИЕ ДАННЫХ ---
+        const keys = ['m_sc_final', 'hackerScore', 'm_sc', 'm_sc_100', 'm_score'];
+        let score = 0; let clickP = 1; let autoP = 0;
+
+        keys.forEach(k => {
+            let s = parseInt(localStorage.getItem(k)) || 0;
+            if (s > score) score = s;
+        });
+        
+        let savedClick = parseInt(localStorage.getItem('m_cl_final')) || parseInt(localStorage.getItem('hackerClick')) || 1;
+        clickP = savedClick;
+        let savedAuto = parseInt(localStorage.getItem('m_au_final')) || parseInt(localStorage.getItem('hackerAuto')) || 0;
+        autoP = savedAuto;
+
         const mC = document.getElementById('matrix-canvas'); const mX = mC.getContext('2d');
         mC.width = window.innerWidth; mC.height = window.innerHeight;
         const chars = "0123456789ABCDEF#$@%"; const drops = Array(Math.floor(mC.width/16)).fill(1);
@@ -97,74 +112,52 @@
         }
         setInterval(drawM, 33);
 
-        let score = parseInt(localStorage.getItem('m_sc')) || 0;
-        let clickP = parseInt(localStorage.getItem('m_cl')) || 1;
-        let autoP = parseInt(localStorage.getItem('m_au')) || 0;
-        let usedPr = JSON.parse(localStorage.getItem('m_pr')) || [];
-        let marketMod = 1.0;
-
         function fmt(n) {
             if (n >= 1000000) return (n / 1000000).toFixed(1) + 'М';
             if (n >= 1000) return (n / 1000).toFixed(1) + 'к';
             return Math.floor(n);
         }
 
-        function updateDaily() {
-            let d = new Date(); let seed = d.getFullYear() * 1000 + (d.getMonth() + 1) * 100 + d.getDate();
-            let chance = Math.abs(Math.sin(seed) * 100);
-            let status = document.getElementById('market-status');
-            if (chance < 30) { marketMod = 0.6; status.innerText = "📉 АКЦИЯ: -40%"; status.style.color = "#ff00ff"; }
-            else { marketMod = 1.0; status.innerText = "🟢 РЫНОК СТАБИЛЕН"; status.style.color = "#00ff00"; }
-            updateUI();
-        }
-
-        function getPrice(base, count, growth) { return Math.floor(base * Math.pow(growth, count) * marketMod); }
-
         function updateUI() {
-            let pCl = getPrice(50, clickP - 1, 1.25); let pAu = getPrice(100, autoP/5, 1.2); let pQ = Math.floor(1000000 * marketMod);
+            let pCl = Math.floor(50 * Math.pow(1.2, clickP - 1));
+            let pAu = Math.floor(100 * Math.pow(1.15, autoP/5));
             document.getElementById('score-text').innerText = fmt(score);
-            document.getElementById('click-val').innerText = clickP; document.getElementById('auto-val').innerText = fmt(autoP);
+            document.getElementById('click-val').innerText = clickP;
+            document.getElementById('auto-val').innerText = fmt(autoP);
             document.getElementById('cost-click').innerText = "Цена: " + fmt(pCl);
             document.getElementById('cost-auto').innerText = "Цена: " + fmt(pAu);
-            document.getElementById('cost-quant').innerText = "Цена: " + fmt(pQ);
+            
             document.getElementById('btn-click').disabled = score < pCl;
             document.getElementById('btn-auto').disabled = score < pAu;
-            document.getElementById('btn-quant').disabled = score < pQ;
+            document.getElementById('btn-quant').disabled = score < 1000000;
             document.getElementById('btn-rtx').disabled = score < 50000;
-            let lvl = Math.floor(score / 10000);
-            document.getElementById('lvl-text').innerText = "ХАКЕР " + (lvl > 100 ? "MAX" : lvl) + " LVL";
-            localStorage.setItem('m_sc', score); localStorage.setItem('m_cl', clickP);
-            localStorage.setItem('m_au', autoP); localStorage.setItem('m_pr', JSON.stringify(usedPr));
+
+            if (score >= 1000000) document.getElementById('ach-2').classList.add('unlocked');
+            if (score >= 100000000) {
+                let leg = document.getElementById('ach-legend');
+                leg.classList.add('unlocked'); leg.innerText = "🔮 ЛЕГЕНДА";
+            }
+
+            localStorage.setItem('m_sc_final', score);
+            localStorage.setItem('m_cl_final', clickP);
+            localStorage.setItem('m_au_final', autoP);
         }
 
         function mineData() { score += clickP; updateUI(); }
         function buy(t) {
-            let p = 0;
-            if(t==='click'){ p=getPrice(50,clickP-1,1.25); if(score>=p){score-=p; clickP++;} }
-            if(t==='auto'){ p=getPrice(100,autoP/5,1.2); if(score>=p){score-=p; autoP+=5;} }
-            if(t==='quant'){ p=Math.floor(1000000*marketMod); if(score>=p){score-=p; autoP+=50000;} }
+            if(t==='click'){ let p=Math.floor(50*Math.pow(1.2,clickP-1)); if(score>=p){score-=p; clickP++;} }
+            if(t==='auto'){ let p=Math.floor(100*Math.pow(1.15,autoP/5)); if(score>=p){score-=p; autoP+=5;} }
+            if(t==='quant'){ if(score>=1000000){score-=1000000; autoP+=50000;} }
             updateUI();
         }
-
         function buyRTX() {
             if(score >= 50000) {
-                score -= 50000; let r = Math.random()*100; let win=""; let p=0;
-                if(r<15){ win="RTX 4090"; p=5000; } else if(r<50){ win="RTX 3080"; p=1500; } else { win="RTX 3060"; p=500; }
-                autoP += p; document.getElementById('rtx-msg').innerText = "ВЫПАЛО: " + win + " (+" + p + "/сек)"; updateUI();
+                score -= 50000; let r = Math.random()*100; let p=r<15?5000:(r<50?1500:500);
+                autoP += p; document.getElementById('rtx-msg').innerText = "ВЫПАЛО: +" + p + "/сек"; updateUI();
             }
         }
-
-        function usePromo() {
-            let val = document.getElementById('promo-input').value.toUpperCase().trim();
-            if(usedPr.includes(val)){ document.getElementById('promo-msg').innerText="❌ УЖЕ БЫЛО"; return; }
-            if(val==="MISHA2025"){ score+=50000; reward(val); }
-            else if(val==="HACKER"){ score+=100000; reward(val); }
-            else { document.getElementById('promo-msg').innerText="❌ ОШИБКА"; }
-        }
-        function reward(c) { usedPr.push(c); document.getElementById('promo-msg').innerText="✅ OK!"; updateUI(); }
-
         setInterval(() => { if(autoP > 0){ score += autoP; updateUI(); } }, 1000);
-        updateDaily();
+        updateUI();
     </script>
 </body>
 </html>
