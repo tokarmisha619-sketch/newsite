@@ -1,4 +1,4 @@
-<!DOCTYPE html><html><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0"><title>КИБЕР-ШТАБ: AI EDITION</title><style>
+<!DOCTYPE html><html><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0"><title>КИБЕР-ШТАБ: AI SMART EDITION</title><style>
 body{font-family:monospace;background:#000;color:#0f0;margin:0;padding:10px;overflow-x:hidden}
 #matrix-canvas{position:fixed;top:0;left:0;width:100%;height:100%;z-index:-1;opacity:0.2}
 #login-overlay{position:fixed;top:0;left:0;width:100%;height:100%;background:#000;z-index:1000;display:flex;align-items:center;justify-content:center}
@@ -9,72 +9,46 @@ body{font-family:monospace;background:#000;color:#0f0;margin:0;padding:10px;over
 #click-btn{width:80px;height:80px;border-radius:50%;border:4px solid #0f0;background:#000;color:#0f0;font-size:2em;cursor:pointer;box-shadow:0 0 15px #0f0;margin:10px}
 button{background:#0f0;color:#000;border:none;padding:10px;font-weight:bold;cursor:pointer;border-radius:5px;text-transform:uppercase;width:100%;margin-top:5px}
 input{background:#000;color:#0f0;border:1px solid #0f0;padding:8px;border-radius:4px;width:90%;text-align:center;margin:5px 0;outline:none}
-.wiki-section{background:#111;padding:15px;border:1px solid #444;height:200px;overflow-y:scroll;text-align:left;font-size:0.9em}
+.wiki-section{background:#111;padding:15px;border:1px solid #444;height:200px;overflow-y:scroll;text-align:left;font-size:0.8em}
 .win-notif{position:fixed;top:20%;left:50%;transform:translate(-50%,-50%);background:#000;border:3px solid #ffcc00;padding:20px;z-index:2000;display:none;text-align:center;box-shadow:0 0 30px #ffcc00}
 .mode-btn{width:45%;font-size:0.7em;display:inline-block;border:1px solid #0f0}
 .active-mode{background:#0f0;color:#000;box-shadow:0 0 10px #0f0}
 .gold-nick { color: #ffcc00 !important; font-weight: bold; text-shadow: 0 0 10px #ffcc00; }
-
-/* ИИ ВИДЖЕТ СБОКУ */
-#ai-module {
-    position: fixed; top: 100px; right: 10px; width: 120px;
-    background: rgba(0,20,40,0.9); border: 2px solid #0ff;
-    padding: 10px; border-radius: 10px; color: #0ff;
-    font-size: 0.7em; text-align: center; box-shadow: 0 0 15px #0ff;
-    z-index: 500; animation: float 3s ease-in-out infinite;
-}
+#ai-module { position: fixed; top: 100px; right: 10px; width: 120px; background: rgba(0,20,40,0.9); border: 2px solid #0ff; padding: 10px; border-radius: 10px; color: #0ff; font-size: 0.7em; text-align: center; box-shadow: 0 0 15px #0ff; z-index: 500; animation: float 3s ease-in-out infinite; }
 @keyframes float { 0%,100% {transform: translateY(0);} 50% {transform: translateY(-10px);} }
 </style></head><body><canvas id="matrix-canvas"></canvas>
-
-<!-- ИИ ВИДЖЕТ -->
-<div id="ai-module">
-    <div style="font-weight:bold; margin-bottom:5px;">AI CORE</div>
-    <div id="ai-chat">Инициализация...</div>
-    <div id="ai-status" style="font-size:0.8em; margin-top:5px; color:#555;">IDLE</div>
-</div>
-
+<div id="ai-module"><div style="font-weight:bold; margin-bottom:5px;">AI CORE</div><div id="ai-chat">Жду вопроса...</div><div id="ai-status" style="font-size:0.8em; margin-top:5px; color:#555;">IDLE</div></div>
 <div id="win-popup" class="win-notif"></div>
 
 <div id="admin-modal" style="display:none; position:fixed; top:50%; left:50%; transform:translate(-50%,-50%); background:#111; border:3px solid #0f0; padding:15px; z-index:3000; width:280px; text-align:center; box-shadow:0 0 50px #0f0; border-radius:15px;">
     <h3 style="color:#0f0; margin-top:0;">ROOT: МИША</h3>
-    <button onclick="toggleAI()" style="background:#0ff; color:#000;">🧬 АКТИВИРОВАТЬ ИИ</button>
+    <button onclick="aiTalk()" style="background:#0ff; color:#000;">💬 ПОГОВОРИТЬ С ИИ</button>
+    <button onclick="toggleAI()" style="background:#0ff; color:#000; font-size:10px;">🧬 АВТО-МАЙНИНГ ИИ</button>
+    <hr style="border:0.5px solid #333">
+    <button onclick="getAdminRTX6000()" style="background:#fc0; color:#000; font-size:10px;">🔥 RTX 6000</button>
+    <button onclick="getAdminRTX7000()" style="background:#f0f; color:#fff; font-size:10px;">🌌 RTX 7000</button>
+    <button onclick="getAdminRTX8000()" style="background:#0cf; color:#000; font-size:10px;">👑 RTX 8000</button>
+    <button onclick="getAdminRTX9000()" style="background:linear-gradient(45deg, #f00, #fff); color:#000; font-size:10px;">🚀 RTX 9000</button>
+    <hr style="border:0.5px solid #333">
     <button onclick="setGoldNick()" style="background:#fc0; color:#000;">👑 ЗОЛОТОЙ НИК</button>
     <button onclick="score = 1e100; updateUI()" style="background:#222; color:#fc0;">💰 GOOGLE XP</button>
-    <button onclick="getAdminRTX9000()" style="background:#f00; color:#fff;">🚀 RTX 9000</button>
+    <button onclick="clearLeaderboard()" style="background:#f00; color:#fff; font-size:10px;">🗑️ ОЧИСТИТЬ ТОП</button>
     <button onclick="closeAdmin()" style="margin-top:10px;">ВЫХОД</button>
 </div>
 
 <div id="login-overlay"><div class="login-box"><h2>ENTER LOGIN</h2><input type="text" id="user-login" placeholder="ИМЯ..."><button onclick="confirmAccess()">ВХОД</button></div></div>
 <div id="main-content" class="container">
 <h2 style="text-align:center;margin:0">ШТАБ: <span id="display-name" onclick="openAdminPanel()" style="cursor:pointer;text-decoration:underline">...</span></h2>
-<div class="box">
-    <h1 id="score-text">0</h1>
-    <div><button id="mode-xp" class="mode-btn active-mode" onclick="setMode('xp')">XP</button><button id="mode-btc" class="mode-btn" onclick="setMode('btc')">BTC</button></div>
-    <button onclick="mineData()" id="click-btn">⚡</button>
-    <p id="lvl-text" style="color:#fc0;font-weight:bold;margin:5px">LVL: 0</p>
-    <p style="font-size:0.8em">Авто: +<span id="auto-val">0</span>/сек</p>
-</div>
-
-<div style="display:grid;grid-template-columns:1fr 1fr;gap:10px"><div class="box" style="border-color:#f7931a">
-    <h4>₿ BITCOIN</h4><p id="btc-bal" style="font-size:0.8em">0.0000 BTC</p>
-    <button onclick="buyBTC()" style="background:#f7931a;color:#fff;font-size:0.7em">BUY</button><button onclick="sellBTC()" style="background:#fff;color:#000;font-size:0.7em">SELL</button>
-</div>
+<div class="box"><h1 id="score-text">0</h1><div><button id="mode-xp" class="mode-btn active-mode" onclick="setMode('xp')">XP</button><button id="mode-btc" class="mode-btn" onclick="setMode('btc')">BTC</button></div><button onclick="mineData()" id="click-btn">⚡</button><p id="lvl-text" style="color:#fc0;font-weight:bold;margin:5px">LVL: 0</p><p style="font-size:0.8em">Авто: +<span id="auto-val">0</span>/сек</p></div>
+<div style="display:grid;grid-template-columns:1fr 1fr;gap:10px"><div class="box" style="border-color:#f7931a"><h4>₿ BITCOIN</h4><p id="btc-bal" style="font-size:0.8em">0.0000 BTC</p><button onclick="buyBTC()" style="background:#f7931a;color:#fff;font-size:0.7em">BUY</button><button onclick="sellBTC()" style="background:#fff;color:#000;font-size:0.7em">SELL</button></div>
 <div class="box" style="border-color:#0080ff"><h4>📤 ПЕРЕВОД</h4><input type="text" id="target-p" placeholder="ИМЯ" style="font-size:0.7em"><button onclick="transferXP()" style="background:#0080ff;color:#fff">SEND</button></div></div>
-
-<div class="box"><h3>🛒 МАГАЗИН</h3><div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
-<button onclick="buyRTX()" style="grid-column:span 2;background:#f0f;color:#fff">🌈 КЕЙС RTX</button>
-<button onclick="buyAntenna()" style="grid-column:span 2;background:#0080ff;color:#fff">📡 ТОП АНТЕННА (100МЛРД)</button>
-<button onclick="usePromo()" style="grid-column:span 2;background:#444;color:#0f0">🎁 ПРОМОКОД</button>
-</div></div>
-
+<div class="box"><h3>🛒 МАГАЗИН</h3><div style="display:grid;grid-template-columns:1fr 1fr;gap:10px"><button onclick="buyRTX()" style="grid-column:span 2;background:#f0f;color:#fff">🌈 КЕЙС RTX</button><button onclick="buyAntenna()" style="grid-column:span 2;background:#0080ff;color:#fff">📡 ТОП АНТЕННА (100МЛРД)</button><button onclick="usePromo()" style="grid-column:span 2;background:#444;color:#0f0">🎁 ПРОМОКОД</button></div></div>
 <div class="box" style="border-color:#fc0"><h3>🏆 ТОП-5 ХАКЕРОВ</h3><div id="board" style="text-align:left;font-size:0.9em"></div></div>
-
 <div class="wiki-section"><h3>📕 ЭНЦИКЛОПЕДИЯ (12 ТИПОВ)</h3><p><b>1.Трояны:</b>🐴</p><hr><p><b>12.Блокеры:</b>🚫</p></div>
-<footer style="text-align:center;font-size:0.8em;color:#666">DEV: МИША</footer></div>
+<footer style="text-align:center;font-size:0.8em;color:#666;margin-top:10px;">DEV: МИША | SUP: ЕГОР, ИГНАТ, КИРИЛЛ</footer></div>
 
 <script>
 let score=0,autoP=0,clickP=1,btc=0,mineMode='xp',userName='',isGold=false,aiActive=false;
-
 function loadData(){
     userName = localStorage.getItem('m_user_name') || '';
     isGold = localStorage.getItem('m_gold') === 'true';
@@ -84,83 +58,64 @@ function loadData(){
     clickP = Number(localStorage.getItem('m_cl_final')) || 1;
     btc = parseFloat(localStorage.getItem('m_btc')) || 0;
 }
-
 function confirmAccess(){
-    let i=document.getElementById('user-login').value.trim();
-    if(i.length<2)return;
+    let i=document.getElementById('user-login').value.trim(); if(i.length<2)return;
     userName=i; localStorage.setItem('m_user_name', userName);
     document.getElementById('login-overlay').style.display='none';
-    document.getElementById('main-content').style.filter='none';
-    document.getElementById('main-content').style.pointerEvents='auto';
-    document.getElementById('display-name').innerText=userName.toUpperCase();
-    loadData(); updateUI();
+    document.getElementById('main-content').style.filter='none'; document.getElementById('main-content').style.pointerEvents='auto';
+    document.getElementById('display-name').innerText=userName.toUpperCase(); loadData(); updateUI();
 }
-
-function fmt(n){
-    if(n>=1e100) return "GOOGLE SCORE";
-    if(n>=1e18)return (n/1e18).toFixed(2)+'Квинт';
-    if(n>=1e15)return (n/1e15).toFixed(2)+'Квдр';
-    if(n>=1e12)return (n/1e12).toFixed(1)+'Трлн';
-    if(n>=1e9)return (n/1e9).toFixed(1)+'Млрд';
-    if(n>=1e6)return (n/1e6).toFixed(1)+'М';
-    return Math.floor(n);
-}
-
+function fmt(n){ if(n>=1e100) return "GOOGLE SCORE"; if(n>=1e18)return (n/1e18).toFixed(2)+'Квинт'; if(n>=1e15)return (n/1e15).toFixed(2)+'Квдр'; if(n>=1e12)return (n/1e12).toFixed(1)+'Трлн'; if(n>=1e9)return (n/1e9).toFixed(1)+'Млрд'; if(n>=1e6)return (n/1e6).toFixed(1)+'М'; return Math.floor(n); }
 function updateUI(){
-    document.getElementById('score-text').innerText=fmt(score);
-    document.getElementById('auto-val').innerText=fmt(autoP);
-    document.getElementById('btc-bal').innerText=btc.toFixed(4)+" BTC";
-    document.getElementById('lvl-text').innerText="LVL: "+Math.floor(score/1e5);
-    localStorage.setItem('m_sc_final', score); localStorage.setItem('m_au_final', autoP);
-    localStorage.setItem('m_cl_final', clickP); localStorage.setItem('m_btc', btc);
-    localStorage.setItem('m_gold', isGold);
-    if(score >= 1e100) localStorage.setItem('is_google', 'true');
-    else localStorage.setItem('is_google', 'false');
+    document.getElementById('score-text').innerText=fmt(score); document.getElementById('auto-val').innerText=fmt(autoP);
+    document.getElementById('btc-bal').innerText=btc.toFixed(4)+" BTC"; document.getElementById('lvl-text').innerText="LVL: "+Math.floor(score/1e5);
+    localStorage.setItem('m_sc_final', score); localStorage.setItem('m_au_final', autoP); localStorage.setItem('m_cl_final', clickP);
+    localStorage.setItem('m_btc', btc); localStorage.setItem('m_gold', isGold);
+    if(score >= 1e100) localStorage.setItem('is_google', 'true'); else localStorage.setItem('is_google', 'false');
     drawBoard();
 }
-
 function setMode(m){mineMode=m;document.getElementById('mode-xp').classList.toggle('active-mode',m==='xp');document.getElementById('mode-btc').classList.toggle('active-mode',m==='btc')}
 function mineData(){if(mineMode==='xp'){score+=clickP}else{btc+=0.0001*clickP}updateUI()}
-function buyAntenna(){if(score>=1e11){score-=1e11;clickP+=500000;alert("АНТЕННА КУПЛЕНА!");updateUI()}else alert("НУЖНО 100 МЛРД!")}
+function buyAntenna(){if(score>=1e11){score-=1e11;clickP+=500000;alert("АНТЕННА!");updateUI()}else alert("100 МЛРД!")}
 function buyBTC(){if(score>=1e8){score-=1e8;btc+=1;updateUI()}}
 function sellBTC(){if(btc>=1){btc-=1;score+=9e7;updateUI()}}
-function buyRTX(){if(score>=5e4){score-=5e4;let r=Math.random()*100,p=(r<2)?1e5:(r<15)?1e4:500;autoP+=p;showWin("RTX КАРТА",p);updateUI()}}
+function buyRTX(){if(score>=5e4){score-=5e4;let r=Math.random()*100,p=(r<2)?1e5:(r<15)?1e4:500;autoP+=p;showWin("КАРТА RTX",p);updateUI()}}
 function showWin(txt,p){let pop=document.getElementById('win-popup');pop.innerHTML=`<h2>${txt}</h2><p>+${fmt(p)}/сек</p><button onclick="this.parentElement.style.display='none'">OK</button>`;pop.style.display='block'}
 function usePromo(){if(prompt("КОД:")==="MISHA2024"){score+=1e6;updateUI()}}
 function transferXP(){let t=document.getElementById('target-p').value.trim();if(score>=1e7){score-=1e7;alert("ОК!");updateUI()}}
 function openAdminPanel(){if(prompt("PASS:")==="misha777")document.getElementById('admin-modal').style.display='block'}
+function getAdminRTX6000(){autoP+=1e10;showWin("RTX 6000", 1e10);updateUI()}
+function getAdminRTX7000(){autoP+=5e10;showWin("RTX 7000", 5e10);updateUI()}
+function getAdminRTX8000(){autoP+=1e18;showWin("RTX 8000", 1e18);updateUI()}
 function getAdminRTX9000(){autoP+=1e20;showWin("🚀 RTX 9000",1e20);updateUI()}
 function setGoldNick(){isGold = !isGold; updateUI();}
 function closeAdmin(){document.getElementById('admin-modal').style.display='none'}
+function clearLeaderboard(){if(confirm("Очистить ТОП?")){localStorage.removeItem('m_board_final');drawBoard();alert("ОЧИЩЕНО!");}}
 
-// ИИ ФУНКЦИИ
-const aiPhrases = ["Взламываю...", "Майним XP", "Система ок", "Миша ТОП", "Ищу баги", "Биткоины растут"];
-setInterval(() => {
-    document.getElementById('ai-chat').innerText = aiPhrases[Math.floor(Math.random()*aiPhrases.length)];
-    if(aiActive) { score += clickP; updateUI(); }
-}, 3000);
-
-function toggleAI() {
-    aiActive = !aiActive;
-    document.getElementById('ai-status').innerText = aiActive ? "WORKING..." : "IDLE";
-    document.getElementById('ai-status').style.color = aiActive ? "#0ff" : "#555";
+// ТЕПЕРЬ ИИ УМНЫЙ
+function aiTalk() {
+    let msg = prompt("ВАШ ВОПРОС К ИИ:").toLowerCase();
+    if(!msg) return;
+    let response = "";
+    if(msg.includes("миша")) response = "Миша — мой создатель и лучший хакер! 👑";
+    else if(msg.includes("привет") || msg.includes("ку")) response = "Приветствую! Система готова к взлому. 🤖";
+    else if(msg.includes("как дела")) response = "Майню биткоины и анализирую защиту. Всё супер! ⚡";
+    else if(msg.includes("взломай")) response = "Проникновение в сеть... Доступ разрешен! 🛠️";
+    else if(msg.includes("кто лучший")) response = "Конечно ты, Миша! 🏆";
+    else response = "Интересный вопрос... Мои нейросети думают, что ты гений!";
+    document.getElementById('ai-chat').innerText = response;
+    alert("ИИ: " + response);
 }
+
+setInterval(() => { if(aiActive) { score += clickP; updateUI(); } }, 3000);
+function toggleAI() { aiActive = !aiActive; document.getElementById('ai-status').innerText = aiActive ? "WORKING..." : "IDLE"; document.getElementById('ai-status').style.color = aiActive ? "#0ff" : "#555"; }
 
 function drawBoard(){
     let r=JSON.parse(localStorage.getItem('m_board_final'))||[];
-    if(userName){
-        let ex=r.findIndex(p=>p.name===userName);
-        if(ex!==-1){r[ex].score=Math.max(r[ex].score,score); r[ex].gold = isGold;}
-        else{r.push({name:userName,score:score,gold:isGold})}
-    }
-    r.sort((a,b)=>b.score-a.score);let t5=r.slice(0,5);
-    localStorage.setItem('m_board_final',JSON.stringify(r));
-    document.getElementById('board').innerHTML=t5.map((p,i)=>{
-        let cls = p.gold ? 'class="gold-nick"' : '';
-        return `<span ${cls}>${i+1}. ${p.name}: ${fmt(p.score)}</span>`;
-    }).join('<br>');
+    if(userName){ let ex=r.findIndex(p=>p.name===userName); if(ex!==-1){r[ex].score=Math.max(r[ex].score,score); r[ex].gold = isGold;} else{r.push({name:userName,score:score,gold:isGold})} }
+    r.sort((a,b)=>b.score-a.score);let t5=r.slice(0,5); localStorage.setItem('m_board_final',JSON.stringify(r));
+    document.getElementById('board').innerHTML=t5.map((p,i)=>{ let cls = p.gold ? 'class="gold-nick"' : ''; return `<span ${cls}>${i+1}. ${p.name}: ${fmt(p.score)}</span>`; }).join('<br>');
 }
-
 const mC=document.getElementById('matrix-canvas'),mX=mC.getContext('2d');mC.width=window.innerWidth;mC.height=window.innerHeight;const drops=Array(Math.floor(mC.width/20)).fill(1);function drawM(){mX.fillStyle="rgba(0,0,0,0.15)";mX.fillRect(0,0,mC.width,mC.height);mX.fillStyle="#0f0";mX.font="15px arial";drops.forEach((y,i)=>{mX.fillText("01"[Math.floor(Math.random()*2)],i*20,y*15);if(y*15>mC.height&&Math.random()>0.98)drops[i]=0;drops[i]++})}
 setInterval(drawM,50);setInterval(()=>{score+=autoP;updateUI()},1000);
 loadData(); if(userName) confirmAccess();
