@@ -3,76 +3,157 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Защита от вирусов — Проект Миши</title>
+    <title>КИБЕР-ЗАЩИТА — Проект Миши</title>
     <style>
-        body { font-family: 'Courier New', Courier, monospace; line-height: 1.6; padding: 20px; background-color: #1a1a1a; color: #00ff00; transition: 0.5s; }
-        .container { max-width: 800px; margin: auto; background: #222; padding: 25px; border: 2px solid #00ff00; border-radius: 12px; box-shadow: 0 0 15px #00ff00; }
-        h1 { color: #00ff00; text-align: center; text-transform: uppercase; font-size: 2em; text-shadow: 2px 2px #000; }
+        body { font-family: 'Courier New', Courier, monospace; line-height: 1.6; padding: 20px; background-color: #000; color: #00ff00; margin: 0; overflow-x: hidden; }
+        
+        /* Стили для матрицы */
+        #matrix-canvas { position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: -1; opacity: 0.3; }
+
+        .container { max-width: 800px; margin: 20px auto; background: rgba(26, 26, 26, 0.9); padding: 25px; border: 2px solid #00ff00; border-radius: 12px; box-shadow: 0 0 20px #00ff00; position: relative; z-index: 1; }
+        
+        h1 { color: #00ff00; text-align: center; text-transform: uppercase; font-size: 2em; text-shadow: 2px 2px #000; margin-bottom: 20px; }
         h2 { color: #00ff00; border-bottom: 1px solid #00ff00; padding-bottom: 10px; margin-top: 30px; }
-        .warning { background: #330000; padding: 15px; border-radius: 8px; border: 1px solid #ff0000; margin: 20px 0; color: #ff0000; font-weight: bold; }
+        .warning { background: rgba(51, 0, 0, 0.8); padding: 15px; border-radius: 8px; border: 1px solid #ff0000; margin: 20px 0; color: #ff0000; font-weight: bold; text-align: center; }
         
         .wiki-section { background: #1a1a1a; padding: 20px; border-radius: 8px; margin-top: 20px; border: 1px solid #444; height: 350px; overflow-y: scroll; text-align: justify; }
         .wiki-section::-webkit-scrollbar { width: 10px; }
         .wiki-section::-webkit-scrollbar-thumb { background: #00ff00; border-radius: 5px; }
 
-        .contact-box { background: #333; padding: 20px; border-radius: 8px; margin-top: 20px; border: 1px dashed #00ff00; text-align: center; }
+        .contact-box { background: #111; padding: 20px; border-radius: 8px; margin-top: 20px; border: 1px dashed #00ff00; text-align: center; }
         .tg-button { display: inline-block; background: #0088cc; color: white; padding: 12px 24px; text-decoration: none; border-radius: 5px; font-weight: bold; margin-top: 10px; transition: 0.3s; }
         .tg-button.disabled { background: #555 !important; cursor: not-allowed; opacity: 0.6; }
         
-        footer { margin-top: 40px; padding-top: 20px; border-top: 1px solid #00ff00; font-size: 1.1em; }
+        footer { margin-top: 40px; padding-top: 20px; border-top: 1px solid #00ff00; font-size: 1.1em; text-align: center; }
         .names { color: #0080ff; font-weight: bold; }
-        button { background: #00ff00; color: black; border: none; padding: 10px 20px; cursor: pointer; font-weight: bold; border-radius: 5px; margin-top: 10px; }
+        
+        button { background: #00ff00; color: black; border: none; padding: 12px 20px; cursor: pointer; font-weight: bold; border-radius: 5px; width: 100%; font-size: 1em; text-transform: uppercase; transition: 0.3s; }
+        button:hover { background: #00cc00; box-shadow: 0 0 10px #00ff00; }
+        
         #timer { color: #ffcc00; font-size: 0.9em; margin-top: 5px; display: none; }
+        hr { border: 0; border-top: 1px solid #444; margin: 15px 0; }
+
+        /* Полоска загрузки */
+        #progress-container { width: 100%; background: #333; height: 12px; margin-top: 15px; display: none; border-radius: 6px; overflow: hidden; border: 1px solid #00ff00; }
+        #progress-bar { width: 0%; height: 100%; background: #00ff00; box-shadow: 0 0 10px #00ff00; }
     </style>
 </head>
 <body>
+
+    <!-- Холст для матрицы -->
+    <canvas id="matrix-canvas"></canvas>
+
     <div class="container">
-        <h1>КИБЕР-ЗАЩИТА: МИША, ИГНАТ И КИРИЛЛ</h1>
+        <h1>КРАСНАЯ УГРОЗА: МИША, ИГНАТ И КИРИЛЛ</h1>
         
         <div class="warning">
-            ВНИМАНИЕ: База данных угроз обновлена. Система под защитой команды Миши.
+            СИСТЕМА БЕЗОПАСНОСТИ АКТИВИРОВАНА
         </div>
 
-        <button onclick="checkSystem()">Сканировать систему</button>
-        <p id="status">Статус: Ожидание...</p>
+        <div style="background: rgba(0,0,0,0.5); padding: 15px; border-radius: 8px; border: 1px solid #00ff00;">
+            <button onclick="checkSystem()" id="scan-btn">ЗАПУСТИТЬ СКАНЕР</button>
+            <div id="progress-container">
+                <div id="progress-bar"></div>
+            </div>
+            <p id="status" style="text-align: center; margin-top: 10px;">Статус: Готов к работе</p>
+        </div>
 
-        <h2>ПОЛНАЯ ЭНЦИКЛОПЕДИЯ ВИРУСОВ</h2>
+        <h2>БАЗА ЗНАНИЙ</h2>
         <div class="wiki-section">
-            <p><strong>Вирус</strong> — это вредоносный код, который ломает систему или ворует данные. Вот основные типы:</p>
-            <h3>1. Трояны</h3><p>Маскируются под игры или полезные программы. Дают хакеру доступ к твоему ПК.</p>
-            <h3>2. Шифровальщики</h3><p>Блокируют все файлы и требуют деньги (выкуп). Крайне опасны!</p>
-            <h3>3. Майнеры</h3><p>Грузят видеокарту на 100%, чтобы зарабатывать деньги хакеру. Комп начинает сильно тормозить.</p>
-            <h3>4. Стиллеры</h3><p>Воруют пароли от Дискорда, ТГ, игр и банковских карт за одну секунду.</p>
-            <h3>5. Черви</h3><p>Сами ползают по интернету и заражают всех подряд без твоего ведома.</p>
-            <p><strong>СОВЕТ ОТ МИШИ:</strong> Видишь файл .exe там, где должна быть картинка? УДАЛЯЙ!</p>
+            <p><strong>Вирус</strong> — вредоносный код. Основные угрозы:</p>
+            <h3>1. Трояны 🐴</h3><p>Прячутся внутри обычных программ.</p>
+            <h3>2. Шифровальщики 🔐</h3><p>Требуют деньги за возврат файлов.</p>
+            <h3>3. Майнеры ⛏️</h3><p>Воруют мощность твоего ПК.</p>
+            <p><strong>СОВЕТ:</strong> Никогда не отключай антивирус по просьбе из интернета!</p>
+        </div>
+
+        <h2 style="color: #ffcc00; border-color: #ffcc00;">ЛЕГЕНДАРНЫЕ ВИРУСЫ (ТОП-10)</h2>
+        <div class="wiki-section" style="border-color: #ffcc00;">
+            <p><strong>1. Creeper (1971) 👻</strong> — Первый в истории.</p><hr>
+            <p><strong>2. Brain (1986) 🧠</strong> — Первый для ПК.</p><hr>
+            <p><strong>3. Morris Worm (1988) 🐛</strong> — Уложил сеть ARPANET.</p><hr>
+            <p><strong>4. Chernobyl (1998) ☢️</strong> — Сжигал "железо".</p><hr>
+            <p><strong>5. ILOVEYOU (2000) ❤️</strong> — Самый романтичный и опасный.</p>
         </div>
 
         <div class="contact-box">
-            <h2>СВЯЗЬ С АВТОРОМ</h2>
-            <p>Есть вопрос? Пиши Мише в Telegram:</p>
-            <!-- ВПИШИ СВОЙ НОМЕР ВМЕСТО 380XXXXXXXXX НИЖЕ -->
-            <a href="https://t.me" id="tg-link" target="_blank" class="tg-button" onclick="activateAntiSpam(event)">ОТПРАВИТЬ ОТЧЕТ В TG</a>
-            <p id="timer">Защита от спама: <span id="seconds">30</span> сек.</p>
-            <p style="font-size: 0.8em; margin-top: 10px; color: #888;">Связь по номеру: +380980068421</p>
+            <h2>ОТЧЕТ ХАКЕРУ</h2>
+            <a href="https://t.me" id="tg-link" target="_blank" class="tg-button" onclick="activateAntiSpam(event)">СВЯЗАТЬСЯ В TELEGRAM</a>
+            <p id="timer">Защита от спама: <span id="seconds">10</span> сек.</p>
         </div>
 
-        <button onclick="toggleTheme()" style="margin-top: 20px;">ТЕМНЫЙ/СВЕТЛЫЙ РЕЖИМ</button>
-
         <footer>
-            <p><strong>РАЗРАБОТЧИК:</strong> <span class="names">Миша</span></p>
-            <p><strong>ПОДДЕРЖКА:</strong> <span class="names">Игнат Кипоть, Кирилл</span></p>
+            <p>DEVELOPER: <span class="names">Миша</span> | SUPPORT: <span class="names">Игнат, Кирилл</span></p>
         </footer>
     </div>
 
     <script>
+        // СКРИПТ МАТРИЦЫ
+        const canvas = document.getElementById('matrix-canvas');
+        const ctx = canvas.getContext('2d');
+
+        canvas.width = window.innerWidth;
+        canvas.height = window.innerHeight;
+
+        const characters = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789@#$%^&*()*&^";
+        const fontSize = 16;
+        const columns = canvas.width / fontSize;
+        const drops = [];
+
+        for (let x = 0; x < columns; x++) drops[x] = 1;
+
+        function drawMatrix() {
+            ctx.fillStyle = "rgba(0, 0, 0, 0.05)";
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+            ctx.fillStyle = "#0F0";
+            ctx.font = fontSize + "px arial";
+
+            for (let i = 0; i < drops.length; i++) {
+                const text = characters.charAt(Math.floor(Math.random() * characters.length));
+                ctx.fillText(text, i * fontSize, drops[i] * fontSize);
+                if (drops[i] * fontSize > canvas.height && Math.random() > 0.975) drops[i] = 0;
+                drops[i]++;
+            }
+        }
+        setInterval(drawMatrix, 33);
+
+        // СКРИПТ СКАНЕРА
+        function checkSystem() {
+            let status = document.getElementById('status');
+            let btn = document.getElementById('scan-btn');
+            let pContainer = document.getElementById('progress-container');
+            let pBar = document.getElementById('progress-bar');
+            
+            btn.disabled = true;
+            pContainer.style.display = "block";
+            let width = 0;
+            
+            let interval = setInterval(() => {
+                if (width >= 100) {
+                    clearInterval(interval);
+                    status.innerHTML = "✅ ВИРУСОВ НЕ ОБНАРУЖЕНО. МИША КОНТРОЛИРУЕТ СИТУАЦИЮ.";
+                    status.style.color = "#00ff00";
+                    btn.disabled = false;
+                } else {
+                    width++;
+                    pBar.style.width = width + "%";
+                    status.innerHTML = "АНАЛИЗ ДАННЫХ: " + width + "%";
+                    status.style.color = "#ffcc00";
+                }
+            }, 40);
+        }
+
+        // ТАЙМЕР
         function activateAntiSpam(event) {
+            const waitTime = 10;
             const link = document.getElementById('tg-link');
             const timerText = document.getElementById('timer');
             const secondsSpan = document.getElementById('seconds');
             if (link.classList.contains('disabled')) { event.preventDefault(); return; }
             link.classList.add('disabled');
             timerText.style.display = 'block';
-            let timeLeft = 30;
+            let timeLeft = waitTime;
+            secondsSpan.innerText = timeLeft;
             const countdown = setInterval(() => {
                 timeLeft--;
                 secondsSpan.innerText = timeLeft;
@@ -80,25 +161,8 @@
                     clearInterval(countdown);
                     link.classList.remove('disabled');
                     timerText.style.display = 'none';
-                    secondsSpan.innerText = 30;
                 }
             }, 1000);
-        }
-
-        function checkSystem() {
-            let status = document.getElementById('status');
-            status.innerHTML = "ИДЕТ ПРОВЕРКА...";
-            setTimeout(() => {
-                status.innerHTML = "✅ ВИРУСОВ НЕТ. ТЫ ПОД ЗАЩИТОЙ КОМАНДЫ МИШИ!";
-                status.style.color = "#00ff00";
-            }, 2500);
-        }
-
-        function toggleTheme() {
-            let body = document.body;
-            let isDark = (body.style.backgroundColor === "rgb(26, 26, 26)" || body.style.backgroundColor === "");
-            body.style.backgroundColor = isDark ? "#ffffff" : "#1a1a1a";
-            body.style.color = isDark ? "#333333" : "#00ff00";
         }
     </script>
 </body>
