@@ -1,227 +1,43 @@
-<!DOCTYPE html>
-<html lang="ru">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>КИБЕР-ЦЕНТР МИШИ: FULL & DR EDITION</title>
-    <style>
-        body { font-family: 'Courier New', Courier, monospace; line-height: 1.6; padding: 20px; background-color: #000; color: #00ff00; margin: 0; overflow-x: hidden; }
-        #matrix-canvas { position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: -1; opacity: 0.3; }
-        #login-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #000; z-index: 100; display: flex; align-items: center; justify-content: center; }
-        .login-box { border: 2px solid #00ff00; padding: 30px; border-radius: 12px; box-shadow: 0 0 20px #00ff00; text-align: center; background: #000; }
-        #main-content { filter: blur(15px); transition: 1s; pointer-events: none; }
-        .container { max-width: 800px; margin: 20px auto; background: rgba(10, 10, 10, 0.95); padding: 25px; border: 2px solid #00ff00; border-radius: 12px; position: relative; z-index: 1; }
-        .box { background: rgba(0,255,0,0.05); padding: 15px; border-radius: 8px; border: 1px double #00ff00; margin-top: 15px; text-align: center; }
-        #click-btn { width: 90px; height: 90px; border-radius: 50%; border: 4px solid #00ff00; background: #000; color: #00ff00; font-size: 2em; cursor: pointer; transition: 0.1s; outline: none; }
-        button { background: #00ff00; color: #000; border: none; padding: 8px; font-weight: bold; cursor: pointer; border-radius: 5px; text-transform: uppercase; }
-        input { background: #000; color: #00ff00; border: 1px solid #00ff00; padding: 10px; border-radius: 4px; font-family: monospace; outline: none; margin: 5px 0; width: 80%; text-align: center; }
-        #dr-banner { display: none; background: linear-gradient(45deg, #ff00ff, #00ffff); color: white; padding: 15px; text-align: center; font-weight: bold; border-radius: 8px; margin-bottom: 15px; border: 2px solid white; animation: neon 1.5s ease-in-out infinite alternate; }
-        .wiki-section { background: #1a1a1a; padding: 20px; border-radius: 8px; margin-top: 20px; border: 1px solid #444; height: 250px; overflow-y: scroll; text-align: justify; }
-        .ach-card { border: 1px solid #444; padding: 5px; font-size: 0.65em; opacity: 0.2; border-radius: 5px; text-align: center; }
-        .ach-card.unlocked { opacity: 1; border-color: #ffcc00; color: #fff; box-shadow: 0 0 10px #ffcc00; }
-        footer { margin-top: 30px; text-align: center; font-size: 0.9em; border-top: 1px solid #00ff00; padding-top: 10px; }
-        @keyframes neon { from { box-shadow: 0 0 5px #ff00ff; } to { box-shadow: 0 0 20px #00ffff; } }
-    </style>
-</head>
-<body>
-    <canvas id="matrix-canvas"></canvas>
-    <div id="login-overlay"><div class="login-box"><h2>ID CONFIRMATION</h2><input type="text" id="user-login" placeholder="ВАШЕ ИМЯ..."><br><button onclick="confirmAccess()">ВХОД</button></div></div>
-
-    <div id="main-content" class="container">
-        <div id="dr-banner">🎂 ПРАЗДНИК ЕГОРА (До 13 мая) 🎂<br>ВСЕ БУСТЫ БЕСПЛАТНЫ! Код: EGOR_DR</div>
-        
-        <h1>СИСТЕМА: <span id="display-name">...</span></h1>
-
-        <!-- КЛИКЕР -->
-        <div class="box">
-            <h2 id="score-text" style="font-size: 3em; margin: 0;">0</h2>
-            <p id="lvl-text" style="color: #ffcc00; font-weight: bold;">ХАКЕР 0 LVL</p>
-            <button onclick="mineData()" id="click-btn">⚡</button>
-            <p>Авто: +<span id="auto-val">0</span>/сек | Клик: +<span id="click-val">1</span></p>
-            <p id="ant-status" style="font-size: 0.8em; color: #00ffff;">📡 Ожидание сигнала...</p>
-        </div>
-
-        <!-- КРИПТО И ПЕРЕВОДЫ -->
-        <div class="box" style="border-color: #f7931a;">
-            <h3 style="color: #f7931a; margin: 0;">₿ BITCOIN ТЕРМИНАЛ</h3>
-            <div id="btc-balance">0.00 BTC</div>
-            <p>Курс: <span id="btc-price">100.0М</span> XP</p>
-            <button onclick="buyBTC()" style="background: #f7931a; color: white;">КУПИТЬ</button>
-            <button onclick="sellBTC()" style="background: white; color: #f7931a;">ПРОДАТЬ</button>
-        </div>
-
-        <div class="box" style="border-color: #fff;">
-            <h3 style="color: #fff; margin: 0;">📤 ПЕРЕДАТЬ XP</h3>
-            <input type="text" id="target-player" placeholder="Имя получателя">
-            <input type="number" id="transfer-amount" placeholder="Сумма">
-            <button onclick="transferXP()">ОТПРАВИТЬ</button>
-        </div>
-
-        <!-- МАГАЗИН -->
-        <div class="box" style="border-color: #ff00ff;">
-            <h3>🛒 МАГАЗИН (АКЦИЯ 100%)</h3>
-            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
-                <div style="border: 1px solid #444; padding: 5px;">
-                    <p style="font-size: 0.7em;">GTX 1070 (+5/с)</p>
-                    <p id="cost-auto" style="color: #ff00ff;">0</p>
-                    <button onclick="buy('auto')">ВЗЯТЬ</button>
-                </div>
-                <div style="border: 1px solid #444; padding: 5px;">
-                    <p style="font-size: 0.7em;">КВАНТ ПК (+50к/с)</p>
-                    <p id="cost-quant" style="color: #ff00ff;">0</p>
-                    <button onclick="buy('quant')">ВЗЯТЬ</button>
-                </div>
-            </div>
-            <button onclick="buyRTX()" style="margin-top: 10px; background: #ff00ff; color: white;">ОТКРЫТЬ КЕЙС RTX (0 XP)</button>
-        </div>
-
-        <!-- ДОСТИЖЕНИЯ -->
-        <div class="box" style="border-color: #ffcc00;">
-            <h3>🏆 ДОСТИЖЕНИЯ</h3>
-            <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 5px;">
-                <div id="ach-1" class="ach-card">🤝 СДЕЛКА</div>
-                <div id="ach-2" class="ach-card">💰 МИЛЛИОН</div>
-                <div id="ach-legend" class="ach-card">🔒 ???</div>
-            </div>
-        </div>
-
-        <!-- ЭНЦИКЛОПЕДИЯ -->
-        <h2 style="text-align: center;">📕 ЭНЦИКЛОПЕДИЯ ВИРУСОВ</h2>
-        <div class="wiki-section">
-            <h3 style="color: #00ffff;">УГРОЗЫ 2025</h3>
-            <p><strong>• ИИ-Полиморф:</strong> Вирус, меняющий код сам.</p><hr>
-            <p><strong>• Фейк-Капча:</strong> Крадет пароли через "Я не робот".</p><hr>
-            <h3>КЛАССИКА</h3>
-            <p><strong>1. Трояны:</strong> Маскируются под игры. 🐴</p><hr>
-            <p><strong>2. Шифровальщики:</strong> Блокируют файлы за выкуп. 🔐</p><hr>
-            <p><strong>3. Майнеры:</strong> Воруют ресурсы ПК хакеру. ⛏️</p>
-        </div>
-
-        <footer>
-            <p>DEV: <span style="color: #0080ff;">МИША</span> | SUPPORT: ЕГОР, ИГНАТ, КИРИЛЛ</p>
-        </footer>
-    </div>
-
-    <script>
-        let userName = localStorage.getItem('m_user_name');
-        let score = 0; let autoP = 0; let clickP = 1;
-        let btcBalance = parseFloat(localStorage.getItem('m_btc')) || 0;
-        let btcPrice = 100000000;
-        let isDR = false;
-
-        function checkDR() {
-            let d = new Date();
-            if (d.getMonth() === 4 && (d.getDate() === 11 || d.getDate() === 12)) {
-                document.getElementById('dr-banner').style.display = 'block';
-                isDR = true;
-            }
-        }
-
-        function confirmAccess() {
-            let input = document.getElementById('user-login').value.trim();
-            if (input.length < 2) return;
-            userName = input;
-            localStorage.setItem('m_user_name', userName);
-            document.getElementById('login-overlay').style.display = 'none';
-            document.getElementById('main-content').style.filter = 'none';
-            document.getElementById('main-content').style.pointerEvents = 'auto';
-            document.getElementById('display-name').innerText = userName.toUpperCase();
-            loadMaxData(); updateUI();
-        }
-
-        function loadMaxData() {
-            const keys = ['m_sc_final', 'hackerScore', 'm_sc', 'm_score'];
-            keys.forEach(k => { let s = parseInt(localStorage.getItem(k)) || 0; if (s > score) score = s; });
-            autoP = parseInt(localStorage.getItem('m_au_final')) || 0;
-            clickP = parseInt(localStorage.getItem('m_cl_final')) || 1;
-        }
-
-        function fmt(n) {
-            if (n >= 1e9) return (n / 1e9).toFixed(1) + 'Млрд';
-            if (n >= 1e6) return (n / 1e6).toFixed(1) + 'М';
-            if (n >= 1e3) return (n / 1e3).toFixed(1) + 'к';
-            return Math.floor(n);
-        }
-
-        function updateUI() {
-            document.getElementById('score-text').innerText = fmt(score);
-            document.getElementById('auto-val').innerText = fmt(autoP);
-            document.getElementById('click-val').innerText = clickP;
-            document.getElementById('btc-balance').innerText = btcBalance.toFixed(2) + " BTC";
-            document.getElementById('btc-price').innerText = fmt(btcPrice);
-            document.getElementById('lvl-text').innerText = "УРОВЕНЬ: ХАКЕР " + Math.floor(score/100000) + " LVL";
-            
-            if (score >= 1e6) document.getElementById('ach-2').classList.add('unlocked');
-            if (score >= 1e8) { let leg = document.getElementById('ach-legend'); leg.classList.add('unlocked'); leg.innerText = "🔮 ЛЕГЕНДА"; }
-
-            localStorage.setItem('m_sc_final', score);
-            localStorage.setItem('m_au_final', autoP);
-            localStorage.setItem('m_cl_final', clickP);
-            localStorage.setItem('m_btc', btcBalance);
-            drawBoard();
-        }
-
-        function mineData() { score += clickP; updateUI(); }
-        
-        function buy(t) {
-            let cost = isDR ? 0 : (t==='auto' ? 100 : 1000000);
-            if(score >= cost) {
-                score -= cost;
-                if(t==='auto') autoP += 5;
-                if(t==='quant') autoP += 50000;
-                updateUI();
-            }
-        }
-
-        function buyRTX() {
-            let cost = isDR ? 0 : 50000;
-            if(score >= cost) {
-                score -= cost;
-                let r = Math.random()*100;
-                let p = r < 15 ? 5000 : (r < 50 ? 1500 : 500);
-                autoP += p; updateUI();
-            }
-        }
-
-        function buyBTC() { if(score >= btcPrice){ score -= btcPrice; btcBalance += 1; updateUI(); } }
-        function sellBTC() { if(btcBalance >= 1){ btcBalance -= 1; score += btcPrice; updateUI(); } }
-
-        function transferXP() {
-            let name = document.getElementById('target-player').value.trim();
-            let am = parseInt(document.getElementById('transfer-amount').value);
-            if(score >= am && am > 0) {
-                let r = JSON.parse(localStorage.getItem('m_board_final')) || [];
-                let i = r.findIndex(p => p.name.toLowerCase() === name.toLowerCase());
-                if(i !== -1){ score -= am; r[i].score += am; localStorage.setItem('m_board_final', JSON.stringify(r)); updateUI(); }
-            }
-        }
-
-        function drawBoard() {
-            let r = JSON.parse(localStorage.getItem('m_board_final')) || [];
-            let ex = r.findIndex(p => p.name.toLowerCase() === (userName || "").toLowerCase());
-            if(userName) { if(ex !== -1) { if(score > r[ex].score) r[ex].score = score; } else { r.push({name: userName, score: score}); } }
-            r.sort((a,b) => b.score - a.score);
-            localStorage.setItem('m_board_final', JSON.stringify(r.slice(0, 10)));
-            document.getElementById('board').innerHTML = r.map((p, i) => `${i+1}. ${p.name}: ${fmt(p.score)}`).join('<br>');
-        }
-
-        const mC = document.getElementById('matrix-canvas'); const mX = mC.getContext('2d');
-        mC.width = window.innerWidth; mC.height = window.innerHeight;
-        const chars = "0123456789ABCDEF"; const drops = Array(Math.floor(mC.width/16)).fill(1);
-        function drawM() {
-            mX.fillStyle = "rgba(0,0,0,0.05)"; mX.fillRect(0,0,mC.width,mC.height);
-            mX.fillStyle = "#0F0"; mX.font = "16px arial";
-            drops.forEach((y, i) => {
-                mX.fillText(chars[Math.floor(Math.random()*chars.length)], i*16, y*16);
-                if (y*16 > mC.height && Math.random() > 0.975) drops[i] = 0; drops[i]++;
-            });
-        }
-        setInterval(drawM, 33);
-        setInterval(() => { if(autoP > 0){ score += autoP; updateUI(); } }, 1000);
-        setInterval(() => { btcPrice = 50000000 + Math.random() * 150000000; updateUI(); }, 15000);
-        
-        checkDR();
-        if (userName) { document.getElementById('user-login').value = userName; confirmAccess(); }
-    </script>
-</body>
-</html>
+<!DOCTYPE html><html><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0"><title>КИБЕР-ШТАБ: МАКСИМУМ</title><style>
+body{font-family:monospace;padding:20px;background:#000;color:#0f0;margin:0;overflow-x:hidden}
+#matrix-canvas{position:fixed;top:0;left:0;width:100%;height:100%;z-index:-1;opacity:0.3}
+#login-overlay{position:fixed;top:0;left:0;width:100%;height:100%;background:#000;z-index:100;display:flex;align-items:center;justify-content:center}
+.login-box{border:2px solid #0f0;padding:20px;border-radius:12px;text-align:center;background:#000;box-shadow:0 0 20px #0f0}
+#main-content{filter:blur(15px);pointer-events:none;transition:1s}
+.container{max-width:800px;margin:20px auto;background:rgba(10,10,10,.95);padding:20px;border:2px solid #0f0;border-radius:12px}
+.box{background:rgba(0,255,0,.05);padding:15px;border-radius:8px;border:1px double #0f0;margin-top:15px;text-align:center}
+#click-btn{width:80px;height:80px;border-radius:50%;border:4px solid #0f0;background:#000;color:#0f0;font-size:2em;cursor:pointer;outline:none}
+button{background:#0f0;color:#000;border:none;padding:8px;font-weight:bold;cursor:pointer;border-radius:5px;text-transform:uppercase;width:100%}
+input{background:#000;color:#0f0;border:1px solid #0f0;padding:8px;border-radius:4px;outline:none;margin:5px 0;width:80%;text-align:center}
+.wiki-section{background:#1a1a1a;padding:15px;border-radius:8px;margin-top:20px;border:1px solid #444;height:250px;overflow-y:scroll;font-size:.85em}
+#dr-banner{display:none;background:linear-gradient(45deg,#f0f,#0ff);color:#fff;padding:10px;text-align:center;font-weight:bold;border-radius:8px;margin-bottom:10px;border:2px solid #fff}
+</style></head><body><canvas id="matrix-canvas"></canvas>
+<div id="login-overlay"><div class="login-box"><h2>ID REQUIRED</h2><input type="text" id="user-login" placeholder="LOGIN..."><br><button onclick="confirmAccess()">ВХОД</button></div></div>
+<div id="main-content" class="container"><div id="dr-banner">🎂 ДР ЕГОРА! ВСЁ БЕСПЛАТНО! Код: EGOR_DR</div>
+<h1>ШТАБ: <span id="display-name">...</span></h1>
+<div class="box"><h2 id="score-text">0</h2><p id="lvl-text" style="color:#fc0">LVL: 0</p><button onclick="mineData()" id="click-btn">⚡</button><p>Авто: +<span id="auto-val">0</span>/сек | Клик: +<span id="click-val">1</span></p><p id="ant-msg" style="font-size:.8em;color:#0ff">📡 Поиск сигнала...</p></div>
+<div style="display:grid;grid-template-columns:1fr 1fr;gap:10px"><div class="box" style="border-color:#0080ff"><h3>🔑 ПРОМО</h3><input type="text" id="promo-input" placeholder="КОД"><button onclick="usePromo()">OK</button></div>
+<div class="box" style="border-color:#fff"><h3>📤 ПЕРЕВОД</h3><input type="text" id="target-p" placeholder="ИМЯ"><input type="number" id="trans-am" placeholder="XP"><button onclick="transferXP()">SEND</button></div></div>
+<div class="box" style="border-color:#f0f"><h3>🛒 МАГАЗИН</h3><div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
+<button onclick="buy('ant')">📡 АНТЕННА (10М)</button><button onclick="buy('auto')">GTX 1070 (100)</button><button onclick="buy('quant')" style="grid-column:span 2">🌌 КВАНТ ПК (1М)</button>
+<button onclick="buyRTX()" style="grid-column:span 2;background:#f0f;color:#fff">🌈 КЕЙС RTX (50к)</button></div><p id="rtx-msg" style="color:#f0f;font-size:.8em;margin-top:5px"></p></div>
+<div class="box" style="border-color:#fc0"><h3>🏆 ТОП ИГРОКОВ</h3><div id="board" style="text-align:left;font-size:.8em"></div></div>
+<div class="wiki-section"><h3>📕 ЭНЦИКЛОПЕДИЯ (12 ТИПОВ)</h3><p><b>1.Трояны:</b> Игры-ловушки.🐴</p><hr><p><b>2.Шифровальщики:</b> Выкуп.🔐</p><hr><p><b>3.Майнеры:</b> Грузят ПК.⛏️</p><hr><p><b>4.Стиллеры:</b> Крадут пароли.🕵️</p><hr><p><b>5.Бэкдоры:</b> Тайный вход.🚪</p><hr><p><b>6.Адвари:</b> Реклама.📢</p><hr><p><b>7.Фишинг:</b> Фейк сайты.🎣</p><hr><p><b>8.Руткиты:</b> Скрыты в ядре.👻</p><hr><p><b>9.Черви:</b> Сетевое заражение.🐛</p><hr><p><b>10.Шпионы:</b> Камера/микрофон.👁️</p><hr><p><b>11.Бомбы:</b> Взрыв по дате.💣</p><hr><p><b>12.Блокеры:</b> Баннеры на экран.🚫</p></div>
+<footer style="text-align:center;margin-top:20px;font-size:.8em">DEV: МИША | SUP: ЕГОР, ИГНАТ, КИРИЛЛ</footer></div>
+<script>
+let userName=localStorage.getItem('m_user_name'),score=0,autoP=0,clickP=1,isDR=false,hasAnt=false,usedPr=[];
+function checkDR(){let d=new Date();if(d.getMonth()===4&&(d.getDate()===11||d.getDate()===12)){document.getElementById('dr-banner').style.display='block';isDR=true}}
+function loadData(){const keys=['m_sc_final','hackerScore','m_sc'];keys.forEach(k=>{let s=parseInt(localStorage.getItem(k))||0;if(s>score)score=s});autoP=parseInt(localStorage.getItem('m_au_final'))||0;clickP=parseInt(localStorage.getItem('m_cl_final'))||1;hasAnt=localStorage.getItem('m_ant')==='true';usedPr=JSON.parse(localStorage.getItem('m_pr'))||[]}
+function confirmAccess(){let i=document.getElementById('user-login').value.trim();if(i.length<2)return;userName=i;localStorage.setItem('m_user_name',userName);document.getElementById('login-overlay').style.display='none';document.getElementById('main-content').style.filter='none';document.getElementById('main-content').style.pointerEvents='auto';document.getElementById('display-name').innerText=userName.toUpperCase();loadData();updateUI()}
+function fmt(n){if(n>=1e9)return (n/1e9).toFixed(2)+'Млрд';if(n>=1e6)return (n/1e6).toFixed(1)+'М';if(n>=1e3)return (n/1e3).toFixed(1)+'к';return Math.floor(n)}
+function updateUI(){document.getElementById('score-text').innerText=fmt(score);document.getElementById('auto-val').innerText=fmt(autoP);document.getElementById('click-val').innerText=clickP;document.getElementById('lvl-text').innerText="LVL: "+Math.floor(score/1e5);if(hasAnt)document.getElementById('ant-msg').innerText="📡 СИГНАЛ СТАБИЛЕН";localStorage.setItem('m_sc_final',score);localStorage.setItem('m_au_final',autoP);localStorage.setItem('m_cl_final',clickP);localStorage.setItem('m_ant',hasAnt);localStorage.setItem('m_pr',JSON.stringify(usedPr));drawBoard()}
+function mineData(){score+=hasAnt?clickP*2:clickP;updateUI()}
+function buy(t){let c=isDR?0:(t==='ant'?1e7:t==='auto'?100:1e6);if(score>=c){if(!isDR)score-=c;if(t==='ant')hasAnt=true;else if(t==='auto')autoP+=5;else autoP+=5e4;updateUI()}}
+function buyRTX(){let c=isDR?0:5e4;if(score>=c){if(!isDR)score-=c;let r=Math.random()*100,p=r<15?5e3:(r<50?1500:500);autoP+=p;document.getElementById('rtx-msg').innerText="ВЫПАЛО: +"+p+"/сек";updateUI()}}
+function usePromo(){let i=document.getElementById('promo-input').value.toUpperCase().trim();if(usedPr.includes(i))return;if(i==='MISHA2025'){score+=5e5;reward(i)}if(i==='EGOR_DR'&&isDR){score+=1e8;reward(i)}if(i==='HACKER'){score+=1e7;reward(i)}}
+function reward(i){usedPr.push(i);document.getElementById('promo-input').value="";alert("ОК!");updateUI()}
+function transferXP(){let t=document.getElementById('target-p').value.trim(),a=parseInt(document.getElementById('trans-am').value);if(score>=a&&a>=1e6){let r=JSON.parse(localStorage.getItem('m_board_final'))||[],i=r.findIndex(p=>p.name.toLowerCase()===t.toLowerCase());if(i!==-1){score-=a;r[i].score+=a;localStorage.setItem('m_board_final',JSON.stringify(r));updateUI()}}}
+function drawBoard(){let r=JSON.parse(localStorage.getItem('m_board_final'))||[];if(userName){let e=r.findIndex(p=>p.name.toLowerCase()===userName.toLowerCase());if(e!==-1){if(score>r[e].score)r[e].score=score}else{r.push({name:userName,score:score})}}r.sort((a,b)=>b.score-a.score);localStorage.setItem('m_board_final',JSON.stringify(r.slice(0,10)));document.getElementById('board').innerHTML=r.map((p,idx)=>`${idx+1}. ${p.name}: ${fmt(p.score)}`).join('<br>')}
+const mC=document.getElementById('matrix-canvas'),mX=mC.getContext('2d');mC.width=window.innerWidth;mC.height=window.innerHeight;const chars="0123456789ABCDEF",drops=Array(Math.floor(mC.width/16)).fill(1);
+function drawM(){mX.fillStyle="rgba(0,0,0,0.1)";mX.fillRect(0,0,mC.width,mC.height);mX.fillStyle="#0F0";mX.font="16px arial";drops.forEach((y,i)=>{mX.fillText(chars[Math.floor(Math.random()*chars.length)],i*16,y*16);if(y*16>mC.height&&Math.random()>.975)drops[i]=0;drops[i]++})}
+setInterval(drawM,40);setInterval(()=>{if(autoP>0){score+=autoP;updateUI()}},1000);checkDR();if(userName)confirmAccess();</script></body></html>
