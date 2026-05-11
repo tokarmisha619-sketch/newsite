@@ -8,143 +8,158 @@
         body { font-family: 'Courier New', Courier, monospace; line-height: 1.6; padding: 20px; background-color: #000; color: #00ff00; margin: 0; overflow-x: hidden; }
         #matrix-canvas { position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: -1; opacity: 0.3; }
         .container { max-width: 800px; margin: 20px auto; background: rgba(26, 26, 26, 0.9); padding: 25px; border: 2px solid #00ff00; border-radius: 12px; box-shadow: 0 0 20px #00ff00; position: relative; z-index: 1; }
-        h1 { color: #00ff00; text-align: center; text-transform: uppercase; font-size: 1.8em; text-shadow: 2px 2px #000; margin-bottom: 20px; }
-        h2 { color: #00ff00; border-bottom: 1px solid #00ff00; padding-bottom: 10px; margin-top: 30px; }
-        .warning { background: rgba(51, 0, 0, 0.8); padding: 15px; border-radius: 8px; border: 1px solid #ff0000; margin: 20px 0; color: #ff0000; font-weight: bold; text-align: center; }
-        .wiki-section { background: #1a1a1a; padding: 20px; border-radius: 8px; margin-top: 20px; border: 1px solid #444; height: 350px; overflow-y: scroll; text-align: justify; }
-        .wiki-section::-webkit-scrollbar { width: 10px; }
-        .wiki-section::-webkit-scrollbar-thumb { background: #00ff00; border-radius: 5px; }
-        .contact-box { background: #111; padding: 20px; border-radius: 8px; margin-top: 20px; border: 1px dashed #00ff00; text-align: center; }
-        .tg-button { display: inline-block; background: #0088cc; color: white; padding: 12px 24px; text-decoration: none; border-radius: 5px; font-weight: bold; margin-top: 10px; transition: 0.3s; }
-        .tg-button.disabled { background: #555 !important; cursor: not-allowed; opacity: 0.6; }
-        footer { margin-top: 40px; padding-top: 20px; border-top: 1px solid #00ff00; font-size: 1.1em; text-align: center; }
-        .names { color: #0080ff; font-weight: bold; }
-        button { background: #00ff00; color: black; border: none; padding: 12px 20px; cursor: pointer; font-weight: bold; border-radius: 5px; width: 100%; font-size: 1em; text-transform: uppercase; transition: 0.3s; }
-        #progress-container { width: 100%; background: #333; height: 12px; margin-top: 15px; display: none; border-radius: 6px; overflow: hidden; border: 1px solid #00ff00; }
-        #progress-bar { width: 0%; height: 100%; background: #00ff00; box-shadow: 0 0 10px #00ff00; }
-        
-        /* Стили Кликера */
-        .clicker-box { background: rgba(0,255,0,0.05); padding: 15px; border-radius: 8px; border: 1px double #00ff00; margin-top: 20px; text-align: center; }
-        #click-btn { width: 80px; height: 80px; border-radius: 50%; border: 3px solid #00ff00; background: #000; color: #00ff00; font-size: 1.5em; cursor: pointer; transition: transform 0.1s; margin-top: 10px; }
+        h1 { color: #00ff00; text-align: center; text-transform: uppercase; font-size: 1.8em; text-shadow: 2px 2px #000; }
+        .box { background: rgba(0,255,0,0.05); padding: 15px; border-radius: 8px; border: 1px double #00ff00; margin-top: 20px; text-align: center; }
+        #click-btn { width: 100px; height: 100px; border-radius: 50%; border: 4px solid #00ff00; background: #000; color: #00ff00; font-size: 2em; cursor: pointer; transition: 0.1s; box-shadow: 0 0 15px #00ff00; }
         #click-btn:active { transform: scale(0.9); }
-        input { background: #000; color: #00ff00; border: 1px solid #00ff00; padding: 8px; border-radius: 4px; font-family: monospace; outline: none; }
-        hr { border: 0; border-top: 1px solid #444; margin: 15px 0; }
+        .shop-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 15px; }
+        .upgrade-card { background: rgba(0,0,0,0.5); border: 1px solid #00ff00; padding: 10px; border-radius: 5px; display: flex; flex-direction: column; justify-content: space-between; }
+        .upgrade-card button { background: #00ff00; color: #000; border: none; padding: 5px 10px; font-weight: bold; cursor: pointer; width: 100%; margin-top: 5px; }
+        .upgrade-card button:disabled { background: #555; cursor: not-allowed; }
+        #snake-game { background: #000; border: 2px solid #00ff00; display: block; margin: 10px auto; touch-action: none; }
+        input { background: #000; color: #00ff00; border: 1px solid #00ff00; padding: 8px; border-radius: 4px; font-family: monospace; outline: none; margin-top: 5px; }
     </style>
 </head>
 <body>
     <canvas id="matrix-canvas"></canvas>
     <div class="container">
         <h1>КРАСНАЯ УГРОЗА: МИША, ИГНАТ И КИРИЛЛ</h1>
-        <div class="warning">СИСТЕМА ПОД ЗАЩИТОЙ КОМАНДЫ МИШИ</div>
 
-        <!-- СКАНЕР -->
-        <div style="background: rgba(0,0,0,0.5); padding: 15px; border-radius: 8px; border: 1px solid #00ff00;">
-            <button onclick="checkSystem()" id="scan-btn">ЗАПУСТИТЬ ПРОВЕРКУ</button>
-            <div id="progress-container"><div id="progress-bar"></div></div>
-            <p id="status" style="text-align: center; margin-top: 10px;">Статус: Ожидание...</p>
-        </div>
-
-        <!-- КЛИКЕР -->
-        <div class="clicker-box">
-            <h3 style="margin: 0; color: #00ff00;">КЛИКЕР ХАКЕРСКОЙ МОЩИ</h3>
-            <div id="click-power" style="font-size: 2.5em; font-weight: bold; color: #fff; text-shadow: 0 0 10px #00ff00;">0</div>
-            <p style="margin: 5px 0;">Уровень: <span id="hacker-level" style="font-weight: bold;">Новичок</span></p>
+        <div class="box">
+            <h2 id="click-power" style="font-size: 3em; margin: 0; text-shadow: 0 0 20px #0F0;">0</h2>
+            <p>Статус: <span id="hacker-level">Новичок</span></p>
             <button onclick="mineData()" id="click-btn">⚡</button>
-
-            <!-- Поле рекорда (появится после 10 кликов) -->
-            <div id="record-input" style="display: none; margin-top: 15px; padding-top: 10px; border-top: 1px dashed #00ff00;">
-                <input type="text" id="player-name" placeholder="Твое имя" maxlength="15">
-                <button onclick="saveRecord()" style="width: auto; padding: 8px 15px; font-size: 0.8em; margin-top: 5px;">В ТОП 🏆</button>
+            <p style="font-size: 0.8em; margin-top: 10px;">Клик: +<span id="click-value">1</span> | Авто: <span id="auto-value">0</span>/сек</p>
+            
+            <div id="record-input" style="display: none; margin-top: 15px; border-top: 1px dashed #00ff00; padding-top: 10px;">
+                <input type="text" id="player-name" placeholder="Твое имя" maxlength="12">
+                <button onclick="saveRecord()" style="width: auto; padding: 8px 15px;">СОХРАНИТЬ РЕКОРД 🏆</button>
             </div>
+            <div id="leaderboard" style="margin-top:10px; text-align:left; font-size:0.9em; color:#00ff00;"></div>
+        </div>
 
-            <div id="leaderboard" style="margin-top: 15px; font-size: 0.9em; text-align: left; color: #00ff00; background: rgba(0,0,0,0.3); border-radius: 5px; padding: 10px;">
-                <!-- Сюда попадут лидеры -->
+        <div class="box" style="border-color: #ffcc00;">
+            <h3 style="color: #ffcc00; margin-top: 0;">🛒 МАГАЗИН УЛУЧШЕНИЙ</h3>
+            <div class="shop-grid">
+                <div class="upgrade-card">
+                    <span>🔥 Софт (+1 клик)</span>
+                    <p id="cost-click" style="font-size: 0.8em;">Цена: 50</p>
+                    <button id="btn-click" onclick="buyClick()">КУПИТЬ</button>
+                </div>
+                <div class="upgrade-card">
+                    <span>📟 Видеокарта (+1/сек)</span>
+                    <p id="cost-auto" style="font-size: 0.8em;">Цена: 100</p>
+                    <button id="btn-auto" onclick="buyAuto()">КУПИТЬ</button>
+                </div>
+                <div class="upgrade-card" style="border-color: #0080ff;">
+                    <span style="color: #0080ff;">💎 GTX 1070 (+250/сек)</span>
+                    <p id="cost-gtx" style="font-size: 0.8em;">Цена: 20000</p>
+                    <button id="btn-gtx" onclick="buyGTX()">УСТАНОВИТЬ</button>
+                </div>
+                <div class="upgrade-card" style="border-color: #ff00ff;">
+                    <span style="color: #ff00ff; font-weight: bold;">🌈 КЕЙС RTX (РАНДОМ)</span>
+                    <p style="font-size: 0.8em;">Цена: 50000</p>
+                    <button id="btn-rtx" onclick="buyRTX()">ОТКРЫТЬ КЕЙС</button>
+                </div>
             </div>
+            <p id="rtx-status" style="margin-top: 10px; color: #ff00ff; font-weight: bold; min-height: 20px;"></p>
         </div>
 
-        <h2>ПОЛНАЯ ЭНЦИКЛОПЕДИЯ УГРОЗ</h2>
-        <div class="wiki-section">
-            <h3>1. Трояны 🐴</h3><p>Маскируются под игры. Дают хакеру доступ к твоему ПК.</p>
-            <h3>2. Шифровальщики 🔐</h3><p>Блокируют файлы и требуют выкуп.</p>
-            <h3>3. Майнеры ⛏️</h3><p>Воруют мощность видеокарты. Комп тормозит.</p>
-            <h3>4. Стиллеры 🕵️</h3><p>Воруют пароли от Discord, Telegram и банков.</p>
-            <h3>5. Бэкдоры 🚪</h3><p>Скрытый вход для хакера в любое время.</p>
-            <h3>6. Адвари 📢</h3><p>Рекламный спам во всех окнах.</p>
-            <h3>7. Фишинг 🎣</h3><p>Сайты-подделки для кражи паролей.</p>
-            <h3>8. Руткиты 👻</h3><p>Прячутся в ядре системы, их сложно найти.</p>
-            <h3>9. Черви 🐛</h3><p>Сами ползают по интернету и заражают всех.</p>
-        </div>
-
-        <h2 style="color: #ffcc00; border-color: #ffcc00;">ТОП-10 ОПАСНЫХ ВИРУСОВ</h2>
-        <div class="wiki-section" style="border-color: #ffcc00;">
-            <p><strong>1. Creeper (1971)</strong> — Самый первый вирус.</p><hr>
-            <p><strong>2. Brain (1986)</strong> — Первый вирус для ПК.</p><hr>
-            <p><strong>3. Morris Worm (1988)</strong> — Чуть не уничтожил интернет.</p><hr>
-            <p><strong>4. WannaCry (2017)</strong> — Атака на весь мир.</p>
-        </div>
-
-        <div class="contact-box">
-            <h2>СВЯЗЬ С МИШЕЙ</h2>
-            <a href="https://t.me" id="tg-link" target="_blank" class="tg-button" onclick="activateAntiSpam(event)">ОТПРАВИТЬ ОТЧЕТ В TG</a>
-            <p id="timer" style="display:none; color: #ffcc00;">Защита от спама: <span id="seconds">10</span> сек.</p>
+        <div class="box">
+            <h3 style="color: #00ff00;">ХАКЕРСКАЯ ЗМЕЙКА (+10 XP)</h3>
+            <canvas id="snake-game" width="280" height="280"></canvas>
+            <button onclick="startSnake()" style="background:#333; color:#fff; padding:10px; width:100%;">ИГРАТЬ</button>
         </div>
 
         <footer>
-            <p>DEVELOPER: <span class="names">Миша</span> | SUPPORT: <span class="names">Игнат, Кирилл</span></p>
+            <p>DEVELOPER: <span style="color:#0080ff;">Миша</span> | GPU: RTX SERIES | SUPPORT: <span style="color:#0080ff;">Игнат, Кирилл</span></p>
         </footer>
     </div>
 
     <script>
-        // --- МАТРИЦА ---
-        const canvas = document.getElementById('matrix-canvas');
-        const ctx = canvas.getContext('2d');
-        canvas.width = window.innerWidth; canvas.height = window.innerHeight;
-        const characters = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ#$@";
-        const fontSize = 16;
-        const columns = canvas.width / fontSize;
-        const drops = [];
-        for (let x = 0; x < columns; x++) drops[x] = 1;
-        function drawMatrix() {
-            ctx.fillStyle = "rgba(0, 0, 0, 0.05)"; ctx.fillRect(0, 0, canvas.width, canvas.height);
-            ctx.fillStyle = "#0F0"; ctx.font = fontSize + "px arial";
-            for (let i = 0; i < drops.length; i++) {
-                const text = characters.charAt(Math.floor(Math.random() * characters.length));
-                ctx.fillText(text, i * fontSize, drops[i] * fontSize);
-                if (drops[i] * fontSize > canvas.height && Math.random() > 0.975) drops[i] = 0;
+        // МАТРИЦА
+        const mCanvas = document.getElementById('matrix-canvas');
+        const mCtx = mCanvas.getContext('2d');
+        mCanvas.width = window.innerWidth; mCanvas.height = window.innerHeight;
+        const chars = "0123456789ABCDEF#$@%";
+        const drops = Array(Math.floor(mCanvas.width/16)).fill(1);
+        function drawM() {
+            mCtx.fillStyle = "rgba(0,0,0,0.05)"; mCtx.fillRect(0,0,mCanvas.width,mCanvas.height);
+            mCtx.fillStyle = "#0F0"; mCtx.font = "16px arial";
+            drops.forEach((y, i) => {
+                mCtx.fillText(chars[Math.floor(Math.random()*chars.length)], i*16, y*16);
+                if (y*16 > mCanvas.height && Math.random() > 0.975) drops[i] = 0;
                 drops[i]++;
-            }
+            });
         }
-        setInterval(drawMatrix, 33);
+        setInterval(drawM, 33);
 
-        // --- ЛОГИКА КЛИКЕРА ---
-        let score = localStorage.getItem('hackerScore') ? parseInt(localStorage.getItem('hackerScore')) : 0;
+        // ЛОГИКА
+        let score = parseInt(localStorage.getItem('hackerScore')) || 0;
+        let clickPower = parseInt(localStorage.getItem('hackerClick')) || 1;
+        let autoPower = parseInt(localStorage.getItem('hackerAuto')) || 0;
         
         function updateDisplay() {
-            document.getElementById('click-power').innerText = score;
-            let level = document.getElementById('hacker-level');
-            let recordBox = document.getElementById('record-input');
+            document.getElementById('click-power').innerText = Math.floor(score);
+            document.getElementById('click-value').innerText = clickPower;
+            document.getElementById('auto-value').innerText = autoPower;
+            
+            let costClick = 50 * clickPower;
+            let costAuto = 100 + (autoPower * 50);
+            
+            document.getElementById('cost-click').innerText = "Цена: " + costClick;
+            document.getElementById('cost-auto').innerText = "Цена: " + costAuto;
+            
+            document.getElementById('btn-click').disabled = score < costClick;
+            document.getElementById('btn-auto').disabled = score < costAuto;
+            document.getElementById('btn-gtx').disabled = score < 20000;
+            document.getElementById('btn-rtx').disabled = score < 50000;
 
-            if (score >= 10) recordBox.style.display = "block"; // Показать ввод имени
+            if (score >= 10) document.getElementById('record-input').style.display = "block";
 
-            if (score < 50) { level.innerText = "Новичок"; level.style.color = "#00ff00"; }
-            else if (score >= 50 && score < 200) { level.innerText = "Ученик Миши"; level.style.color = "#0080ff"; }
-            else if (score >= 200 && score < 1000) { level.innerText = "Кибер-Защитник"; level.style.color = "#ffcc00"; }
-            else if (score >= 1000) { level.innerText = "МАСТЕР ХАКЕР"; level.style.color = "#ff0000"; }
+            let lvl = document.getElementById('hacker-level');
+            if (score < 1000) lvl.innerText = "Новичок";
+            else lvl.innerText = "ХАКЕР " + Math.floor(score/1000) + " LVL";
+            
+            localStorage.setItem('hackerScore', score);
+            localStorage.setItem('hackerClick', clickPower);
+            localStorage.setItem('hackerAuto', autoPower);
             showLeaderboard();
         }
 
-        function mineData() {
-            score++;
-            localStorage.setItem('hackerScore', score);
-            updateDisplay();
+        function mineData() { score += clickPower; updateDisplay(); }
+        function buyClick() { let cost = 50*clickPower; if(score >= cost){ score -= cost; clickPower++; updateDisplay(); } }
+        function buyAuto() { let cost = 100+(autoPower*50); if(score >= cost){ score -= cost; autoPower++; updateDisplay(); } }
+        function buyGTX() { if(score >= 20000){ score -= 20000; autoPower += 250; updateDisplay(); } }
+
+        function buyRTX() {
+            if (score >= 50000) {
+                score -= 50000;
+                let rnd = Math.random() * 100;
+                let win = ""; let pwr = 0;
+                if (rnd < 15) { win = "RTX 4090"; pwr = 5000; }
+                else if (rnd < 50) { win = "RTX 3080"; pwr = 1500; }
+                else { win = "RTX 3060"; pwr = 500; }
+                autoPower += pwr;
+                document.getElementById('rtx-status').innerText = "ВЫПАЛО: " + win + " [+" + pwr + "/сек]";
+                updateDisplay();
+            }
         }
 
+        // ЛОГИКА ТОПА БЕЗ ДУБЛИКАТОВ
         function saveRecord() {
-            let name = document.getElementById('player-name').value || "Аноним";
+            let name = document.getElementById('player-name').value.trim() || "Аноним";
             let records = JSON.parse(localStorage.getItem('hackerLeaderboard')) || [];
-            records.push({ name: name, score: score });
+            let existingIdx = records.findIndex(r => r.name.toLowerCase() === name.toLowerCase());
+
+            if (existingIdx !== -1) {
+                if (score > records[existingIdx].score) records[existingIdx].score = score;
+            } else {
+                records.push({ name: name, score: score });
+            }
+            
             records.sort((a, b) => b.score - a.score);
-            records = records.slice(0, 5); // Только лучшие 5
+            records = records.slice(0, 5);
             localStorage.setItem('hackerLeaderboard', JSON.stringify(records));
             document.getElementById('player-name').value = "";
             showLeaderboard();
@@ -158,42 +173,38 @@
                 records.map((r, i) => `${i+1}. ${r.name} — ${r.score} XP`).join('<br>');
         }
 
-        // --- СКАНЕР ---
-        function checkSystem() {
-            let status = document.getElementById('status');
-            let btn = document.getElementById('scan-btn');
-            let pBar = document.getElementById('progress-bar');
-            let pCont = document.getElementById('progress-container');
-            btn.disabled = true; pCont.style.display = "block";
-            let width = 0;
-            let interval = setInterval(() => {
-                if (width >= 100) {
-                    clearInterval(interval);
-                    status.innerHTML = "✅ ВИРУСОВ НЕ ОБНАРУЖЕНО.";
-                    status.style.color = "#00ff00";
-                    btn.disabled = false;
-                } else {
-                    width++; pBar.style.width = width + "%";
-                    status.innerHTML = "ПРОВЕРКА: " + width + "%";
-                }
-            }, 50);
-        }
+        setInterval(() => { if(autoPower > 0){ score += autoPower; updateDisplay(); } }, 1000);
 
-        // --- ТАЙМЕР TG ---
-        function activateAntiSpam(event) {
-            const link = document.getElementById('tg-link');
-            const timerText = document.getElementById('timer');
-            const secondsSpan = document.getElementById('seconds');
-            if (link.classList.contains('disabled')) { event.preventDefault(); return; }
-            link.classList.add('disabled'); timerText.style.display = 'block';
-            let timeLeft = 10;
-            const countdown = setInterval(() => {
-                timeLeft--; secondsSpan.innerText = timeLeft;
-                if (timeLeft <= 0) { clearInterval(countdown); link.classList.remove('disabled'); timerText.style.display = 'none'; }
-            }, 1000);
+        // ЗМЕЙКА
+        const sCanvas = document.getElementById('snake-game');
+        const sCtx = sCanvas.getContext('2d');
+        let snake, food, d, sInterval;
+        function startSnake() {
+            clearInterval(sInterval);
+            snake = [{x: 140, y: 140}];
+            food = {x: Math.floor(Math.random()*13+1)*20, y: Math.floor(Math.random()*13+1)*20};
+            d = "RIGHT"; sInterval = setInterval(drawS, 150);
         }
-
-        // Запуск при загрузке
+        document.addEventListener("keydown", e => {
+            if(e.keyCode==37 && d!="RIGHT") d="LEFT";
+            if(e.keyCode==38 && d!="DOWN") d="UP";
+            if(e.keyCode==39 && d!="LEFT") d="RIGHT";
+            if(e.keyCode==40 && d!="UP") d="DOWN";
+        });
+        function drawS() {
+            sCtx.fillStyle = "black"; sCtx.fillRect(0,0,280,280);
+            snake.forEach(s => { sCtx.fillStyle = "#0F0"; sCtx.fillRect(s.x, s.y, 18, 18); });
+            sCtx.fillStyle = "red"; sCtx.fillRect(food.x, food.y, 18, 18);
+            let hX = snake[0].x; let hY = snake[0].y;
+            if(d=="LEFT") hX-=20; if(d=="UP") hY-=20; if(d=="RIGHT") hX+=20; if(d=="DOWN") hY+=20;
+            if(hX==food.x && hY==food.y) {
+                score += 10; updateDisplay();
+                food = {x: Math.floor(Math.random()*13+1)*20, y: Math.floor(Math.random()*13+1)*20};
+            } else { snake.pop(); }
+            let nH = {x:hX, y:hY};
+            if(hX<0 || hX>=280 || hY<0 || hY>=280) { clearInterval(sInterval); return; }
+            snake.unshift(nH);
+        }
         updateDisplay();
     </script>
 </body>
