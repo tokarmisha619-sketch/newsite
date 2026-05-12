@@ -3,38 +3,32 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width,initial-scale=1.0">
-    <title>HAKCLIKER 3.2</title>
+    <title>HAKCLIKER 3.1: ULTIMATE BATTLE</title>
     <style>
         body{font-family:monospace;background:#000;color:#0f0;margin:0;padding:10px;overflow:hidden;touch-action:none}
         #matrix-canvas{position:fixed;top:0;left:0;width:100%;height:100%;z-index:-1;opacity:0.2}
         .container{max-width:600px;margin:0 auto;background:rgba(0,10,0,0.85);padding:15px;border:2px solid #0f0;border-radius:10px;height:95vh;overflow-y:auto}
         .box{background:rgba(0,255,0,0.05);padding:15px;border:1px double #0f0;border-radius:8px;margin-bottom:15px;text-align:center;position:relative}
         .gold-nick { color: #ffcc00 !important; text-shadow: 0 0 10px #ffcc00; font-weight: bold; }
-        
-        /* ЧАСТИЦЫ */
         .particle { position: fixed; pointer-events: none; z-index: 10000; color: #0f0; font-size: 1.2em; animation: pFly 0.8s ease-out forwards; }
         @keyframes pFly { 0% { opacity: 1; transform: translate(0,0); } 100% { opacity: 0; transform: translate(var(--dx), var(--dy)) rotate(360deg); } }
-
-        /* АДМИНКА */
         #admin-modal { position: fixed; top: 40px; left: 10px; background: #111; border: 3px solid #f00; z-index: 3000; width: 260px; border-radius: 15px; display: none; box-shadow: 0 0 30px #f00; }
         #admin-header { background: #f00; color: #fff; padding: 10px; cursor: grab; text-align: center; font-weight: bold; border-radius: 12px 12px 0 0; user-select: none; }
         .admin-body { padding: 10px; display: grid; gap: 5px; max-height: 400px; overflow-y: auto; }
-        
         button{background:#0f0;color:#000;border:none;padding:8px;font-weight:bold;cursor:pointer;border-radius:5px;text-transform:uppercase;width:100%;margin-top:5px;font-size:0.7em}
-        input{background:#000;color:#0f0;border:1px solid #0f0;padding:8px;border-radius:4px;width:90%;text-align:center;margin:5px 0;outline:none}
-        #click-btn{width:70px;height:70px;border-radius:50%;border:4px solid #0f0;background:#000;color:#0f0;font-size:1.5em;cursor:pointer;box-shadow:0 0 15px #0f0;margin:10px; transition: 0.1s;}
-        #click-btn:active { transform: scale(0.9); }
-
-        #leaderboard-container { height: 250px; overflow-y: scroll; border: 1px solid #040; background: rgba(0,0,0,0.8); padding: 5px; margin-top: 10px; }
-        .leader-item { display: flex; justify-content: space-between; padding: 4px; border-bottom: 1px solid #111; font-size: 0.65em; }
+        input{background:#000;color:#0f0;border:1px solid #0f0;padding:5px;border-radius:4px;width:90%;text-align:center;margin:5px 0;outline:none}
+        #click-btn{width:70px;height:70px;border-radius:50%;border:4px solid #0f0;background:#000;color:#0f0;font-size:1.5em;cursor:pointer;box-shadow:0 0 15px #0f0;margin:10px;}
+        #leaderboard-container { height: 200px; overflow-y: scroll; border: 1px solid #040; background: rgba(0,0,0,0.8); padding: 5px; margin-top: 10px; }
+        .leader-item { display: flex; justify-content: space-between; padding: 4px; border-bottom: 1px solid #111; font-size: 0.6em; }
         .my-pos { background: rgba(0,255,0,0.3) !important; border: 1px solid #0f0; color: #fff; }
     </style>
 </head>
 <body>
     <canvas id="matrix-canvas"></canvas>
 
+    <!-- АДМИНКА -->
     <div id="admin-modal">
-        <div id="admin-header">✋ ТЯНИ ПАНЕЛЬ</div>
+        <div id="admin-header">✋ ADMIN CONTROL</div>
         <div class="admin-body">
             <button onclick="getRTX(6000, 1e6)" style="background:#fc0">🔥 RTX 6000</button>
             <button onclick="getRTX(7000, 1e7)" style="background:#f0f; color:#fff">🌌 RTX 7000</button>
@@ -46,7 +40,7 @@
             <hr>
             <button onclick="isGold=true; updateUI()" style="background:#ffcc00">👑 GOLD NAME</button>
             <button onclick="score += 1e24; updateUI()" style="background:#0f0">💰 +1Sx XP</button>
-            <button onclick="fullReset()" style="background:#f00; color:#fff">🗑️ ПОЛНЫЙ СБРОС</button>
+            <button onclick="fullReset()" style="background:#f00; color:#fff">🗑️ СБРОС (RESET)</button>
             <button onclick="document.getElementById('admin-modal').style.display='none'">CLOSE</button>
         </div>
     </div>
@@ -60,14 +54,29 @@
     </div>
 
     <div id="main-content" class="container" style="display:none">
-        <h2 style="text-align:center;">ROOT: <span id="display-name" onclick="openAdmin()" style="cursor:pointer; text-decoration:underline">...</span></h2>
+        <h2 style="text-align:center;">ШТАБ: <span id="display-name" onclick="openAdmin()" style="cursor:pointer; text-decoration:underline">...</span></h2>
+        
         <div class="box">
             <h1 id="score-text">0</h1>
             <button onclick="mineData(event)" id="click-btn">⚡</button>
-            <p id="lvl-text" style="color:#fc0;">LVL: 0</p>
-            <p style="font-size:0.8em">AUTO: +<span id="auto-val">0</span>/sec</p>
+            <p style="font-size:0.8em; margin:0">АВТО: +<span id="auto-val">0</span>/sec</p>
         </div>
-        <div class="box" style="border-color: #0cf;">
+
+        <!-- МАГАЗИН И ПЕРЕВОД -->
+        <div style="display:grid; grid-template-columns: 1fr 1fr; gap:10px;">
+            <div class="box" style="border-color: #f0f;">
+                <h3>🛒 МАГАЗИН</h3>
+                <button onclick="buyCase()" style="background:#f0f; color:#fff">🌈 КЕЙС RTX (10K)</button>
+                <button onclick="buyAntenna()" style="background:#0080ff; color:#fff">📡 АНТЕННА (1M)</button>
+            </div>
+            <div class="box" style="border-color: #0cf;">
+                <h3>📤 ПЕРЕВОД</h3>
+                <input type="text" id="t-name" placeholder="КОМУ (НИК)">
+                <button onclick="transferMoney()" style="background:#0cf; color:#000">ОТПРАВИТЬ XP</button>
+            </div>
+        </div>
+
+        <div class="box" style="border-color: #fc0;">
             <h3 style="margin:0">🏆 LIVE TOP 100</h3>
             <div id="leaderboard-container"><div id="leaderboard"></div></div>
         </div>
@@ -78,7 +87,7 @@
         let bots = [];
 
         function initBots() {
-            const names = ["Satoshi", "Musk", "Anonymous", "Pavel", "Hacker", "Shadow", "Ghost", "Neo"];
+            const names = ["Satoshi", "Elon", "Anonymous", "Pavel", "Hacker", "Shadow", "Ghost", "Neo"];
             for(let i=1; i<=100; i++) {
                 bots.push({
                     name: names[Math.floor(Math.random()*names.length)] + "_" + i,
@@ -95,15 +104,15 @@
         }
 
         function createParticles(e) {
-            const chars = ["0", "1", "{", "}", ";", "=>", "[]"];
+            const chars = ["0", "1", "{", "}", ";", "=>"];
             for(let i=0; i<6; i++) {
                 const p = document.createElement('div');
                 p.className = 'particle';
                 p.innerText = chars[Math.floor(Math.random()*chars.length)];
                 p.style.left = (e.clientX || window.innerWidth/2) + 'px';
                 p.style.top = (e.clientY || window.innerHeight/2) + 'px';
-                p.style.setProperty('--dx', (Math.random()-0.5)*200 + 'px');
-                p.style.setProperty('--dy', (Math.random()-0.5)*200 + 'px');
+                p.style.setProperty('--dx', (Math.random()-0.5)*240 + 'px');
+                p.style.setProperty('--dy', (Math.random()-0.5)*240 + 'px');
                 document.body.appendChild(p);
                 setTimeout(() => p.remove(), 800);
             }
@@ -112,6 +121,33 @@
         function mineData(e) { score += clickP; createParticles(e); updateUI(); }
         function getRTX(m, p) { autoP += p; updateUI(); alert("RTX " + m + " ACTIVE!"); }
         function openAdmin() { if(userName.toLowerCase()==='миша') document.getElementById('admin-modal').style.display='block'; }
+
+        function buyCase() {
+            if(score >= 10000) {
+                score -= 10000;
+                const models = ["RTX 2060", "RTX 3070", "RTX 4090", "RTX TITAN"];
+                let idx = Math.floor(Math.random()*models.length);
+                let win = (idx + 1) * 2000;
+                autoP += win;
+                alert("ВЫПАЛА: " + models[idx] + " (+" + win + "/сек)");
+                updateUI();
+            } else { alert("НУЖНО 10.000 XP!"); }
+        }
+
+        function buyAntenna() {
+            if(score >= 1000000) { score -= 1000000; autoP += 50000; alert("АНТЕННА УСТАНОВЛЕНА!"); updateUI(); }
+            else { alert("НУЖНО 1М!"); }
+        }
+
+        function transferMoney() {
+            let t = document.getElementById('t-name').value;
+            let val = Number(prompt("СКОЛЬКО XP ПЕРЕВЕСТИ?"));
+            if(val <= score && val > 0) {
+                let b = bots.find(x => x.name.toLowerCase().includes(t.toLowerCase()));
+                if(b) { score -= val; b.score += val; updateUI(); }
+                else { alert("ИГРОК НЕ НАЙДЕН"); }
+            }
+        }
 
         function confirmAccess() {
             let i = document.getElementById('user-login').value.trim();
@@ -126,16 +162,16 @@
             let nTag = document.getElementById('display-name');
             nTag.innerText = userName.toUpperCase();
             if (isGold) nTag.className = 'gold-nick';
+            
             document.getElementById('score-text').innerText = Math.floor(score).toLocaleString();
             document.getElementById('auto-val').innerText = autoP.toLocaleString();
-            document.getElementById('lvl-text').innerText = "LVL: " + Math.floor(Math.sqrt(score/100));
             
             let all = [...bots, {name:userName, score:score}].sort((a,b)=>b.score-a.score);
             let html = '';
             all.forEach((p, i) => {
                 let isMe = p.name === userName;
                 let gClass = (isMe && isGold) ? 'gold-nick' : '';
-                html += `<div class="leader-item ${isMe?'my-pos':''} ${gClass}"><span>#${i+1} ${p.name}</span><span>${Math.floor(p.score).toLocaleString()} XP</span></div>`;
+                html += `<div class="leader-item ${isMe?'my-pos':''} ${gClass}"><span>#${i+1} ${p.name}</span><span>${Math.floor(p.score).toLocaleString()}</span></div>`;
             });
             document.getElementById('leaderboard').innerHTML = html;
             save();
