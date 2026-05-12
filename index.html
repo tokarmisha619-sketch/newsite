@@ -3,133 +3,90 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width,initial-scale=1.0">
-    <title>HAKCLIKER 3.1: BOT EVOLUTION</title>
+    <title>HAKCLIKER 3.1: 100 REAL BOTS</title>
     <style>
         body{font-family:monospace;background:#000;color:#0f0;margin:0;padding:10px;overflow:hidden;touch-action:none}
         #matrix-canvas{position:fixed;top:0;left:0;width:100%;height:100%;z-index:-1;opacity:0.2}
         .container{max-width:600px;margin:0 auto;background:rgba(0,10,0,0.85);padding:15px;border:2px solid #0f0;border-radius:10px;height:95vh;overflow-y:auto}
         .box{background:rgba(0,255,0,0.05);padding:15px;border:1px double #0f0;border-radius:8px;margin-bottom:15px;text-align:center;position:relative}
         .gold-nick { color: #ffcc00 !important; text-shadow: 0 0 10px #ffcc00; font-weight: bold; }
-        .particle { position: fixed; pointer-events: none; z-index: 10000; color: #0f0; font-size: 1.2em; animation: pFly 0.8s ease-out forwards; }
-        @keyframes pFly { 0% { opacity: 1; transform: translate(0,0); } 100% { opacity: 0; transform: translate(var(--dx), var(--dy)) rotate(360deg); } }
-        #admin-modal { position: fixed; top: 40px; left: 10px; background: #111; border: 3px solid #f00; z-index: 3000; width: 260px; border-radius: 15px; display: none; box-shadow: 0 0 30px #f00; }
-        #admin-header { background: #f00; color: #fff; padding: 10px; cursor: grab; text-align: center; font-weight: bold; border-radius: 12px 12px 0 0; user-select: none; }
-        .admin-body { padding: 10px; display: grid; gap: 5px; max-height: 400px; overflow-y: auto; }
+        
+        /* ТАБЛИЦА ЛИДЕРОВ */
+        #leaderboard-container { height: 300px; overflow-y: scroll; border: 1px solid #040; background: rgba(0,0,0,0.8); padding: 5px; margin-top: 10px; }
+        .leader-item { display: flex; justify-content: space-between; padding: 6px; border-bottom: 1px solid #111; font-size: 0.65em; white-space: nowrap; }
+        .my-pos { background: rgba(0,255,0,0.3) !important; border: 1px solid #0f0; color: #fff; }
+
+        #click-btn{width:70px;height:70px;border-radius:50%;border:4px solid #0f0;background:#000;color:#0f0;font-size:1.5em;cursor:pointer;box-shadow:0 0 15px #0f0;margin:10px;}
         button{background:#0f0;color:#000;border:none;padding:8px;font-weight:bold;cursor:pointer;border-radius:5px;text-transform:uppercase;width:100%;margin-top:5px;font-size:0.7em}
-        input{background:#000;color:#0f0;border:1px solid #0f0;padding:5px;border-radius:4px;width:90%;text-align:center;margin:5px 0;outline:none}
-        #click-btn{width:75px;height:75px;border-radius:50%;border:4px solid #0f0;background:#000;color:#0f0;font-size:1.5em;cursor:pointer;box-shadow:0 0 15px #0f0;margin:10px; transition: 0.1s;}
-        #click-btn:active { transform: scale(0.9); }
-        .leader-item { display: flex; justify-content: space-between; padding: 4px; border-bottom: 1px solid #111; font-size: 0.8em; }
+        
+        #admin-modal { position: fixed; top: 40px; left: 10px; background: #111; border: 3px solid #f00; z-index: 3000; width: 250px; border-radius: 15px; display: none; }
+        #admin-header { background: #f00; color: #fff; padding: 10px; cursor: grab; text-align: center; font-weight: bold; border-radius: 12px 12px 0 0; }
     </style>
 </head>
 <body>
     <canvas id="matrix-canvas"></canvas>
 
     <div id="admin-modal">
-        <div id="admin-header">✋ ADMIN PANEL</div>
-        <div class="admin-body">
-            <button onclick="getRTX(6000, 1e6)" style="background:#fc0">🔥 RTX 6000</button>
-            <button onclick="getRTX(7000, 1e7)" style="background:#f0f; color:#fff">🌌 RTX 7000</button>
-            <button onclick="getRTX(8000, 5e8)" style="background:#0cf">👑 RTX 8000</button>
-            <button onclick="getRTX(9000, 1e12)" style="background:#0f0">🚀 RTX 9000</button>
-            <button onclick="getRTX(10000, 5e17)" style="background:linear-gradient(45deg,#0f0,#ff0)">⚡ RTX 10000</button>
-            <button onclick="getRTX(15000, 1e21)" style="background:#f00; color:#fff">💎 RTX 15000</button>
-            <hr>
-            <button onclick="isGold=true; updateUI()" style="background:#ffcc00">👑 GOLD NAME</button>
-            <button onclick="score += 1e24; updateUI()" style="background:#0f0">💰 +1Sx XP</button>
-            <button onclick="fullReset()" style="background:#f00; color:#fff">🗑️ СБРОС ИГРЫ</button>
-            <button onclick="document.getElementById('admin-modal').style.display='none'">CLOSE</button>
+        <div id="admin-header">✋ ТЯНИ ЗДЕСЬ</div>
+        <div style="padding:10px; display:grid; gap:5px;">
+            <button onclick="getRTX(15000, 1e15)" style="background:#f00; color:#fff">🚀 RTX 15000 (+1Q/s)</button>
+            <button onclick="score += 1e18; updateUI()" style="background:#0f0">💰 +1Qt XP</button>
+            <button onclick="isGold=true; updateUI()" style="background:#fc0">👑 ЗОЛОТОЙ НИК</button>
+            <button onclick="localStorage.clear(); location.reload();" style="background:#600; color:#fff">🗑️ СБРОС</button>
+            <button onclick="document.getElementById('admin-modal').style.display='none'">ЗАКРЫТЬ</button>
         </div>
     </div>
 
     <div id="login-overlay" style="position:fixed; top:0; left:0; width:100%; height:100%; background:#000; z-index:2000; display:flex; align-items:center; justify-content:center">
         <div class="box" style="width:250px; background:#000;">
             <h2>HAKCLIKER OS</h2>
-            <input type="text" id="user-login" placeholder="LOGIN...">
-            <button onclick="confirmAccess()">START</button>
+            <input type="text" id="user-login" placeholder="ИМЯ..." style="background:#000;color:#0f0;border:1px solid #0f0;padding:10px;text-align:center;width:80%;">
+            <button onclick="confirmAccess()">ВОЙТИ</button>
         </div>
     </div>
 
-    <div id="main-content" class="container">
+    <div id="main-content" class="container" style="display:none">
         <h2 style="text-align:center;">ROOT: <span id="display-name" onclick="openAdmin()" style="cursor:pointer; text-decoration:underline">...</span></h2>
         
         <div class="box">
             <h1 id="score-text">0</h1>
-            <button onclick="mineData(event)" id="click-btn">⚡</button>
-            <p id="lvl-text" style="color:#fc0;">LVL: 0</p>
+            <button onclick="mineData()" id="click-btn">⚡</button>
+            <p id="lvl-text" style="color:#fc0; margin:0">RANK: NOOB</p>
             <p style="font-size:0.8em">AUTO: +<span id="auto-val">0</span>/sec</p>
         </div>
 
-        <div style="display:grid; grid-template-columns: 1fr 1fr; gap:10px;">
-            <div class="box" style="border-color: #f0f;">
-                <h3>🛒 SHOP</h3>
-                <button onclick="buyCase()" style="background:#f0f; color:#fff">🌈 RTX CASE (10K)</button>
-                <button onclick="buyAntenna()" style="background:#0080ff; color:#fff">📡 ANTENNA (1M)</button>
-            </div>
-            <div class="box" style="border-color: #0cf;">
-                <h3>📤 TRANSFER</h3>
-                <input type="text" id="t-name" placeholder="TARGET">
-                <button onclick="transferMoney()" style="background:#0cf; color:#000">SEND XP</button>
+        <div class="box" style="border-color: #0cf;">
+            <h3 style="margin:0">🏆 LIVE TOP 100</h3>
+            <div id="leaderboard-container">
+                <div id="leaderboard"></div>
             </div>
         </div>
-
-        <div class="box"><div id="leaderboard"></div></div>
     </div>
 
     <script>
         let score=0, autoP=0, clickP=1, userName='', isGold=false;
-        // У ботов теперь есть начальная скорость
-        let bots = [
-            {name:"Satoshi", score:1e18, spd:1e12},
-            {name:"Musk", score:1e15, spd:1e10},
-            {name:"Anonymous", score:1e12, spd:1e8}
-        ];
+        let bots = [];
 
-        function openAdmin() { if(userName.toLowerCase()==='миша') document.getElementById('admin-modal').style.display='block'; }
-
-        function createParticles(e) {
-            const chars = ["0", "1", "{", "}", ";", "=>", "[]"];
-            for(let i=0; i<6; i++) {
-                const p = document.createElement('div');
-                p.className = 'particle';
-                p.innerText = chars[Math.floor(Math.random()*chars.length)];
-                p.style.left = (e.clientX || window.innerWidth/2) + 'px';
-                p.style.top = (e.clientY || window.innerHeight/2) + 'px';
-                p.style.setProperty('--dx', (Math.random()-0.5)*200 + 'px');
-                p.style.setProperty('--dy', (Math.random()-0.5)*200 + 'px');
-                document.body.appendChild(p);
-                setTimeout(() => p.remove(), 800);
+        // Создаем 100 ботов с реальной скоростью
+        function initBots() {
+            const names = ["Satoshi", "Musk", "Anonymous", "Durov", "Hacker", "Shadow", "Ghost", "Neo", "Zero", "Admin"];
+            for(let i=1; i<=100; i++) {
+                bots.push({
+                    name: names[Math.floor(Math.random()*names.length)] + "_" + i,
+                    score: Math.floor(Math.random() * 5000),
+                    // Каждый бот зарабатывает от 100к до 10млн в сек
+                    power: Math.floor(Math.random() * 10000000) + 100000
+                });
             }
         }
-
-        function mineData(e) { score += clickP; createParticles(e); updateUI(); }
-
-        function buyCase() {
-            if(score >= 10000) {
-                score -= 10000;
-                const models = ["RTX 2060", "RTX 3070", "RTX 4090", "RTX TITAN"];
-                const powers = [1000, 5000, 20000, 100000];
-                let idx = Math.floor(Math.random()*models.length);
-                autoP += powers[idx];
-                alert("ВЫПАЛА: " + models[idx] + " (+" + powers[idx] + "/сек)");
-                updateUI();
-            } else { alert("МАЛО XP!"); }
-        }
-
-        function buyAntenna() {
-            if(score >= 1000000) { score -= 1000000; autoP += 50000; updateUI(); }
-            else { alert("НУЖНО 1М!"); }
-        }
-
-        function fullReset() {
-            localStorage.clear();
-            location.reload();
-        }
+        initBots();
 
         function confirmAccess() {
             let i = document.getElementById('user-login').value.trim();
             if(i.length < 2) return;
-            userName = i; document.getElementById('login-overlay').style.display='none';
+            userName = i;
+            document.getElementById('login-overlay').style.display='none';
+            document.getElementById('main-content').style.display='block';
             updateUI();
         }
 
@@ -137,60 +94,49 @@
             let nTag = document.getElementById('display-name');
             nTag.innerText = userName.toUpperCase();
             if (isGold) nTag.className = 'gold-nick';
-            document.getElementById('score-text').innerText = fmt(score);
-            document.getElementById('auto-val').innerText = fmt(autoP);
-            document.getElementById('lvl-text').innerText = "LVL: " + Math.floor(Math.sqrt(score/100));
             
+            // Показываем полную сумму без сокращений
+            document.getElementById('score-text').innerText = Math.floor(score).toLocaleString();
+            document.getElementById('auto-val').innerText = autoP.toLocaleString();
+            
+            // Обновляем таблицу
             let all = [...bots, {name:userName, score:score}].sort((a,b)=>b.score-a.score);
             let html = '';
-            all.forEach((p,i) => {
-                let gClass = (p.name === userName && isGold) ? 'gold-nick' : '';
-                let bg = p.name === userName ? 'background:rgba(0,255,0,0.2)' : '';
-                html += `<div class="leader-item ${gClass}" style="${bg}"><span>#${i+1} ${p.name}</span><span>${fmt(p.score)}</span></div>`;
+            all.forEach((p, i) => {
+                let isMe = p.name === userName;
+                let myClass = isMe ? 'my-pos' : '';
+                let gClass = (isMe && isGold) ? 'gold-nick' : '';
+                // Тут выводим ПОЛНУЮ сумму через toLocaleString()
+                html += `<div class="leader-item ${myClass} ${gClass}">
+                            <span>#${i+1} ${p.name}</span>
+                            <span>${Math.floor(p.score).toLocaleString()} XP</span>
+                         </div>`;
             });
             document.getElementById('leaderboard').innerHTML = html;
-            save();
-        }
-
-        function fmt(n) {
-            if (n >= 1e21) return (n/1e21).toFixed(1)+'Sx';
-            if (n >= 1e18) return (n/1e18).toFixed(1)+'Qt';
-            if (n >= 1e15) return (n/1e15).toFixed(1)+'Q';
-            if (n >= 1e12) return (n/1e12).toFixed(1)+'T';
-            if (n >= 1e9) return (n/1e9).toFixed(1)+'B';
-            return Math.floor(n).toLocaleString();
-        }
-
-        function getRTX(m, p) { autoP += p; updateUI(); }
-
-        function transferMoney() {
-            let t = document.getElementById('t-name').value;
-            let val = Number(prompt("СКОЛЬКО?"));
-            if(val <= score && val > 0) {
-                let b = bots.find(x => x.name.toLowerCase().includes(t.toLowerCase()));
-                if(b) { score -= val; b.score += val; updateUI(); }
-            }
-        }
-
-        function save() {
+            
             localStorage.setItem('h_score', score);
             localStorage.setItem('h_auto', autoP);
             localStorage.setItem('h_user', userName);
             localStorage.setItem('h_gold', isGold);
         }
 
-        // ОБНОВЛЕННЫЙ ЦИКЛ: БОТЫ ПРОКАЧИВАЮТСЯ
+        function mineData() { score += clickP; updateUI(); }
+        function getRTX(m, p) { autoP += p; updateUI(); }
+        function openAdmin() { if(userName.toLowerCase()==='миша') document.getElementById('admin-modal').style.display='block'; }
+
+        // ГЛАВНЫЙ ТАЙМЕР: БОТЫ И ТЫ ЗАРАБАТЫВАЕТЕ РЕАЛЬНО
         setInterval(() => {
+            if(!userName) return;
+            // Боты реально прибавляют свою мощность
             bots.forEach(b => {
-                // Боты каждую секунду "покупают" воображаемую RTX 6000
-                b.spd += 1000000 / 10; // +1M к скорости каждую секунду (делим на 10 для частоты интервала)
-                b.score += b.spd / 10;
+                b.score += b.power / 10;
             });
+            // Твой авто-майнинг
             score += autoP / 10;
             updateUI();
         }, 100);
 
-        // DRAG ПАНЕЛИ
+        // DRAG ADMIN
         const modal = document.getElementById("admin-modal");
         const header = document.getElementById("admin-header");
         let active = false, xOff = 0, yOff = 0, startX, startY;
@@ -228,6 +174,7 @@
         }
         setInterval(draw, 50);
 
+        // LOAD
         const saved = localStorage.getItem('h_user');
         if(saved) { 
             userName = saved; score = Number(localStorage.getItem('h_score')) || 0;
