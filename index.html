@@ -3,37 +3,30 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width,initial-scale=1.0">
-    <title>HAKCLIKER 3.1: FINAL ULTIMATE</title>
+    <title>HAKCLIKER 3.1: BOT EVOLUTION</title>
     <style>
         body{font-family:monospace;background:#000;color:#0f0;margin:0;padding:10px;overflow:hidden;touch-action:none}
         #matrix-canvas{position:fixed;top:0;left:0;width:100%;height:100%;z-index:-1;opacity:0.2}
         .container{max-width:600px;margin:0 auto;background:rgba(0,10,0,0.85);padding:15px;border:2px solid #0f0;border-radius:10px;height:95vh;overflow-y:auto}
         .box{background:rgba(0,255,0,0.05);padding:15px;border:1px double #0f0;border-radius:8px;margin-bottom:15px;text-align:center;position:relative}
         .gold-nick { color: #ffcc00 !important; text-shadow: 0 0 10px #ffcc00; font-weight: bold; }
-        
-        /* ЧАСТИЦЫ */
         .particle { position: fixed; pointer-events: none; z-index: 10000; color: #0f0; font-size: 1.2em; animation: pFly 0.8s ease-out forwards; }
         @keyframes pFly { 0% { opacity: 1; transform: translate(0,0); } 100% { opacity: 0; transform: translate(var(--dx), var(--dy)) rotate(360deg); } }
-
-        /* АДМИНКА */
         #admin-modal { position: fixed; top: 40px; left: 10px; background: #111; border: 3px solid #f00; z-index: 3000; width: 260px; border-radius: 15px; display: none; box-shadow: 0 0 30px #f00; }
         #admin-header { background: #f00; color: #fff; padding: 10px; cursor: grab; text-align: center; font-weight: bold; border-radius: 12px 12px 0 0; user-select: none; }
         .admin-body { padding: 10px; display: grid; gap: 5px; max-height: 400px; overflow-y: auto; }
-        
         button{background:#0f0;color:#000;border:none;padding:8px;font-weight:bold;cursor:pointer;border-radius:5px;text-transform:uppercase;width:100%;margin-top:5px;font-size:0.7em}
         input{background:#000;color:#0f0;border:1px solid #0f0;padding:5px;border-radius:4px;width:90%;text-align:center;margin:5px 0;outline:none}
         #click-btn{width:75px;height:75px;border-radius:50%;border:4px solid #0f0;background:#000;color:#0f0;font-size:1.5em;cursor:pointer;box-shadow:0 0 15px #0f0;margin:10px; transition: 0.1s;}
         #click-btn:active { transform: scale(0.9); }
         .leader-item { display: flex; justify-content: space-between; padding: 4px; border-bottom: 1px solid #111; font-size: 0.8em; }
-        #echo-bot { position: fixed; bottom: 10px; right: 10px; width: 140px; background: rgba(0,30,0,0.9); border: 1px solid #0f0; padding: 8px; border-radius: 10px; font-size: 0.7em; color: #0f0; z-index: 500; }
     </style>
 </head>
 <body>
     <canvas id="matrix-canvas"></canvas>
-    <div id="echo-bot"><b>AI ECHO:</b> <span id="bot-msg">Ready...</span></div>
 
     <div id="admin-modal">
-        <div id="admin-header">✋ ТЯНИ ПАНЕЛЬ</div>
+        <div id="admin-header">✋ ADMIN PANEL</div>
         <div class="admin-body">
             <button onclick="getRTX(6000, 1e6)" style="background:#fc0">🔥 RTX 6000</button>
             <button onclick="getRTX(7000, 1e7)" style="background:#f0f; color:#fff">🌌 RTX 7000</button>
@@ -44,7 +37,7 @@
             <hr>
             <button onclick="isGold=true; updateUI()" style="background:#ffcc00">👑 GOLD NAME</button>
             <button onclick="score += 1e24; updateUI()" style="background:#0f0">💰 +1Sx XP</button>
-            <button onclick="fullReset()" style="background:#f00; color:#fff">🗑️ ПОЛНЫЙ СБРОС</button>
+            <button onclick="fullReset()" style="background:#f00; color:#fff">🗑️ СБРОС ИГРЫ</button>
             <button onclick="document.getElementById('admin-modal').style.display='none'">CLOSE</button>
         </div>
     </div>
@@ -85,11 +78,15 @@
 
     <script>
         let score=0, autoP=0, clickP=1, userName='', isGold=false;
-        let bots = [{name:"Satoshi",score:1e18,spd:1e12},{name:"Musk",score:1e15,spd:1e10},{name:"Anonymous",score:1e12,spd:1e8}];
+        // У ботов теперь есть начальная скорость
+        let bots = [
+            {name:"Satoshi", score:1e18, spd:1e12},
+            {name:"Musk", score:1e15, spd:1e10},
+            {name:"Anonymous", score:1e12, spd:1e8}
+        ];
 
         function openAdmin() { if(userName.toLowerCase()==='миша') document.getElementById('admin-modal').style.display='block'; }
 
-        // ЭФФЕКТ КЛИКА (НУЛИ И СИМВОЛЫ)
         function createParticles(e) {
             const chars = ["0", "1", "{", "}", ";", "=>", "[]"];
             for(let i=0; i<6; i++) {
@@ -107,28 +104,25 @@
 
         function mineData(e) { score += clickP; createParticles(e); updateUI(); }
 
-        // КЕЙС С МОДЕЛЯМИ
         function buyCase() {
             if(score >= 10000) {
                 score -= 10000;
                 const models = ["RTX 2060", "RTX 3070", "RTX 4090", "RTX TITAN"];
-                const powers = [1000, 5000, 25000, 100000];
+                const powers = [1000, 5000, 20000, 100000];
                 let idx = Math.floor(Math.random()*models.length);
                 autoP += powers[idx];
-                alert("ИЗ КЕЙСА ВЫПАЛА: " + models[idx] + " (+" + powers[idx] + "/сек)");
+                alert("ВЫПАЛА: " + models[idx] + " (+" + powers[idx] + "/сек)");
                 updateUI();
             } else { alert("МАЛО XP!"); }
         }
 
         function buyAntenna() {
-            if(score >= 1000000) { score -= 1000000; autoP += 50000; alert("АНТЕННА УСТАНОВЛЕНА!"); updateUI(); }
+            if(score >= 1000000) { score -= 1000000; autoP += 50000; updateUI(); }
             else { alert("НУЖНО 1М!"); }
         }
 
-        // ПОЛНЫЙ СБРОС (ИСПРАВЛЕНО)
         function fullReset() {
             localStorage.clear();
-            score = 0; autoP = 0; clickP = 1;
             location.reload();
         }
 
@@ -163,14 +157,15 @@
             if (n >= 1e18) return (n/1e18).toFixed(1)+'Qt';
             if (n >= 1e15) return (n/1e15).toFixed(1)+'Q';
             if (n >= 1e12) return (n/1e12).toFixed(1)+'T';
+            if (n >= 1e9) return (n/1e9).toFixed(1)+'B';
             return Math.floor(n).toLocaleString();
         }
 
         function getRTX(m, p) { autoP += p; updateUI(); }
-        
+
         function transferMoney() {
             let t = document.getElementById('t-name').value;
-            let val = Number(prompt("СКОЛЬКО ПЕРЕВЕСТИ?"));
+            let val = Number(prompt("СКОЛЬКО?"));
             if(val <= score && val > 0) {
                 let b = bots.find(x => x.name.toLowerCase().includes(t.toLowerCase()));
                 if(b) { score -= val; b.score += val; updateUI(); }
@@ -184,9 +179,18 @@
             localStorage.setItem('h_gold', isGold);
         }
 
-        setInterval(() => { bots.forEach(b => b.score += b.spd/10); score += autoP/10; updateUI(); }, 100);
+        // ОБНОВЛЕННЫЙ ЦИКЛ: БОТЫ ПРОКАЧИВАЮТСЯ
+        setInterval(() => {
+            bots.forEach(b => {
+                // Боты каждую секунду "покупают" воображаемую RTX 6000
+                b.spd += 1000000 / 10; // +1M к скорости каждую секунду (делим на 10 для частоты интервала)
+                b.score += b.spd / 10;
+            });
+            score += autoP / 10;
+            updateUI();
+        }, 100);
 
-        // DRAG
+        // DRAG ПАНЕЛИ
         const modal = document.getElementById("admin-modal");
         const header = document.getElementById("admin-header");
         let active = false, xOff = 0, yOff = 0, startX, startY;
@@ -208,6 +212,7 @@
         document.addEventListener("mousedown", dS); document.addEventListener("mousemove", dM);
         document.addEventListener("mouseup", () => active = false); document.addEventListener("touchend", () => active = false);
 
+        // MATRIX
         const canvas = document.getElementById('matrix-canvas');
         const ctx = canvas.getContext('2d');
         canvas.width = window.innerWidth; canvas.height = window.innerHeight;
