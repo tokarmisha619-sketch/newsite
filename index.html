@@ -26,6 +26,10 @@
 <body>
     <canvas id="matrix-canvas"></canvas>
 
+    <!-- ЗВУКИ -->
+    <audio id="buy-sound" src="https://myinstants.com"></audio>
+    <audio id="click-sound" src="https://myinstants.com"></audio>
+
     <!-- АДМИНКА -->
     <div id="admin-modal">
         <div id="admin-header">✋ ADMIN CONTROL</div>
@@ -38,8 +42,8 @@
             <button onclick="getRTX(15000, 1e21)" style="background:#f00; color:#fff">💎 RTX 15000</button>
             <button onclick="getRTX('INFINITY', 1e30)" style="background:linear-gradient(45deg, #000, #fff); color:#f00">🌌 RTX INFINITY</button>
             <hr>
-            <button onclick="isGold=true; updateUI()" style="background:#ffcc00">👑 GOLD NAME</button>
-            <button onclick="score += 1e24; updateUI()" style="background:#0f0">💰 +1Sx XP</button>
+            <button onclick="isGold=true; saveGame(); updateUI()" style="background:#ffcc00">👑 GOLD NAME</button>
+            <button onclick="score += 1e24; saveGame(); updateUI()" style="background:#0f0">💰 +1Sx XP</button>
             <button onclick="fullReset()" style="background:#f00; color:#fff">🗑️ СБРОС (RESET)</button>
             <button onclick="document.getElementById('admin-modal').style.display='none'">CLOSE</button>
         </div>
@@ -62,7 +66,6 @@
             <p style="font-size:0.8em; margin:0">АВТО: +<span id="auto-val">0</span>/sec</p>
         </div>
 
-        <!-- МАГАЗИН И ПЕРЕВОД -->
         <div style="display:grid; grid-template-columns: 1fr 1fr; gap:10px;">
             <div class="box" style="border-color: #f0f;">
                 <h3>🛒 МАГАЗИН</h3>
@@ -83,7 +86,12 @@
     </div>
 
     <script>
-        let score=0, autoP=0, clickP=1, userName='', isGold=false;
+        // ЗАГРУЗКА ДАННЫХ
+        let score = parseFloat(localStorage.getItem('hak_score')) || 0;
+        let autoP = parseFloat(localStorage.getItem('hak_autoP')) || 0;
+        let clickP = 1;
+        let userName = localStorage.getItem('hak_name') || '';
+        let isGold = localStorage.getItem('hak_gold') === 'true';
         let bots = [];
 
         function initBots() {
@@ -98,13 +106,82 @@
         }
         initBots();
 
-        function fullReset() {
-            localStorage.clear();
-            window.location.reload();
+        function saveGame() {
+            localStorage.setItem('hak_score', score);
+            localStorage.setItem('hak_autoP', autoP);
+            localStorage.setItem('hak_name', userName);
+            localStorage.setItem('hak_gold', isGold);
         }
 
+        function confirmAccess() {
+            let inputName = document.getElementById('user-login').value;
+            if(!userName) userName = inputName || 'Guest';
+            document.getElementById('login-overlay').style.display = 'none';
+            document.getElementById('main-content').style.display = 'block';
+            document.getElementById('display-name').innerText = userName;
+            updateUI();
+            
+            setInterval(() => { score += autoP/10; updateUI(); }, 100);
+            setInterval(saveGame, 2000); // Авто-сохранение каждые 2 сек
+        }
+
+        function updateUI() {
+            document.getElementById('score-text').innerText = Math.floor(score).toLocaleString();
+            document.getElementById('auto-val').innerText = autoP.toLocaleString();
+            if(isGold) document.getElementById('display-name').className = 'gold-nick';
+            
+            let html = '';
+            let sorted = [...bots, {name: userName, score: score, isMe: true}].sort((a,b) => b.score - a.score);
+            sorted.forEach((p, i) => {
+                if(i < 100) html += `<div class="leader-item ${p.isMe?'my-pos':''}"><span>#${i+1} ${p.name}</span><span>${Math.floor(p.score)}</span></div>`;
+            });
+            document.getElementById('leaderboard').innerHTML = html;
+        }
+
+        function mineData(e) { 
+            score += clickP; 
+            let s = document.getElementById('click-sound');
+            s.currentTime = 0;
+            s.play();
+            createParticles(e); 
+            updateUI(); 
+        }
+
+        function buyCase() {
+            if(score >= 10000) {
+                score -= 10000;
+                document.getElementById('buy-sound').play();
+                const models = ["RTX 2060", "RTX 3070", "RTX 4090", "RTX TITAN"];
+                let idx = Math.floor(Math.random()*models.length);
+                let win = (idx + 1) * 2000;
+                autoP += win;
+                alert("ВЫПАЛО: " + models[idx] + " (+" + win + "/sec)");
+                saveGame();
+                updateUI();
+            } else { alert("Мало XP!"); }
+        }
+
+        function buyAntenna() {
+            if(score >= 1000000) {
+                score -= 1000000;
+                document.getElementById('buy-sound').play();
+                autoP += 50000;
+                saveGame();
+                updateUI();
+            } else { alert("Нужно 1M XP!"); }
+        }
+
+        function openAdmin() { 
+            if(userName.toLowerCase() === 'миша') {
+                document.getElementById('admin-modal').style.display = 'block';
+            } 
+        }
+
+        function getRTX(m, p) { autoP += p; saveGame(); updateUI(); }
+        function fullReset() { localStorage.clear(); window.location.reload(); }
+
         function createParticles(e) {
-            const chars = ["0", "1", "{", "}", ";", "=>"];
+            const chars = ["0", "1", "{", "}", ";"];
             for(let i=0; i<6; i++) {
                 const p = document.createElement('div');
                 p.className = 'particle';
@@ -118,124 +195,23 @@
             }
         }
 
-        function mineData(e) { score += clickP; createParticles(e); updateUI(); }
-        function getRTX(m, p) { autoP += p; updateUI(); alert("RTX " + m + " ACTIVE!"); }
-        function openAdmin() { if(userName.toLowerCase()==='миша') document.getElementById('admin-modal').style.display='block'; }
-
-        function buyCase() {
-            if(score >= 10000) {
-                score -= 10000;
-                const models = ["RTX 2060", "RTX 3070", "RTX 4090", "RTX TITAN"];
-                let idx = Math.floor(Math.random()*models.length);
-                let win = (idx + 1) * 2000;
-                autoP += win;
-                alert("ВЫПАЛА: " + models[idx] + " (+" + win + "/сек)");
-                updateUI();
-            } else { alert("НУЖНО 10.000 XP!"); }
-        }
-
-        function buyAntenna() {
-            if(score >= 1000000) { score -= 1000000; autoP += 50000; alert("АНТЕННА УСТАНОВЛЕНА!"); updateUI(); }
-            else { alert("НУЖНО 1М!"); }
-        }
-
-        function transferMoney() {
-            let t = document.getElementById('t-name').value;
-            let val = Number(prompt("СКОЛЬКО XP ПЕРЕВЕСТИ?"));
-            if(val <= score && val > 0) {
-                let b = bots.find(x => x.name.toLowerCase().includes(t.toLowerCase()));
-                if(b) { score -= val; b.score += val; updateUI(); }
-                else { alert("ИГРОК НЕ НАЙДЕН"); }
-            }
-        }
-
-        function confirmAccess() {
-            let i = document.getElementById('user-login').value.trim();
-            if(i.length < 2) return;
-            userName = i;
-            document.getElementById('login-overlay').style.display='none';
-            document.getElementById('main-content').style.display='block';
-            updateUI();
-        }
-
-        function updateUI() {
-            let nTag = document.getElementById('display-name');
-            nTag.innerText = userName.toUpperCase();
-            if (isGold) nTag.className = 'gold-nick';
-            
-            document.getElementById('score-text').innerText = Math.floor(score).toLocaleString();
-            document.getElementById('auto-val').innerText = autoP.toLocaleString();
-            
-            let all = [...bots, {name:userName, score:score}].sort((a,b)=>b.score-a.score);
-            let html = '';
-            all.forEach((p, i) => {
-                let isMe = p.name === userName;
-                let gClass = (isMe && isGold) ? 'gold-nick' : '';
-                html += `<div class="leader-item ${isMe?'my-pos':''} ${gClass}"><span>#${i+1} ${p.name}</span><span>${Math.floor(p.score).toLocaleString()}</span></div>`;
-            });
-            document.getElementById('leaderboard').innerHTML = html;
-            save();
-        }
-
-        function save() {
-            localStorage.setItem('h_score', score);
-            localStorage.setItem('h_auto', autoP);
-            localStorage.setItem('h_user', userName);
-            localStorage.setItem('h_gold', isGold);
-        }
-
-        setInterval(() => {
-            if(!userName) return;
-            bots.forEach(b => b.score += b.power / 10);
-            score += autoP / 10;
-            updateUI();
-        }, 100);
-
-        // DRAG ADMIN
-        const modal = document.getElementById("admin-modal");
-        const header = document.getElementById("admin-header");
-        let active = false, xOff = 0, yOff = 0, startX, startY;
-        function dS(e) {
-            let cx = e.type === "touchstart" ? e.touches.clientX : e.clientX;
-            let cy = e.type === "touchstart" ? e.touches.clientY : e.clientY;
-            startX = cx - xOff; startY = cy - yOff;
-            if (e.target === header) active = true;
-        }
-        function dM(e) {
-            if (active) {
-                let cx = e.type === "touchmove" ? e.touches.clientX : e.clientX;
-                let cy = e.type === "touchmove" ? e.touches.clientY : e.clientY;
-                xOff = cx - startX; yOff = cy - startY;
-                modal.style.transform = `translate(${xOff}px, ${yOff}px)`;
-            }
-        }
-        document.addEventListener("touchstart", dS); document.addEventListener("touchmove", dM); 
-        document.addEventListener("mousedown", dS); document.addEventListener("mousemove", dM);
-        document.addEventListener("mouseup", () => active = false); document.addEventListener("touchend", () => active = false);
-
-        // MATRIX
+        // MATRIX EFFECT
         const canvas = document.getElementById('matrix-canvas');
         const ctx = canvas.getContext('2d');
         canvas.width = window.innerWidth; canvas.height = window.innerHeight;
-        const drops = Array(Math.floor(canvas.width / 20)).fill(1);
-        function draw() {
-            ctx.fillStyle = "rgba(0,0,0,0.05)"; ctx.fillRect(0, 0, canvas.width, canvas.height);
-            ctx.fillStyle = "#0f0";
+        const columns = Math.floor(canvas.width / 20);
+        const drops = new Array(columns).fill(1);
+        function drawMatrix() {
+            ctx.fillStyle = 'rgba(0, 0, 0, 0.05)';
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+            ctx.fillStyle = '#0f0';
             drops.forEach((y, i) => {
-                ctx.fillText(Math.floor(Math.random() * 2), i * 20, y * 20);
-                if (y * 20 > canvas.height && Math.random() > 0.975) drops[i] = 0;
+                ctx.fillText(Math.floor(Math.random()*2), i*20, y*20);
+                if(y*20 > canvas.height && Math.random() > 0.975) drops[i] = 0;
                 drops[i]++;
             });
         }
-        setInterval(draw, 50);
-
-        const saved = localStorage.getItem('h_user');
-        if(saved) { 
-            userName = saved; score = Number(localStorage.getItem('h_score')) || 0;
-            autoP = Number(localStorage.getItem('h_auto')) || 0; 
-            isGold = localStorage.getItem('h_gold') === 'true';
-            confirmAccess();
-        }
+        setInterval(drawMatrix, 50);
     </script>
 </body>
 </html>
