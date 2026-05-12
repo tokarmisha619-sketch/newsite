@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width,initial-scale=1.0">
-    <title>HAKCLIKER 3.1: COMPETITION</title>
+    <title>HAKCLIKER 3.1: LEGACY</title>
     <style>
         body{font-family:monospace;background:#000;color:#0f0;margin:0;padding:10px;overflow:hidden;touch-action:none}
         #matrix-canvas{position:fixed;top:0;left:0;width:100%;height:100%;z-index:-1;opacity:0.2}
@@ -12,50 +12,38 @@
         #main-content{filter:blur(15px);transition:1s;pointer-events:none}
         .container{max-width:600px;margin:0 auto;background:rgba(0,0,0,0.9);padding:15px;border:2px solid #0f0;border-radius:10px;height:95vh;overflow-y:auto}
         .box{background:rgba(0,255,0,0.05);padding:15px;border:1px double #0f0;border-radius:8px;margin-bottom:15px;text-align:center}
-        #click-btn{width:80px;height:80px;border-radius:50%;border:4px solid #0f0;background:#000;color:#0f0;font-size:2em;cursor:pointer;box-shadow:0 0 15px #0f0;margin:10px}
-        button{background:#0f0;color:#000;border:none;padding:10px;font-weight:bold;cursor:pointer;border-radius:5px;text-transform:uppercase;width:100%;margin-top:5px}
+        #click-btn{width:70px;height:70px;border-radius:50%;border:4px solid #0f0;background:#000;color:#0f0;font-size:2em;cursor:pointer;box-shadow:0 0 15px #0f0;margin:10px}
+        button{background:#0f0;color:#000;border:none;padding:8px;font-weight:bold;cursor:pointer;border-radius:5px;text-transform:uppercase;width:100%;margin-top:5px;font-size:0.7em}
         
-        /* ТАБЛИЦА ЛИДЕРОВ */
-        .leaderboard { background: rgba(0,20,0,0.8); border: 1px solid #0f0; padding: 10px; border-radius: 5px; text-align: left; }
-        .leader-item { display: flex; justify-content: space-between; padding: 4px; border-bottom: 1px solid #040; font-size: 0.8em; }
-        .my-pos { background: #0f0 !important; color: #000 !important; font-weight: bold; }
-
-        /* АДМИНКА */
-        #admin-modal { position: fixed; top: 30px; left: 10px; background: #111; border: 3px solid #0f0; z-index: 3000; width: 260px; border-radius: 15px; display: none; }
-        #admin-header { background: #0f0; color: #000; padding: 8px; cursor: grab; text-align: center; font-weight: bold; border-radius: 12px 12px 0 0; }
+        /* ПЕРЕТАСКИВАЕМАЯ АДМИНКА */
+        #admin-modal { position: fixed; top: 20%; left: 10%; background: #111; border: 3px solid #f00; z-index: 3000; width: 240px; border-radius: 15px; display: none; }
+        #admin-header { background: #f00; color: #fff; padding: 8px; cursor: grab; text-align: center; font-weight: bold; border-radius: 12px 12px 0 0; }
         .admin-body { padding: 10px; display: grid; gap: 5px; }
-        #admin-btn { display:none; background:#f00; color:#fff; border:2px solid #fff; margin-bottom: 5px;}
-        
-        #status-box { position: fixed; top: 80px; right: 10px; width: 110px; background: rgba(0,30,0,0.9); border: 1px solid #0f0; padding: 5px; font-size: 0.6em; border-radius: 5px; z-index: 500; text-align: center; }
+
+        .shop-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+        .leaderboard { text-align: left; font-size: 0.8em; margin-top: 10px; }
+        .my-pos { background: #0f0; color: #000; font-weight: bold; }
     </style>
 </head>
 <body>
     <canvas id="matrix-canvas"></canvas>
 
-    <div id="status-box">
-        <div style="color: #0f0; font-weight: bold;">RANK</div>
-        <div id="rank-text">ROOKIE</div>
-        <div id="pos-text">#5</div>
-    </div>
-
+    <!-- АДМИН-ПАНЕЛЬ -->
     <div id="admin-modal">
-        <div id="admin-header">✋ ТЯНИ ПАНЕЛЬ</div>
+        <div id="admin-header">✋ ADMIN DRAG</div>
         <div class="admin-body">
-            <button onclick="getRTX(6000, 1e6)" style="background:#fc0;">🔥 RTX 6000</button>
-            <button onclick="getRTX(7000, 1e7)" style="background:#f0f; color:#fff;">🌌 RTX 7000</button>
-            <button onclick="getRTX(8000, 5e8)" style="background:#0cf;">👑 RTX 8000</button>
-            <button onclick="getRTX(9000, 1e12)" style="background:linear-gradient(45deg, #f00, #fff);">🚀 RTX 9000</button>
-            <button onclick="score += 1e15; updateUI()" style="background:#0f0;">💰 +1 КВАДРИЛЛИОН</button>
-            <button onclick="localStorage.clear(); location.reload();" style="background:#f00; color:#fff;">🗑️ СБРОС</button>
-            <button onclick="document.getElementById('admin-modal').style.display='none'">ЗАКРЫТЬ</button>
+            <button onclick="getRTX(9000, 1e12)" style="background:#fff;">🚀 RTX 9000 FREE</button>
+            <button onclick="score += 1e15; updateUI()" style="background:#0f0;">💰 +1 QUADRILLION</button>
+            <button onclick="localStorage.clear(); location.reload();" style="background:#f00; color:#fff;">🗑️ RESET GAME</button>
+            <button onclick="document.getElementById('admin-modal').style.display='none'">CLOSE</button>
         </div>
     </div>
 
     <div id="login-overlay"><div class="login-box"><h2>HAKCLIKER 3.1</h2><input type="text" id="user-login" placeholder="НИК..."><button onclick="confirmAccess()">START</button></div></div>
 
     <div id="main-content" class="container">
-        <button id="admin-btn" onclick="document.getElementById('admin-modal').style.display='block'">⚠️ ADMIN PANEL</button>
-        <h2 style="text-align:center;">ШТАБ: <span id="display-name">...</span></h2>
+        <!-- Админка теперь открывается по клику на ШТАБ -->
+        <h2 style="text-align:center;">ШТАБ: <span id="display-name" onclick="openAdmin()" style="cursor:pointer; text-decoration:underline;">...</span></h2>
         
         <div class="box">
             <h1 id="score-text">0</h1>
@@ -64,83 +52,49 @@
             <p style="font-size:0.8em">AUTO: +<span id="auto-val">0</span>/sec</p>
         </div>
 
-        <div class="box" style="border-color: #0cf;">
-            <h3 style="margin: 0 0 10px 0;">🏆 LIVE TOURNAMENT</h3>
+        <div class="box" style="border-color: #f0f;">
+            <h3 style="margin: 0 0 10px 0;">🛒 МАГАЗИН</h3>
+            <div class="shop-grid">
+                <button onclick="buyCase()" style="background:#f0f; color:#fff;">🌈 КЕЙС RTX (10К)</button>
+                <button onclick="buyAntenna()" style="background:#0080ff; color:#fff;">📡 АНТЕННА (1М)</button>
+            </div>
+        </div>
+
+        <div class="box">
+            <h4>🏆 ТУРНИР</h4>
             <div id="leaderboard" class="leaderboard"></div>
         </div>
     </div>
 
     <script>
-        let score=0, autoP=0, clickP=1, userName='', isGold=false;
-        let competitors = [
-            {name: "Elon Musk 🚀", score: 1e12, speed: 5e8},
-            {name: "Anonymous 🎭", score: 1e9, speed: 1e7},
-            {name: "Hacker_Pro 💻", score: 1e7, speed: 5e5},
-            {name: "ScriptKid 👶", score: 1e4, speed: 1e2}
-        ];
+        let score=0, autoP=0, clickP=1, userName='';
+        let bots = [{name: "Elon Musk", score: 1e12}, {name: "Anonymous", score: 1e9}, {name: "Hacker", score: 1e6}];
 
-        function loadGame() {
-            userName = localStorage.getItem('h_user') || '';
-            score = Number(localStorage.getItem('h_score')) || 0;
-            autoP = Number(localStorage.getItem('h_auto')) || 0;
-            if (userName) {
-                document.getElementById('login-overlay').style.display = 'none';
-                document.getElementById('main-content').style.filter = 'none';
-                document.getElementById('main-content').style.pointerEvents = 'auto';
-                document.getElementById('display-name').innerText = userName.toUpperCase();
-                if(userName.toLowerCase() === 'миша') document.getElementById('admin-btn').style.display='block';
-                updateUI();
+        function openAdmin() {
+            if(userName.toLowerCase() === 'миша') {
+                document.getElementById('admin-modal').style.display = 'block';
+            } else {
+                alert("ДОСТУП ЗАПРЕЩЕН!");
             }
         }
-        window.onload = loadGame;
 
-        function updateUI() {
-            document.getElementById('score-text').innerText = fmt(score);
-            document.getElementById('auto-val').innerText = fmt(autoP);
-            document.getElementById('lvl-text').innerText = "LVL: " + Math.floor(Math.sqrt(score/100));
-
-            // Логика соревнования
-            let all = [...competitors, {name: userName, score: score}].sort((a,b) => b.score - a.score);
-            let myPos = all.findIndex(p => p.name === userName) + 1;
-            
-            document.getElementById('pos-text').innerText = "#" + myPos;
-            let r = "ROOKIE";
-            if(myPos === 1) r = "LEGEND 👑";
-            else if(myPos === 2) r = "MASTER";
-            else if(myPos === 3) r = "PRO";
-            document.getElementById('rank-text').innerText = r;
-
-            let html = '';
-            all.forEach((p, i) => {
-                let me = p.name === userName ? 'my-pos' : '';
-                html += `<div class="leader-item ${me}"><span>#${i+1} ${p.name}</span><span>${fmt(p.score)}</span></div>`;
-            });
-            document.getElementById('leaderboard').innerHTML = html;
-
-            saveGame();
+        function buyCase() {
+            if (score >= 10000) {
+                score -= 10000;
+                let win = Math.floor(Math.random() * 5000) + 500;
+                autoP += win;
+                alert("ИЗ КЕЙСА ВЫПАЛО: +" + win + "/сек!");
+                updateUI();
+            } else { alert("НУЖНО 10.000 XP!"); }
         }
 
-        // Боты тоже копят очки
-        setInterval(() => {
-            competitors.forEach(bot => bot.score += bot.speed / 10);
-            score += autoP / 10;
-            updateUI();
-        }, 100);
-
-        function fmt(n) {
-            if (n >= 1e15) return (n/1e15).toFixed(1)+'Q';
-            if (n >= 1e12) return (n/1e12).toFixed(1)+'T';
-            if (n >= 1e9) return (n/1e9).toFixed(1)+'B';
-            if (n >= 1e6) return (n/1e6).toFixed(1)+'M';
-            return Math.floor(n);
-        }
-
-        function mineData() { score += clickP; updateUI(); }
-        function getRTX(m, p) { autoP += p; updateUI(); }
-        function saveGame() {
-            localStorage.setItem('h_score', score);
-            localStorage.setItem('h_auto', autoP);
-            localStorage.setItem('h_user', userName);
+        function buyAntenna() {
+            if (score >= 1000000) {
+                score -= 1000000;
+                autoP += 50000;
+                alert("АНТЕННА УСТАНОВЛЕНА! +50.000/сек!");
+                updateUI();
+            } else { alert("НУЖНО 1.000.000 XP!"); }
         }
 
         function confirmAccess() {
@@ -151,11 +105,46 @@
             document.getElementById('main-content').style.filter='none';
             document.getElementById('main-content').style.pointerEvents='auto';
             document.getElementById('display-name').innerText=userName.toUpperCase();
-            if(userName.toLowerCase() === 'миша') document.getElementById('admin-btn').style.display='block';
             updateUI();
         }
 
-        // ПЕРЕТАСКИВАНИЕ
+        function loadGame() {
+            userName = localStorage.getItem('h_user') || '';
+            score = Number(localStorage.getItem('h_score')) || 0;
+            autoP = Number(localStorage.getItem('h_auto')) || 0;
+            if (userName) confirmAccess();
+        }
+        window.onload = loadGame;
+
+        function updateUI() {
+            document.getElementById('score-text').innerText = fmt(score);
+            document.getElementById('auto-val').innerText = fmt(autoP);
+            document.getElementById('lvl-text').innerText = "LVL: " + Math.floor(Math.sqrt(score/100));
+
+            let all = [...bots, {name: userName, score: score}].sort((a,b) => b.score - a.score);
+            let html = '';
+            all.forEach((p, i) => {
+                let me = p.name === userName ? 'my-pos' : '';
+                html += `<div style="display:flex; justify-content:space-between;" class="${me}"><span>#${i+1} ${p.name}</span><span>${fmt(p.score)}</span></div>`;
+            });
+            document.getElementById('leaderboard').innerHTML = html;
+            localStorage.setItem('h_score', score);
+            localStorage.setItem('h_auto', autoP);
+            localStorage.setItem('h_user', userName);
+        }
+
+        function fmt(n) {
+            if (n >= 1e12) return (n/1e12).toFixed(1)+'T';
+            if (n >= 1e9) return (n/1e9).toFixed(1)+'B';
+            if (n >= 1e6) return (n/1e6).toFixed(1)+'M';
+            return Math.floor(n);
+        }
+
+        function mineData() { score += clickP; updateUI(); }
+        function getRTX(m, p) { autoP += p; updateUI(); }
+        setInterval(() => { score += autoP/10; updateUI(); }, 100);
+
+        // DRAG LOGIC
         const modal = document.getElementById("admin-modal");
         const header = document.getElementById("admin-header");
         let active = false, currentX, currentY, initialX, initialY, xOffset = 0, yOffset = 0;
@@ -180,7 +169,7 @@
         document.addEventListener("mousedown", dStart); document.addEventListener("mousemove", dMove);
         document.addEventListener("mouseup", () => active = false); document.addEventListener("touchend", () => active = false);
 
-        // МАТРИЦА
+        // MATRIX
         const canvas = document.getElementById('matrix-canvas');
         const ctx = canvas.getContext('2d');
         canvas.width = window.innerWidth; canvas.height = window.innerHeight;
