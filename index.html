@@ -26,9 +26,9 @@
 <body>
     <canvas id="matrix-canvas"></canvas>
 
-    <!-- ЗВУКИ -->
-    <audio id="buy-sound" src="https://myinstants.com"></audio>
-    <audio id="click-sound" src="https://myinstants.com"></audio>
+    <!-- ЗВУКИ (ОБНОВЛЕННЫЕ ССЫЛКИ) -->
+    <audio id="buy-sound" src="https://myinstants.com" preload="auto"></audio>
+    <audio id="click-sound" src="https://myinstants.com" preload="auto"></audio>
 
     <!-- АДМИНКА -->
     <div id="admin-modal">
@@ -86,12 +86,9 @@
     </div>
 
     <script>
-        // ЗАГРУЗКА ДАННЫХ
         let score = parseFloat(localStorage.getItem('hak_score')) || 0;
         let autoP = parseFloat(localStorage.getItem('hak_autoP')) || 0;
-        let clickP = 1;
-        let userName = localStorage.getItem('hak_name') || '';
-        let isGold = localStorage.getItem('hak_gold') === 'true';
+        let clickP = 1, userName = localStorage.getItem('hak_name') || '', isGold = localStorage.getItem('hak_gold') === 'true';
         let bots = [];
 
         function initBots() {
@@ -119,10 +116,12 @@
             document.getElementById('login-overlay').style.display = 'none';
             document.getElementById('main-content').style.display = 'block';
             document.getElementById('display-name').innerText = userName;
+            // Важно: загружаем звуки после первого взаимодействия
+            document.getElementById('click-sound').load();
+            document.getElementById('buy-sound').load();
             updateUI();
-            
             setInterval(() => { score += autoP/10; updateUI(); }, 100);
-            setInterval(saveGame, 2000); // Авто-сохранение каждые 2 сек
+            setInterval(saveGame, 2000);
         }
 
         function updateUI() {
@@ -140,9 +139,9 @@
 
         function mineData(e) { 
             score += clickP; 
-            let s = document.getElementById('click-sound');
+            const s = document.getElementById('click-sound');
             s.currentTime = 0;
-            s.play();
+            s.play().catch(()=>{}); // Игнорим ошибки браузера
             createParticles(e); 
             updateUI(); 
         }
@@ -150,7 +149,7 @@
         function buyCase() {
             if(score >= 10000) {
                 score -= 10000;
-                document.getElementById('buy-sound').play();
+                document.getElementById('buy-sound').play().catch(()=>{});
                 const models = ["RTX 2060", "RTX 3070", "RTX 4090", "RTX TITAN"];
                 let idx = Math.floor(Math.random()*models.length);
                 let win = (idx + 1) * 2000;
@@ -158,30 +157,25 @@
                 alert("ВЫПАЛО: " + models[idx] + " (+" + win + "/sec)");
                 saveGame();
                 updateUI();
-            } else { alert("Мало XP!"); }
+            }
         }
 
         function buyAntenna() {
             if(score >= 1000000) {
                 score -= 1000000;
-                document.getElementById('buy-sound').play();
+                document.getElementById('buy-sound').play().catch(()=>{});
                 autoP += 50000;
                 saveGame();
                 updateUI();
-            } else { alert("Нужно 1M XP!"); }
+            }
         }
 
-        function openAdmin() { 
-            if(userName.toLowerCase() === 'миша') {
-                document.getElementById('admin-modal').style.display = 'block';
-            } 
-        }
-
+        function openAdmin() { if(userName.toLowerCase() === 'миша') document.getElementById('admin-modal').style.display = 'block'; }
         function getRTX(m, p) { autoP += p; saveGame(); updateUI(); }
         function fullReset() { localStorage.clear(); window.location.reload(); }
 
         function createParticles(e) {
-            const chars = ["0", "1", "{", "}", ";"];
+            const chars = ["0", "1", "{", "}"];
             for(let i=0; i<6; i++) {
                 const p = document.createElement('div');
                 p.className = 'particle';
@@ -195,7 +189,6 @@
             }
         }
 
-        // MATRIX EFFECT
         const canvas = document.getElementById('matrix-canvas');
         const ctx = canvas.getContext('2d');
         canvas.width = window.innerWidth; canvas.height = window.innerHeight;
