@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width,initial-scale=1.0">
-    <title>HAKCLIKER 3.1: LEGACY</title>
+    <title>HAKCLIKER 3.1</title>
     <style>
         body{font-family:monospace;background:#000;color:#0f0;margin:0;padding:10px;overflow:hidden;touch-action:none}
         #matrix-canvas{position:fixed;top:0;left:0;width:100%;height:100%;z-index:-1;opacity:0.2}
@@ -14,27 +14,29 @@
         .box{background:rgba(0,255,0,0.05);padding:15px;border:1px double #0f0;border-radius:8px;margin-bottom:15px;text-align:center}
         #click-btn{width:70px;height:70px;border-radius:50%;border:4px solid #0f0;background:#000;color:#0f0;font-size:2em;cursor:pointer;box-shadow:0 0 15px #0f0;margin:10px}
         button{background:#0f0;color:#000;border:none;padding:8px;font-weight:bold;cursor:pointer;border-radius:5px;text-transform:uppercase;width:100%;margin-top:5px;font-size:0.7em}
+        input{background:#000;color:#0f0;border:1px solid #0f0;padding:5px;border-radius:4px;width:80%;text-align:center;margin:5px 0;outline:none;font-size:0.8em}
+        .gold-nick { color: #ffcc00 !important; font-weight: bold; text-shadow: 0 0 10px #ffcc00; }
         
         /* ПЕРЕТАСКИВАЕМАЯ АДМИНКА */
-        #admin-modal { position: fixed; top: 20%; left: 10%; background: #111; border: 3px solid #f00; z-index: 3000; width: 240px; border-radius: 15px; display: none; }
-        #admin-header { background: #f00; color: #fff; padding: 8px; cursor: grab; text-align: center; font-weight: bold; border-radius: 12px 12px 0 0; }
+        #admin-modal { position: fixed; top: 40px; left: 10px; background: #111; border: 3px solid #f00; z-index: 3000; width: 250px; border-radius: 15px; display: none; }
+        #admin-header { background: #f00; color: #fff; padding: 10px; cursor: grab; text-align: center; font-weight: bold; border-radius: 12px 12px 0 0; }
         .admin-body { padding: 10px; display: grid; gap: 5px; }
 
-        .shop-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
-        .leaderboard { text-align: left; font-size: 0.8em; margin-top: 10px; }
-        .my-pos { background: #0f0; color: #000; font-weight: bold; }
+        .leader-item { display: flex; justify-content: space-between; padding: 4px; border-bottom: 1px solid #111; font-size: 0.8em; }
+        .my-pos { background: rgba(0,255,0,0.2); color: #fff; border: 1px solid #0f0; }
     </style>
 </head>
 <body>
     <canvas id="matrix-canvas"></canvas>
 
-    <!-- АДМИН-ПАНЕЛЬ -->
     <div id="admin-modal">
-        <div id="admin-header">✋ ADMIN DRAG</div>
+        <div id="admin-header">✋ ADMIN CONTROL</div>
         <div class="admin-body">
-            <button onclick="getRTX(9000, 1e12)" style="background:#fff;">🚀 RTX 9000 FREE</button>
-            <button onclick="score += 1e15; updateUI()" style="background:#0f0;">💰 +1 QUADRILLION</button>
-            <button onclick="localStorage.clear(); location.reload();" style="background:#f00; color:#fff;">🗑️ RESET GAME</button>
+            <button onclick="getRTX(10000, 5e17)" style="background:linear-gradient(45deg, #0f0, #ff0);">⚡ RTX 10000 (+500Q/с)</button>
+            <button onclick="score += 1e18; updateUI()" style="background:#0f0;">💰 +1 КВИНТИЛЛИОН</button>
+            <button onclick="resetBots()" style="background:#f90; color:#000;">⛔ ОБНУЛИТЬ ВСЕХ БОТОВ</button>
+            <button onclick="isGold=true; updateUI()" style="background:#ffcc00;">👑 GOLD NICK</button>
+            <button onclick="localStorage.clear(); location.reload();" style="background:#f00; color:#fff;">🗑️ RESET SYSTEM</button>
             <button onclick="document.getElementById('admin-modal').style.display='none'">CLOSE</button>
         </div>
     </div>
@@ -42,7 +44,6 @@
     <div id="login-overlay"><div class="login-box"><h2>HAKCLIKER 3.1</h2><input type="text" id="user-login" placeholder="НИК..."><button onclick="confirmAccess()">START</button></div></div>
 
     <div id="main-content" class="container">
-        <!-- Админка теперь открывается по клику на ШТАБ -->
         <h2 style="text-align:center;">ШТАБ: <span id="display-name" onclick="openAdmin()" style="cursor:pointer; text-decoration:underline;">...</span></h2>
         
         <div class="box">
@@ -52,49 +53,58 @@
             <p style="font-size:0.8em">AUTO: +<span id="auto-val">0</span>/sec</p>
         </div>
 
-        <div class="box" style="border-color: #f0f;">
-            <h3 style="margin: 0 0 10px 0;">🛒 МАГАЗИН</h3>
-            <div class="shop-grid">
-                <button onclick="buyCase()" style="background:#f0f; color:#fff;">🌈 КЕЙС RTX (10К)</button>
-                <button onclick="buyAntenna()" style="background:#0080ff; color:#fff;">📡 АНТЕННА (1М)</button>
+        <div style="display:grid; grid-template-columns: 1fr 1fr; gap:10px;">
+            <div class="box" style="border-color: #f0f;">
+                <h3>🛒 МАГАЗИН</h3>
+                <button onclick="buyCase()" style="background:#f0f; color:#fff;">🌈 КЕЙС RTX</button>
+                <button onclick="usePromo()" style="background:#444; color:#0f0;">🎁 ПРОМОКОД</button>
+            </div>
+            <div class="box" style="border-color: #0080ff;">
+                <h3>📤 ПЕРЕВОД</h3>
+                <input type="text" id="trans-name" placeholder="КОМУ">
+                <input type="number" id="trans-val" placeholder="СУММА">
+                <button onclick="transferMoney()" style="background:#0080ff; color:#fff;">SEND XP</button>
             </div>
         </div>
 
-        <div class="box">
-            <h4>🏆 ТУРНИР</h4>
-            <div id="leaderboard" class="leaderboard"></div>
+        <div class="box" style="border-color: #0cf;">
+            <h3>🏆 ТУРНИР</h3>
+            <div id="leaderboard"></div>
         </div>
     </div>
 
     <script>
-        let score=0, autoP=0, clickP=1, userName='';
-        let bots = [{name: "Elon Musk", score: 1e12}, {name: "Anonymous", score: 1e9}, {name: "Hacker", score: 1e6}];
+        let score=0, autoP=0, clickP=1, userName='', isGold=false;
+        let bots = [
+            {name: "Elon Musk 🚀", score: 1e12, speed: 1e8},
+            {name: "Anonymous 🎭", score: 1e10, speed: 5e7},
+            {name: "HackerOne 💻", score: 1e8, speed: 1e6}
+        ];
 
-        function openAdmin() {
-            if(userName.toLowerCase() === 'миша') {
-                document.getElementById('admin-modal').style.display = 'block';
-            } else {
-                alert("ДОСТУП ЗАПРЕЩЕН!");
+        function openAdmin() { if(userName.toLowerCase() === 'миша') document.getElementById('admin-modal').style.display = 'block'; }
+        
+        // НОВАЯ ФУНКЦИЯ УДАЛЕНИЯ ДЕНЕГ У БОТОВ
+        function resetBots() {
+            bots.forEach(bot => { bot.score = 0; bot.speed = 0; });
+            alert("СИСТЕМА ВЗЛОМАНА: ВСЕ ИГРОКИ ОБНУЛЕНЫ!");
+            updateUI();
+        }
+
+        function usePromo() {
+            let p = prompt("ПРОМОКОД:");
+            if(p === "MISHA_TOP") { score += 1e11; alert("+100 МЛРД"); }
+            else if(p === "FREE_RTX") { autoP += 5e5; alert("+500К/с"); }
+            updateUI();
+        }
+
+        function transferMoney() {
+            let target = document.getElementById('trans-name').value;
+            let val = Number(document.getElementById('trans-val').value);
+            if(val <= score && val > 0) {
+                let bot = bots.find(b => b.name.toLowerCase().includes(target.toLowerCase()));
+                if(bot) { score -= val; bot.score += val; alert("XP ОТПРАВЛЕНЫ"); }
             }
-        }
-
-        function buyCase() {
-            if (score >= 10000) {
-                score -= 10000;
-                let win = Math.floor(Math.random() * 5000) + 500;
-                autoP += win;
-                alert("ИЗ КЕЙСА ВЫПАЛО: +" + win + "/сек!");
-                updateUI();
-            } else { alert("НУЖНО 10.000 XP!"); }
-        }
-
-        function buyAntenna() {
-            if (score >= 1000000) {
-                score -= 1000000;
-                autoP += 50000;
-                alert("АНТЕННА УСТАНОВЛЕНА! +50.000/сек!");
-                updateUI();
-            } else { alert("НУЖНО 1.000.000 XP!"); }
+            updateUI();
         }
 
         function confirmAccess() {
@@ -112,6 +122,7 @@
             userName = localStorage.getItem('h_user') || '';
             score = Number(localStorage.getItem('h_score')) || 0;
             autoP = Number(localStorage.getItem('h_auto')) || 0;
+            isGold = localStorage.getItem('h_gold') === 'true';
             if (userName) confirmAccess();
         }
         window.onload = loadGame;
@@ -120,20 +131,25 @@
             document.getElementById('score-text').innerText = fmt(score);
             document.getElementById('auto-val').innerText = fmt(autoP);
             document.getElementById('lvl-text').innerText = "LVL: " + Math.floor(Math.sqrt(score/100));
+            if (isGold) document.getElementById('display-name').classList.add('gold-nick');
 
             let all = [...bots, {name: userName, score: score}].sort((a,b) => b.score - a.score);
             let html = '';
             all.forEach((p, i) => {
-                let me = p.name === userName ? 'my-pos' : '';
-                html += `<div style="display:flex; justify-content:space-between;" class="${me}"><span>#${i+1} ${p.name}</span><span>${fmt(p.score)}</span></div>`;
+                let meClass = p.name === userName ? 'my-pos' : '';
+                html += `<div class="leader-item ${meClass}"><span>#${i+1} ${p.name}</span><span>${fmt(p.score)}</span></div>`;
             });
             document.getElementById('leaderboard').innerHTML = html;
+
             localStorage.setItem('h_score', score);
             localStorage.setItem('h_auto', autoP);
             localStorage.setItem('h_user', userName);
+            localStorage.setItem('h_gold', isGold);
         }
 
         function fmt(n) {
+            if (n >= 1e18) return (n/1e18).toFixed(1)+'Qt';
+            if (n >= 1e15) return (n/1e15).toFixed(1)+'Q';
             if (n >= 1e12) return (n/1e12).toFixed(1)+'T';
             if (n >= 1e9) return (n/1e9).toFixed(1)+'B';
             if (n >= 1e6) return (n/1e6).toFixed(1)+'M';
@@ -142,27 +158,32 @@
 
         function mineData() { score += clickP; updateUI(); }
         function getRTX(m, p) { autoP += p; updateUI(); }
-        setInterval(() => { score += autoP/10; updateUI(); }, 100);
+        function buyCase() { if (score >= 10000) { score -= 10000; autoP += 5000; updateUI(); } }
 
-        // DRAG LOGIC
+        setInterval(() => {
+            bots.forEach(bot => bot.score += bot.speed / 10);
+            score += autoP / 10;
+            updateUI();
+        }, 100);
+
+        // DRAG ADMIN
         const modal = document.getElementById("admin-modal");
         const header = document.getElementById("admin-header");
-        let active = false, currentX, currentY, initialX, initialY, xOffset = 0, yOffset = 0;
+        let active = false, xOff = 0, yOff = 0, startX, startY;
 
         function dStart(e) {
-            let cx = e.type === "touchstart" ? e.touches.clientX : e.clientX;
-            let cy = e.type === "touchstart" ? e.touches.clientY : e.clientY;
-            initialX = cx - xOffset; initialY = cy - yOffset;
+            let cx = e.type === "touchstart" ? e.touches[0].clientX : e.clientX;
+            let cy = e.type === "touchstart" ? e.touches[0].clientY : e.clientY;
+            startX = cx - xOff; startY = cy - yOff;
             if (e.target === header) active = true;
         }
         function dMove(e) {
             if (active) {
                 e.preventDefault();
-                let cx = e.type === "touchmove" ? e.touches.clientX : e.clientX;
-                let cy = e.type === "touchmove" ? e.touches.clientY : e.clientY;
-                currentX = cx - initialX; currentY = cy - initialY;
-                xOffset = currentX; yOffset = currentY;
-                modal.style.transform = `translate(${currentX}px, ${currentY}px)`;
+                let cx = e.type === "touchmove" ? e.touches[0].clientX : e.clientX;
+                let cy = e.type === "touchmove" ? e.touches[0].clientY : e.clientY;
+                xOff = cx - startX; yOff = cy - startY;
+                modal.style.transform = `translate(${xOff}px, ${yOff}px)`;
             }
         }
         document.addEventListener("touchstart", dStart); document.addEventListener("touchmove", dMove); 
