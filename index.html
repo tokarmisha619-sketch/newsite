@@ -3,47 +3,48 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width,initial-scale=1.0">
-    <title>HAKCLIKER 3.1: STRIKE MODE</title>
+    <title>HAKCLIKER 3.1: FINAL ULTIMATE</title>
     <style>
         body{font-family:monospace;background:#000;color:#0f0;margin:0;padding:10px;overflow:hidden;touch-action:none}
-        #matrix-canvas{position:fixed;top:0;left:0;width:100%;height:100%;z-index:-1;opacity:0.2;transition:0.5s}
+        #matrix-canvas{position:fixed;top:0;left:0;width:100%;height:100%;z-index:-1;opacity:0.2}
         .container{max-width:600px;margin:0 auto;background:rgba(0,10,0,0.85);padding:15px;border:2px solid #0f0;border-radius:10px;height:95vh;overflow-y:auto}
         .box{background:rgba(0,255,0,0.05);padding:15px;border:1px double #0f0;border-radius:8px;margin-bottom:15px;text-align:center;position:relative}
-        
-        /* ЗОЛОТОЙ НИК СТИЛЬ */
         .gold-nick { color: #ffcc00 !important; text-shadow: 0 0 10px #ffcc00; font-weight: bold; }
         
-        /* ОКНО ТВОЕЙ АТАКИ */
-        #strike-box { display:none; position:fixed; top:50%; left:50%; transform:translate(-50%,-50%); width:280px; background:#002244; border:4px solid #0080ff; color:#fff; z-index:5000; padding:20px; text-align:center; box-shadow:0 0 50px #0080ff; border-radius:15px; }
-        #strike-btn { background:#0080ff; color:#fff; border:none; padding:15px; width:100%; margin-top:10px; cursor:pointer; font-weight:bold; }
+        /* ЧАСТИЦЫ */
+        .particle { position: fixed; pointer-events: none; z-index: 10000; color: #0f0; font-size: 1.2em; animation: pFly 0.8s ease-out forwards; }
+        @keyframes pFly { 0% { opacity: 1; transform: translate(0,0); } 100% { opacity: 0; transform: translate(var(--dx), var(--dy)) rotate(360deg); } }
+
+        /* АДМИНКА */
+        #admin-modal { position: fixed; top: 40px; left: 10px; background: #111; border: 3px solid #f00; z-index: 3000; width: 260px; border-radius: 15px; display: none; box-shadow: 0 0 30px #f00; }
+        #admin-header { background: #f00; color: #fff; padding: 10px; cursor: grab; text-align: center; font-weight: bold; border-radius: 12px 12px 0 0; user-select: none; }
+        .admin-body { padding: 10px; display: grid; gap: 5px; max-height: 400px; overflow-y: auto; }
         
-        #click-btn{width:75px;height:75px;border-radius:50%;border:4px solid #0f0;background:#000;color:#0f0;font-size:1.5em;cursor:pointer;box-shadow:0 0 15px #0f0;margin:10px;}
-        
-        #admin-modal { position: fixed; top: 40px; left: 10px; background: #111; border: 3px solid #f00; z-index: 3000; width: 250px; border-radius: 15px; display: none; }
-        #admin-header { background: #f00; color: #fff; padding: 10px; cursor: grab; text-align: center; font-weight: bold; border-radius: 12px 12px 0 0; }
-        #echo-bot { position: fixed; bottom: 10px; right: 10px; width: 150px; background: rgba(0,30,0,0.9); border: 1px solid #0f0; padding: 8px; border-radius: 10px; font-size: 0.7em; color: #0f0; z-index: 500; }
+        button{background:#0f0;color:#000;border:none;padding:8px;font-weight:bold;cursor:pointer;border-radius:5px;text-transform:uppercase;width:100%;margin-top:5px;font-size:0.7em}
+        input{background:#000;color:#0f0;border:1px solid #0f0;padding:5px;border-radius:4px;width:90%;text-align:center;margin:5px 0;outline:none}
+        #click-btn{width:75px;height:75px;border-radius:50%;border:4px solid #0f0;background:#000;color:#0f0;font-size:1.5em;cursor:pointer;box-shadow:0 0 15px #0f0;margin:10px; transition: 0.1s;}
+        #click-btn:active { transform: scale(0.9); }
+        .leader-item { display: flex; justify-content: space-between; padding: 4px; border-bottom: 1px solid #111; font-size: 0.8em; }
+        #echo-bot { position: fixed; bottom: 10px; right: 10px; width: 140px; background: rgba(0,30,0,0.9); border: 1px solid #0f0; padding: 8px; border-radius: 10px; font-size: 0.7em; color: #0f0; z-index: 500; }
     </style>
 </head>
 <body>
     <canvas id="matrix-canvas"></canvas>
-    
-    <div id="echo-bot"><b>AI ECHO:</b> <span id="bot-msg">Готов к взлому...</span></div>
-
-    <!-- ОКНО АТАКИ (ТЫ АТАКУЕШЬ) -->
-    <div id="strike-box">
-        <h2 style="margin:0; color:#0080ff">⚡ ЦЕЛЬ НАЙДЕНА!</h2>
-        <p>Взламываем сервер корпорации...<br>У тебя 60 секунд!</p>
-        <div style="font-size:2em; font-weight:bold;" id="timer">60s</div>
-        <button id="strike-btn" onclick="strikeClick()">КЛИКАЙ ДЛЯ ВЗЛОМА (<span id="clicks-left">30</span>)</button>
-    </div>
+    <div id="echo-bot"><b>AI ECHO:</b> <span id="bot-msg">Ready...</span></div>
 
     <div id="admin-modal">
-        <div id="admin-header">✋ ADMIN PANEL</div>
-        <div style="padding:10px; display:grid; gap:5px;">
-            <button onclick="getRTX(15000, 1e18)" style="background:#f00; color:#fff">⚡ RTX 15000 (+1Qt/s)</button>
-            <button onclick="isGold=true; updateUI()" style="background:#ffcc00; color:#000">👑 ЗОЛОТОЙ НИК (ВЕЗДЕ)</button>
+        <div id="admin-header">✋ ТЯНИ ПАНЕЛЬ</div>
+        <div class="admin-body">
+            <button onclick="getRTX(6000, 1e6)" style="background:#fc0">🔥 RTX 6000</button>
+            <button onclick="getRTX(7000, 1e7)" style="background:#f0f; color:#fff">🌌 RTX 7000</button>
+            <button onclick="getRTX(8000, 5e8)" style="background:#0cf">👑 RTX 8000</button>
+            <button onclick="getRTX(9000, 1e12)" style="background:#0f0">🚀 RTX 9000</button>
+            <button onclick="getRTX(10000, 5e17)" style="background:linear-gradient(45deg,#0f0,#ff0)">⚡ RTX 10000</button>
+            <button onclick="getRTX(15000, 1e21)" style="background:#f00; color:#fff">💎 RTX 15000</button>
+            <hr>
+            <button onclick="isGold=true; updateUI()" style="background:#ffcc00">👑 GOLD NAME</button>
             <button onclick="score += 1e24; updateUI()" style="background:#0f0">💰 +1Sx XP</button>
-            <button onclick="localStorage.clear(); location.reload();" style="background:#333; color:#fff">🗑️ RESET</button>
+            <button onclick="fullReset()" style="background:#f00; color:#fff">🗑️ ПОЛНЫЙ СБРОС</button>
             <button onclick="document.getElementById('admin-modal').style.display='none'">CLOSE</button>
         </div>
     </div>
@@ -51,126 +52,141 @@
     <div id="login-overlay" style="position:fixed; top:0; left:0; width:100%; height:100%; background:#000; z-index:2000; display:flex; align-items:center; justify-content:center">
         <div class="box" style="width:250px; background:#000;">
             <h2>HAKCLIKER OS</h2>
-            <input type="text" id="user-login" placeholder="ИМЯ..." style="background:#000;color:#0f0;border:1px solid #0f0;padding:10px;text-align:center;width:80%;">
-            <button onclick="confirmAccess()">ВХОД</button>
+            <input type="text" id="user-login" placeholder="LOGIN...">
+            <button onclick="confirmAccess()">START</button>
         </div>
     </div>
 
     <div id="main-content" class="container">
-        <h2 style="text-align:center;">ШТАБ: <span id="display-name" onclick="openAdmin()" style="cursor:pointer; text-decoration:underline">...</span></h2>
+        <h2 style="text-align:center;">ROOT: <span id="display-name" onclick="openAdmin()" style="cursor:pointer; text-decoration:underline">...</span></h2>
+        
         <div class="box">
             <h1 id="score-text">0</h1>
-            <button onclick="mineData()" id="click-btn">⚡</button>
-            <p id="lvl-text" style="color:#fc0;">RANK: ROOKIE</p>
+            <button onclick="mineData(event)" id="click-btn">⚡</button>
+            <p id="lvl-text" style="color:#fc0;">LVL: 0</p>
             <p style="font-size:0.8em">AUTO: +<span id="auto-val">0</span>/sec</p>
         </div>
-        <div class="box" style="border-color:#0cf;">
-            <h4>🏆 LIVE TOURNAMENT</h4>
-            <div id="leaderboard"></div>
+
+        <div style="display:grid; grid-template-columns: 1fr 1fr; gap:10px;">
+            <div class="box" style="border-color: #f0f;">
+                <h3>🛒 SHOP</h3>
+                <button onclick="buyCase()" style="background:#f0f; color:#fff">🌈 RTX CASE (10K)</button>
+                <button onclick="buyAntenna()" style="background:#0080ff; color:#fff">📡 ANTENNA (1M)</button>
+            </div>
+            <div class="box" style="border-color: #0cf;">
+                <h3>📤 TRANSFER</h3>
+                <input type="text" id="t-name" placeholder="TARGET">
+                <button onclick="transferMoney()" style="background:#0cf; color:#000">SEND XP</button>
+            </div>
         </div>
+
+        <div class="box"><div id="leaderboard"></div></div>
     </div>
 
     <script>
-        let score=0, autoP=0, clickP=1, userName='', isGold=false, isStriking=false, timeLeft=60, clicksLeft=30;
-        let bots = [{name:"Satoshi 👑",score:1e18,spd:1e12},{name:"Musk 🚀",score:1e15,spd:1e10},{name:"Anonymous 🎭",score:1e12,spd:1e8}];
+        let score=0, autoP=0, clickP=1, userName='', isGold=false;
+        let bots = [{name:"Satoshi",score:1e18,spd:1e12},{name:"Musk",score:1e15,spd:1e10},{name:"Anonymous",score:1e12,spd:1e8}];
 
-        function logBot(msg) { document.getElementById('bot-msg').innerText = msg; }
         function openAdmin() { if(userName.toLowerCase()==='миша') document.getElementById('admin-modal').style.display='block'; }
 
-        // ТВОЯ АТАКА
-        function startStrike() {
-            if (isStriking || !userName) return;
-            isStriking = true;
-            timeLeft = 60;
-            clicksLeft = 30;
-            document.getElementById('strike-box').style.display = 'block';
-            document.getElementById('clicks-left').innerText = clicksLeft;
-            logBot("НАЧИНАЕМ АТАКУ НА СЕРВЕР!");
-            
-            let strikeTimer = setInterval(() => {
-                if (!isStriking) { clearInterval(strikeTimer); return; }
-                timeLeft--;
-                document.getElementById('timer').innerText = timeLeft + "s";
-                if (timeLeft <= 0) { clearInterval(strikeTimer); endStrike(false); }
-            }, 1000);
-        }
-
-        function strikeClick() {
-            clicksLeft--;
-            document.getElementById('clicks-left').innerText = clicksLeft;
-            if (clicksLeft <= 0) endStrike(true);
-        }
-
-        function endStrike(win) {
-            isStriking = false;
-            document.getElementById('strike-box').style.display = 'none';
-            if (win) {
-                let prize = score * 0.5 + 1e12;
-                score += prize;
-                logBot("СЕРВЕР ВЗЛОМАН! ПРИЗ ВАШ!");
-                alert("УСПЕХ! Вы украли " + fmt(prize) + " XP!");
-            } else {
-                logBot("АТАКА ПРОВАЛЕНА...");
-                alert("ВРЕМЯ ВЫШЛО! Вас отследили.");
+        // ЭФФЕКТ КЛИКА (НУЛИ И СИМВОЛЫ)
+        function createParticles(e) {
+            const chars = ["0", "1", "{", "}", ";", "=>", "[]"];
+            for(let i=0; i<6; i++) {
+                const p = document.createElement('div');
+                p.className = 'particle';
+                p.innerText = chars[Math.floor(Math.random()*chars.length)];
+                p.style.left = (e.clientX || window.innerWidth/2) + 'px';
+                p.style.top = (e.clientY || window.innerHeight/2) + 'px';
+                p.style.setProperty('--dx', (Math.random()-0.5)*200 + 'px');
+                p.style.setProperty('--dy', (Math.random()-0.5)*200 + 'px');
+                document.body.appendChild(p);
+                setTimeout(() => p.remove(), 800);
             }
-            updateUI();
         }
 
-        // Шанс атаки раз в 50 секунд
-        setInterval(() => { if(Math.random() > 0.6) startStrike(); }, 50000);
+        function mineData(e) { score += clickP; createParticles(e); updateUI(); }
+
+        // КЕЙС С МОДЕЛЯМИ
+        function buyCase() {
+            if(score >= 10000) {
+                score -= 10000;
+                const models = ["RTX 2060", "RTX 3070", "RTX 4090", "RTX TITAN"];
+                const powers = [1000, 5000, 25000, 100000];
+                let idx = Math.floor(Math.random()*models.length);
+                autoP += powers[idx];
+                alert("ИЗ КЕЙСА ВЫПАЛА: " + models[idx] + " (+" + powers[idx] + "/сек)");
+                updateUI();
+            } else { alert("МАЛО XP!"); }
+        }
+
+        function buyAntenna() {
+            if(score >= 1000000) { score -= 1000000; autoP += 50000; alert("АНТЕННА УСТАНОВЛЕНА!"); updateUI(); }
+            else { alert("НУЖНО 1М!"); }
+        }
+
+        // ПОЛНЫЙ СБРОС (ИСПРАВЛЕНО)
+        function fullReset() {
+            localStorage.clear();
+            score = 0; autoP = 0; clickP = 1;
+            location.reload();
+        }
 
         function confirmAccess() {
             let i = document.getElementById('user-login').value.trim();
             if(i.length < 2) return;
-            userName = i;
-            document.getElementById('login-overlay').style.display='none';
+            userName = i; document.getElementById('login-overlay').style.display='none';
             updateUI();
         }
 
         function updateUI() {
-            let nameTag = document.getElementById('display-name');
-            nameTag.innerText = userName.toUpperCase();
-            if (isGold) nameTag.className = 'gold-nick';
-
+            let nTag = document.getElementById('display-name');
+            nTag.innerText = userName.toUpperCase();
+            if (isGold) nTag.className = 'gold-nick';
             document.getElementById('score-text').innerText = fmt(score);
             document.getElementById('auto-val').innerText = fmt(autoP);
+            document.getElementById('lvl-text').innerText = "LVL: " + Math.floor(Math.sqrt(score/100));
             
             let all = [...bots, {name:userName, score:score}].sort((a,b)=>b.score-a.score);
             let html = '';
             all.forEach((p,i) => {
-                // Применяем золотой ник и в списке лидеров
-                let goldClass = (p.name === userName && isGold) ? 'gold-nick' : '';
-                let myBg = p.name === userName ? 'background:rgba(0,255,0,0.2)' : '';
-                html += `<div style="display:flex;justify-content:space-between;padding:5px;${myBg}" class="${goldClass}">
-                            <span>#${i+1} ${p.name}</span><span>${fmt(p.score)}</span>
-                         </div>`;
+                let gClass = (p.name === userName && isGold) ? 'gold-nick' : '';
+                let bg = p.name === userName ? 'background:rgba(0,255,0,0.2)' : '';
+                html += `<div class="leader-item ${gClass}" style="${bg}"><span>#${i+1} ${p.name}</span><span>${fmt(p.score)}</span></div>`;
             });
             document.getElementById('leaderboard').innerHTML = html;
-            
+            save();
+        }
+
+        function fmt(n) {
+            if (n >= 1e21) return (n/1e21).toFixed(1)+'Sx';
+            if (n >= 1e18) return (n/1e18).toFixed(1)+'Qt';
+            if (n >= 1e15) return (n/1e15).toFixed(1)+'Q';
+            if (n >= 1e12) return (n/1e12).toFixed(1)+'T';
+            return Math.floor(n).toLocaleString();
+        }
+
+        function getRTX(m, p) { autoP += p; updateUI(); }
+        
+        function transferMoney() {
+            let t = document.getElementById('t-name').value;
+            let val = Number(prompt("СКОЛЬКО ПЕРЕВЕСТИ?"));
+            if(val <= score && val > 0) {
+                let b = bots.find(x => x.name.toLowerCase().includes(t.toLowerCase()));
+                if(b) { score -= val; b.score += val; updateUI(); }
+            }
+        }
+
+        function save() {
             localStorage.setItem('h_score', score);
             localStorage.setItem('h_auto', autoP);
             localStorage.setItem('h_user', userName);
             localStorage.setItem('h_gold', isGold);
         }
 
-        function fmt(n) {
-            if (n >= 1e18) return (n/1e18).toFixed(1)+'Qt';
-            if (n >= 1e15) return (n/1e15).toFixed(1)+'Q';
-            if (n >= 1e12) return (n/1e12).toFixed(1)+'T';
-            if (n >= 1e9) return (n/1e9).toFixed(1)+'B';
-            return Math.floor(n).toLocaleString();
-        }
+        setInterval(() => { bots.forEach(b => b.score += b.spd/10); score += autoP/10; updateUI(); }, 100);
 
-        function mineData() { score += clickP; updateUI(); }
-        function getRTX(m, p) { autoP += p; updateUI(); }
-
-        setInterval(() => {
-            bots.forEach(b => b.score += b.spd/10);
-            score += autoP/10;
-            updateUI();
-        }, 100);
-
-        // DRAG ADMIN
+        // DRAG
         const modal = document.getElementById("admin-modal");
         const header = document.getElementById("admin-header");
         let active = false, xOff = 0, yOff = 0, startX, startY;
@@ -192,7 +208,6 @@
         document.addEventListener("mousedown", dS); document.addEventListener("mousemove", dM);
         document.addEventListener("mouseup", () => active = false); document.addEventListener("touchend", () => active = false);
 
-        // MATRIX
         const canvas = document.getElementById('matrix-canvas');
         const ctx = canvas.getContext('2d');
         canvas.width = window.innerWidth; canvas.height = window.innerHeight;
@@ -208,7 +223,6 @@
         }
         setInterval(draw, 50);
 
-        // LOAD
         const saved = localStorage.getItem('h_user');
         if(saved) { 
             userName = saved; score = Number(localStorage.getItem('h_score')) || 0;
