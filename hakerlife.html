@@ -3,22 +3,26 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width,initial-scale=1.0">
-    <title>🚨 MISSION PORTUGAL: CYBER SHIELD 3D</title>
+    <title>🚨 MISSION PORTUGAL: MOUSE AIM 3D</title>
     <style>
         body { font-family: monospace; background: #0c0f12; color: #e0e5eb; margin: 0; padding: 10px; overflow: hidden; touch-action: none; }
         .game-layout { display: grid; grid-template-columns: 1fr 300px; gap: 10px; max-width: 1200px; margin: 0 auto; height: 95vh; }
         .screen-box { background: #161a1e; border: 2px solid #4a5568; border-radius: 8px; padding: 10px; display: flex; flex-direction: column; box-shadow: 0 4px 20px rgba(0,0,0,0.5); position: relative; }
         
-        .canvas-container { position: relative; width: 100%; height: 350px; overflow: hidden; border: 1px solid #2d3748; border-radius: 4px; }
+        .canvas-container { position: relative; width: 100%; height: 350px; overflow: hidden; border: 1px solid #2d3748; border-radius: 4px; cursor: pointer; }
         canvas { width: 100%; height: 100%; background: #000; }
         
         /* 🔫 2.5D СПРАЙТ ХАКЕРСКОГО ЭМИ-ОРУЖИЯ */
         #cyber-weapon { position: absolute; bottom: 0; left: 50%; transform: translateX(-50%); width: 120px; height: 100px; background: linear-gradient(to top, #1a202c, #4a5568); border: 3px solid #00ffff; border-bottom: none; border-radius: 10px 10px 0 0; box-shadow: 0 0 15px #00ffff; pointer-events: none; transition: transform 0.1s; z-index: 5; }
         #weapon-laser { position: absolute; bottom: 85px; left: 50%; transform: translateX(-50%); width: 14px; height: 14px; background: #00ffff; border-radius: 50%; box-shadow: 0 0 20px #00ffff; pointer-events: none; z-index: 6; }
         
-        /* 💥 ИСКРЫ ИЗ ДУЛА */
-        .spark { position: absolute; width: 6px; height: 6px; background: #00ffff; border-radius: 50%; box-shadow: 0 0 10px #00ffff; pointer-events: none; z-index: 10; opacity: 1; transition: all 0.2s ease-out; }
+        /* КРЕСТИК ПРИЦЕЛА КАК В PUBG */
+        #crosshair { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 10px; height: 10px; pointer-events: none; z-index: 20; }
+        #crosshair::before, #crosshair::after { content: ''; position: absolute; background: #00ffff; box-shadow: 0 0 5px #00ffff; }
+        #crosshair::before { top: 4px; left: -5px; width: 20px; height: 2px; }
+        #crosshair::after { top: -5px; left: 4px; width: 2px; height: 20px; }
 
+        .spark { position: absolute; width: 6px; height: 6px; background: #00ffff; border-radius: 50%; box-shadow: 0 0 10px #00ffff; pointer-events: none; z-index: 10; opacity: 1; transition: all 0.2s ease-out; }
         .weapon-fire { transform: translateX(-50%) translateY(15px) scale(0.96) !important; background: linear-gradient(to top, #2d3748, #00ffff) !important; box-shadow: 0 0 25px #00ffff !important; }
         #explosion-flash { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: #fff; opacity: 0; pointer-events: none; z-index: 100; transition: opacity 0.1s ease-out; }
 
@@ -29,8 +33,6 @@
         button { background: #3182ce; color: #fff; border: none; padding: 8px 15px; font-family: monospace; font-weight: bold; cursor: pointer; border-radius: 4px; text-transform: uppercase; }
         button:hover { background: #2b6cb0; box-shadow: 0 0 8px #3182ce; }
         .sidebar { background: #161a1e; border: 2px solid #4a5568; border-radius: 8px; padding: 15px; font-size: 0.8em; box-shadow: 0 4px 20px rgba(0,0,0,0.5); }
-        .nav-btn { width: 50px; height: 40px; margin: 3px; font-size: 1.2em; background: #2d3748; color: #fff; border: 1px solid #4a5568; border-radius: 4px; cursor: pointer; }
-        .nav-btn:hover { background: #4a5568; }
         
         .shake-effect { animation: screenShake 0.4s ease-in-out infinite; }
         @keyframes screenShake {
@@ -49,7 +51,7 @@
         <div id="main-box" class="screen-box">
             <div class="canvas-container" id="fire-zone">
                 <canvas id="3d-screen" width="320" height="240"></canvas>
-                
+                <div id="crosshair"></div>
                 <div id="cyber-weapon"><div id="weapon-laser"></div></div>
                 <div id="explosion-flash"></div>
             </div>
@@ -58,8 +60,8 @@
             
             <div id="terminal">
                 <div id="mission-title" style="color: #ecc94b; font-weight: bold; text-align: center;">=== ЭТАП 1: ДОМ В США ===</div>
-                <p id="instruction-text">[ДИРЕКТИВА]: Ты дома. Развернись, найди светящуюся КРАСНУЮ ДВЕРЬ и войди в неё, чтобы выйти на улицу города.</p>
-                <p style="color: #a0aec0;">Управление: W,A,S,D — ходить, Стрелочки — поворот камеры. <b>ПРОБЕЛ — выстрел! Собирай кейсы (желтые) и батареи (синие)</b></p>
+                <p id="instruction-text">[ДИРЕКТИВА]: Кликни по экрану игры, чтобы включить обзор мышкой (как в PUBG). Найди светящуюся КРАСНУЮ ДВЕРЬ здания и войди в неё.</p>
+                <p style="color: #a0aec0;">Управление: W,A,S,D — ходить во все стороны, Движение мыши — прицеливание. Левый клик/Пробел — выстрел!</p>
                 <hr style="border: 1px dashed #4a5568;">
                 <div id="story-log"></div>
             </div>
@@ -76,25 +78,13 @@
             <p>📍 ЛОКАЦИЯ: <span id="loc-val" style="color: #fff;">Твой дом (США)</span></p>
             <p>🎯 ЦЕЛЬ: <span id="target-val" style="color: #ecc94b;">Выйти через Красную Дверь</span></p>
             <p>🏅 РАНГ: <span id="rank-val" style="color: #9f7aea; font-weight: bold;">Стажер</span></p>
-            
-            <!-- ИНВЕНТАРЬ ЗАРЯДОВ ЭМИ -->
             <p>🔋 ЗАРЯДЫ ЭМИ: <span id="ammo-val" style="color: #00ffff; font-weight: bold;">20 шт</span></p>
-            
             <p>💰 КОШЕЛЕК ОЧКОВ: $<span id="score-val" style="color: #48bb78; font-weight: bold;">0</span></p>
             <p>💵 ЗАРПЛАТА: <span style="color: #00bfff;">$<span id="salary-val">0</span>/сек</span></p>
             <p>💻 ВЗЛОМАНО СЕТЕЙ: <span id="hacked-count" style="color: #ed8936; font-weight: bold;">0 объектов</span></p>
             <p>📊 ДВИЖОК: <span id="fps-val" style="color: #9f7aea; font-weight: bold;">0 FPS</span></p>
             <hr style="border: 1px dashed #4a5568;">
-            <h4 style="text-align: center; margin-bottom: 5px;">ПАНЕЛЬ ДВИЖЕНИЯ И АТАК</h4>
-            <div style="text-align: center;">
-                <button class="nav-btn" onclick="movePlayer('w')">W</button><br>
-                <button class="nav-btn" onclick="movePlayer('a')">A</button>
-                <button class="nav-btn" onclick="movePlayer('s')">S</button>
-                <button class="nav-btn" onclick="movePlayer('d')">D</button><br>
-                <button class="nav-btn" style="width: 45px; background: #00ffff; color:#000;" onclick="fireWeapon()">⚡</button>
-                <button class="nav-btn" style="width: 50px; background: #2b6cb0;" onclick="movePlayer('left')">◀</button>
-                <button class="nav-btn" style="width: 50px; background: #2b6cb0;" onclick="movePlayer('right')">▶</button>
-            </div>
+            <p style="font-size: 0.85em; color: #a0aec0; text-align: center;">Нажми ESC, чтобы вернуть курсор мыши</p>
         </div>
     </div>
 
@@ -103,9 +93,15 @@
         let step = 1; 
         let salary = 0;
         let hackedObjects = 0;
-        let ammo = 20; // Стартовое количество патронов
+        let ammo = 20; 
         let audioCtx = null;
         let lastCalledTime, fps;
+
+        // Положение и угол взгляда игрока
+        let px = 2.0, py = 2.0, pa = 3.14; 
+        
+        // Массив нажатых клавиш шутера
+        let keys = { w: false, a: false, s: false, d: false };
 
         function initAudio() { if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)(); }
         function playBeep(freq, duration, type='sine') {
@@ -131,16 +127,37 @@
             else rankElement.innerText = "Спецагент CYBER SHIELD ⚡";
         }
 
-        // ВЫСТРЕЛА С ЦИФРОВЫМИ ИСКРАМИ И ОГРАНИЧЕНИЕМ ПАТРОНОВ
+        // КЛИК ДЛЯ ЗАХВАТА МЫШКИ (ПОИНТЕР ЛОК)
+        const container = document.getElementById('fire-zone');
+        container.addEventListener('click', () => {
+            if (step < 4) {
+                container.requestPointerLock();
+            }
+        });
+
+        // СЛУШАТЕЛЬ ДВИЖЕНИЯ МЫШИ (ЦЕЛИВАНИЕ КАК В PUBG)
+        document.addEventListener('pointerlockchange', () => {
+            if (document.pointerLockElement === container) {
+                document.addEventListener("mousemove", updateRotation, false);
+                container.addEventListener("click", fireWeapon, false); // Стрельба на левый клик мыши
+            } else {
+                document.removeEventListener("mousemove", updateRotation, false);
+                container.removeEventListener("click", fireWeapon, false);
+            }
+        });
+
+        function updateRotation(e) {
+            let sensitivity = 0.0025; // Чувствительность мыши
+            pa += e.movementX * sensitivity;
+        }
+
         function fireWeapon() {
             if (step === 4 || step === 5) return;
-            
             if (ammo <= 0) {
-                playBeep(150, 0.1, 'sawtooth'); // Звук пустой пушки
-                printLog("⚠️ ВНИМАНИЕ: Энергия ЭМИ-бластера на нуле! Срочно найди синюю батарею на дороге!", "#f56565");
+                playBeep(150, 0.1, 'sawtooth');
+                printLog("⚠️ ВНИМАНИЕ: Заряды ЭМИ на нуле! Ищи синюю батарею!", "#f56565");
                 return;
             }
-
             ammo -= 1;
             document.getElementById('ammo-val').innerText = ammo + " шт";
 
@@ -148,28 +165,19 @@
             weapon.classList.add('weapon-fire');
             playBeep(850, 0.12, 'sawtooth');
 
-            // Генерация искр
             let zone = document.getElementById('fire-zone');
             for(let i=0; i<8; i++) {
                 let spark = document.createElement('div');
-                spark.className = 'spark';
-                spark.style.left = '50%';
-                spark.style.bottom = '95px';
+                spark.className = 'spark'; spark.style.left = '50%'; spark.style.bottom = '95px';
                 zone.appendChild(spark);
-
-                // Случайный разлет искр
                 let angle = (Math.random() * Math.PI) - Math.PI; 
                 let speed = Math.random() * 60 + 30;
-                let dx = Math.cos(angle) * speed;
-                let dy = Math.sin(angle) * speed;
-
                 setTimeout(() => {
-                    spark.style.transform = `translate(${dx}px, ${dy}px) scale(0.1)`;
+                    spark.style.transform = `translate(${Math.cos(angle)*speed}px, ${Math.sin(angle)*speed}px) scale(0.1)`;
                     spark.style.opacity = '0';
                 }, 10);
                 setTimeout(() => spark.remove(), 200);
             }
-
             setTimeout(() => weapon.classList.remove('weapon-fire'), 80);
         }
 
@@ -179,7 +187,6 @@
         const rCtx = radarCanvas.getContext('2d');
         const mapSize = 12;
         
-        // КАРТЫ (1-Стены, 0-Улица, 2-Цель, 3-Кейс с деньгами, 4-Батарея ЭМИ)
         let mapUSA_House = [
            ,
            ,
@@ -226,7 +233,6 @@
         ];
 
         let map = mapUSA_House; 
-        let px = 2.0, py = 2.0, pa = 3.14; 
         const fov = Math.PI / 3, numRays = 160; 
 
         function drawGtaRadar() {
@@ -239,11 +245,9 @@
                         rCtx.fillStyle = step === 1 ? "#e53e3e" : (step === 2 ? "#ed8936" : "#3182ce");
                         rCtx.fillRect((x - px) * scale, (y - py) * scale, scale, scale);
                     } else if (map[y][x] === 3) {
-                        rCtx.fillStyle = "#ecc94b"; // Желтый кейс
-                        rCtx.beginPath(); rCtx.arc((x - px) * scale + 4, (y - py) * scale + 4, 3, 0, Math.PI*2); rCtx.fill();
+                        rCtx.fillStyle = "#ecc94b"; rCtx.beginPath(); rCtx.arc((x - px) * scale + 4, (y - py) * scale + 4, 3, 0, Math.PI*2); rCtx.fill();
                     } else if (map[y][x] === 4) {
-                        rCtx.fillStyle = "#00ffff"; // Голубая батарея патронов
-                        rCtx.beginPath(); rCtx.arc((x - px) * scale + 4, (y - py) * scale + 4, 3, 0, Math.PI*2); rCtx.fill();
+                        rCtx.fillStyle = "#00ffff"; rCtx.beginPath(); rCtx.arc((x - px) * scale + 4, (y - py) * scale + 4, 3, 0, Math.PI*2); rCtx.fill();
                     }
                 }
             }
@@ -251,9 +255,38 @@
             rCtx.strokeStyle = "#48bb78"; rCtx.lineWidth = 2; rCtx.beginPath(); rCtx.moveTo(50, 50); rCtx.lineTo(50, 38); rCtx.stroke();
         }
 
+        // ПОЛНОЦЕННОЕ ДВИЖЕНИЕ ШУТЕРА (W,A,S,D относительно угла мыши)
+        function updatePlayerMovement() {
+            if (step >= 4) return;
+            let moveSpeed = 0.08; 
+
+            let moveX = 0;
+            let moveY = 0;
+
+            if (keys.w) { moveX += Math.cos(pa); moveY += Math.sin(pa); }
+            if (keys.s) { moveX -= Math.cos(pa); moveY -= Math.sin(pa); }
+            if (keys.a) { moveX += Math.cos(pa - Math.PI/2); moveY += Math.sin(pa - Math.PI/2); } // Стрейф влево
+            if (keys.d) { moveX += Math.cos(pa + Math.PI/2); moveY += Math.sin(pa + Math.PI/2); } // Стрейф вправо
+
+            if (moveX !== 0 || moveY !== 0) {
+                // Нормализация скорости движения
+                let len = Math.sqrt(moveX*moveX + moveY*moveY);
+                let nx = px + (moveX / len) * moveSpeed;
+                let ny = py + (moveY / len) * moveSpeed;
+
+                if (map[Math.floor(py)][Math.floor(nx)] !== 1) px = nx;
+                if (map[Math.floor(ny)][Math.floor(px)] !== 1) py = ny;
+                
+                // Ритмичный звук шагов при ходьбе
+                if (Math.random() > 0.85) playBeep(80, 0.03, 'triangle');
+            }
+        }
+
         function render3D() {
             if(!lastCalledTime) { lastCalledTime = performance.now(); fps = 0; } 
             else { let delta = (performance.now() - lastCalledTime)/1000; lastCalledTime = performance.now(); fps = Math.round(1/delta); document.getElementById('fps-val').innerText = fps + " FPS"; }
+
+            updatePlayerMovement(); // Обновляем позицию шутера перед кадром
 
             ctx.fillStyle = "#4299e1"; ctx.fillRect(0, 0, canvas.width, canvas.height / 2);
             ctx.fillStyle = "#2d3748"; ctx.fillRect(0, canvas.height / 2, canvas.width, canvas.height / 2);
@@ -273,7 +306,7 @@
                 
                 if (wallType === 2) { ctx.strokeStyle = step === 1 ? "#e53e3e" : (step === 2 ? "#ed8936" : "#3182ce"); } 
                 else if (wallType === 3) { ctx.strokeStyle = "#ecc94b"; } 
-                else if (wallType === 4) { ctx.strokeStyle = "#00ffff"; } // Отрисовка патронов в 2.5D мире
+                else if (wallType === 4) { ctx.strokeStyle = "#00ffff"; } 
                 else { let wallColor = Math.floor(180 * (1 - distance/12)); ctx.strokeStyle = `rgb(${wallColor+20},${wallColor+20},${wallColor+25})`; }
                 ctx.lineWidth = Math.ceil(canvas.width / numRays);
                 ctx.beginPath(); ctx.moveTo(xPixel, (canvas.height - wallHeight) / 2); ctx.lineTo(xPixel, (canvas.height + wallHeight) / 2); ctx.stroke();
@@ -281,19 +314,14 @@
             drawGtaRadar(); 
             
             let tx = Math.floor(px), ty = Math.floor(py);
-            // Сбор денежного кейса
             if (map[ty][tx] === 3) {
-                map[ty][tx] = 0;
-                let bonus = Math.floor(Math.random() * 20000) + 5000; score += bonus;
+                map[ty][tx] = 0; let bonus = Math.floor(Math.random() * 20000) + 5000; score += bonus;
                 document.getElementById('score-val').innerText = score.toLocaleString();
                 playBeep(880, 0.1); printLog(`💰 КЕЙС: Получено +$${bonus.toLocaleString()}`, "#ecc94b");
             }
-            // Сбор батареи питания (патронов)
             if (map[ty][tx] === 4) {
-                map[ty][tx] = 0; ammo += 10;
-                document.getElementById('ammo-val').innerText = ammo + " шт";
-                playBeep(600, 0.1); setTimeout(() => playBeep(900, 0.12), 60);
-                printLog(`🔋 ЭНЕРГИЯ: Батарея подобрана! Заряды ЭМИ восстановлены на +10 выстрелов!`, "#00ffff");
+                map[ty][tx] = 0; ammo += 10; document.getElementById('ammo-val').innerText = ammo + " шт";
+                playBeep(600, 0.1); printLog(`🔋 ЭНЕРГИЯ: Батарея подобрана! Заряды ЭМИ +10 выстрелов!`, "#00ffff");
             }
 
             if (map[ty][tx] === 2) {
@@ -303,52 +331,32 @@
             }
         }
 
-        function movePlayer(dir) {
-            if (step === 4 || step === 5) return; 
-            let moveSpeed = 0.25, rotSpeed = 0.18;
-            if (dir === 'w') {
-                let nx = px + Math.cos(pa) * moveSpeed, ny = py + Math.sin(pa) * moveSpeed;
-                if (map[Math.floor(py)][Math.floor(nx)] !== 1) px = nx; if (map[Math.floor(ny)][Math.floor(px)] !== 1) py = ny; 
-                playBeep(80, 0.04, 'triangle'); 
-            }
-            if (dir === 's') {
-                let nx = px - Math.cos(pa) * moveSpeed, ny = py - Math.sin(pa) * moveSpeed;
-                if (map[Math.floor(py)][Math.floor(nx)] !== 1) px = nx; if (map[Math.floor(ny)][Math.floor(px)] !== 1) py = ny; 
-                playBeep(80, 0.04, 'triangle'); 
-            }
-            if (dir === 'a') {
-                let nx = px + Math.cos(pa - Math.PI/2) * moveSpeed, ny = py + Math.sin(pa - Math.PI/2) * moveSpeed;
-                if (map[Math.floor(py)][Math.floor(nx)] !== 1) px = nx; if (map[Math.floor(ny)][Math.floor(px)] !== 1) py = ny;
-            }
-            if (dir === 'd') {
-                let nx = px + Math.cos(pa + Math.PI/2) * moveSpeed, ny = py + Math.sin(pa + Math.PI/2) * moveSpeed;
-                if (map[Math.floor(py)][Math.floor(nx)] !== 1) px = nx; if (map[Math.floor(ny)][Math.floor(px)] !== 1) py = ny;
-            }
-            if (dir === 'left') pa -= rotSpeed; if (dir === 'right') pa += rotSpeed;
-            render3D();
-        }
-
         function startRoadToAirport() {
             step = 2; px = 1.5; py = 1.5; pa = 0.0; map = mapUSA_Road; playBeep(440, 0.1);
+            document.exitPointerLock(); // Временно возвращаем мышь при смене этапа
             document.getElementById('mission-title').innerText = "=== ЭТАП 2: ДОРОГА В АЭРОПОРТ ===";
             document.getElementById('loc-val').innerText = "Улицы США"; document.getElementById('target-val').innerText = "Дойти до Оранжевого Аэропорта";
-            document.getElementById('instruction-text').innerText = "[ДИРЕКТИВА]: Ты вышел из дома! Иди прямо по улице до здания Аэропорта. Собирай кейсы и синие батареи заряда пушки!";
-            printLog(">> Выход на городскую трассу выполнен. Системы вооружения переведены в боевой режим.");
+            document.getElementById('instruction-text').innerText = "[ДИРЕКТИВА]: Кликни по экрану снова! Иди по дороге вперед до здания Аэропорта (Оранжевый куб).";
+            printLog(">> Выход на городскую трассу выполнен. Мышь активирована.");
             render3D();
         }
 
         function startPortugalCity() {
             step = 3; px = 1.5; py = 1.5; pa = 0.5; map = mapPortugal; playBeep(523, 0.1);
+            document.exitPointerLock();
             document.getElementById('mission-title').innerText = "=== ЭТАП 3: ГОРОД ЛИССАБОН ===";
             document.getElementById('loc-val').innerText = "Лиссабон (Португалия)"; document.getElementById('target-val').innerText = "Найти Синий Хакерский Дом";
-            document.getElementById('instruction-text').innerText = "[ДИРЕКТИВА]: Перелет завершен! Ты в Португалии. Иди по городским дорогам и найди Синий Хакерский Дом.";
-            printLog("<br>✈️ Успешное прибытие в Лиссабон. Выдвигайся к штабу Cyber Shield.");
+            document.getElementById('instruction-text').innerText = "[ДИРЕКТИВА]: Кликни по экрану! Иди по дорогам и найди Синий Хакерский Дом.";
+            printLog("<br>✈️ Успешное прибытие в Лиссабон. Выдвигайся к штабу.");
             render3D();
         }
 
         function startHackerWork() {
             step = 4; canvas.style.display = "none"; radarCanvas.style.display = "none"; 
             document.getElementById('cyber-weapon').style.display = "none"; 
+            document.getElementById('crosshair').style.display = "none";
+            document.exitPointerLock(); // Полностью отключаем захват мыши для работы в терминале
+            
             hackedObjects += 1; salary = 250; 
             document.getElementById('hacked-count').innerText = hackedObjects + " объектов";
             document.getElementById('salary-val').innerText = salary;
@@ -358,7 +366,7 @@
             document.getElementById('target-val').innerText = "Уничтожение штаб-квартир мошенников";
             document.getElementById('instruction-text').innerText = "[ДИРЕКТИВА]: Активирована пассивная ставка Cyber Shield. Запусти атаку на подрыв серверов преступников.";
             
-            printLog("<br>🖥️ Ты внутри главного хакерского дома в Лиссабоне! Твой пассивный оклад запущен: <span style='color: #0cf;'>$250/сек</span>. Обнаружены 2 крупные базы телефонных мошенников.", "#3182ce");
+            printLog("<br>🖥️ Ты внутри главного хакерского дома в Лиссабоне! Твой пассивный оклад запущен: <span style='color: #0cf;'>$250/сек</span>.", "#3182ce");
             printLog("Выбери цель для удаленного взлома и физического подрыва здания мошенников:<br>1 - Уничтожить колл-центр фальшивых лотерей (+20 взломов, +$500K)<br>2 - Полностью взорвать главный серверный бункер скамеров банков (+70 взломов, +$1.5M)", "#ffff00");
             
             document.getElementById('user-input').disabled = false; document.getElementById('submit-btn').disabled = false;
@@ -371,10 +379,9 @@
             
             let mainBox = document.getElementById('main-box');
             let flash = document.getElementById('explosion-flash');
-            
             mainBox.classList.add('shake-effect');
             flash.style.opacity = "1";
-            setTimeout(() => { flash.style.opacity = "0"; }, 180); // Вспышка взрыва
+            setTimeout(() => { flash.style.opacity = "0"; }, 180);
 
             playBeep(120, 1.8, 'sawtooth');
 
@@ -382,11 +389,11 @@
                 mainBox.classList.remove('shake-effect');
                 if (input === "1") {
                     score += 500000; hackedObjects += 20;
-                    printLog(">> БУУУМ! Генераторы перегружены! Здание мошенников взлетело на воздух вместе со всей аппаратурой! Ты спас людей!", "#48bb78");
+                    printLog(">> БУУУМ! Здание мошенников взлетело на воздух! Ты спас людей!", "#48bb78");
                     endGame();
                 } else if (input === "2") {
                     score += 1500000; hackedObjects += 70;
-                    printLog(">> КОЛОССАЛЬНЫЙ ВЗРЫВ! Главный бункер скамеров полностью уничтожен, а их базы данных стерты навсегда!", "#48bb78");
+                    printLog(">> КОЛОССАЛЬНЫЙ ВЗРЫВ! Главный бункер скамеров полностью уничтожен!", "#48bb78");
                     endGame();
                 } else { printLog("Неверный код! Введи 1 или 2.", "#f56565"); }
                 document.getElementById('score-val').innerText = score.toLocaleString();
@@ -401,18 +408,24 @@
             document.getElementById('user-input').disabled = true; document.getElementById('submit-btn').disabled = true;
         }
 
+        // ОБРАБОТЧИК НАЖАТИЙ КЛАВИШ (РЕЖИМ ШУТЕРА W,A,S,D)
         window.addEventListener('keydown', (e) => {
-            if (e.code === 'KeyW' || e.code === 'ArrowUp') movePlayer('w'); 
-            if (e.code === 'KeyS' || e.code === 'ArrowDown') movePlayer('s');
-            if (e.code === 'KeyA' || e.code === 'KeyA') movePlayer('a'); 
-            if (e.code === 'KeyD' || e.code === 'KeyD') movePlayer('d');
-            if (e.code === 'ArrowLeft') movePlayer('left'); 
-            if (e.code === 'ArrowRight') movePlayer('right');
+            if (e.code === 'KeyW') keys.w = true;
+            if (e.code === 'KeyS') keys.s = true;
+            if (e.code === 'KeyA') keys.a = true;
+            if (e.code === 'KeyD') keys.d = true;
             if (e.code === 'Space') { e.preventDefault(); fireWeapon(); }
         });
 
+        window.addEventListener('keyup', (e) => {
+            if (e.code === 'KeyW') keys.w = false;
+            if (e.code === 'KeyS') keys.s = false;
+            if (e.code === 'KeyA') keys.a = false;
+            if (e.code === 'KeyD') keys.d = false;
+        });
+
         setInterval(() => { if (step === 4) { score += salary; document.getElementById('score-val').innerText = score.toLocaleString(); } }, 1000);
-        setInterval(() => { if (step < 4) render3D(); }, 35);
+        setInterval(() => { if (step < 4) render3D(); }, 30); // 30мс для идеальной плавности при обзоре мышью
     </script>
 </body>
 </html>
