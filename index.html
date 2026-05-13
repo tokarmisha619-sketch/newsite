@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width,initial-scale=1.0">
-    <title>HACLER CLICKER 3.1: REALISTIC TEMP UPDATE</title>
+    <title>HACLER CLICKER 3.1: LIVE GAME</title>
     <style>
         body{font-family:monospace;background:#000;color:#0f0;margin:0;padding:10px;overflow:hidden;touch-action:none}
         #matrix-canvas{position:fixed;top:0;left:0;width:100%;height:100%;z-index:-1;opacity:0.2}
@@ -12,9 +12,6 @@
         .gold-nick { color: #ffcc00 !important; text-shadow: 0 0 10px #ffcc00; font-weight: bold; }
         .particle { position: fixed; pointer-events: none; z-index: 10000; color: #0f0; font-size: 1.2em; animation: pFly 0.8s ease-out forwards; font-weight: bold; text-shadow: 0 0 5px #0f0; }
         @keyframes pFly { 0% { opacity: 1; transform: translate(0,0) scale(1); } 100% { opacity: 0; transform: translate(var(--dx), var(--dy)) rotate(180deg) scale(0.5); } }
-        #admin-modal { position: fixed; top: 40px; left: 10px; background: #111; border: 3px solid #f00; z-index: 3000; width: 260px; border-radius: 15px; display: none; box-shadow: 0 0 30px #f00; }
-        #admin-header { background: #f00; color: #fff; padding: 10px; cursor: grab; text-align: center; font-weight: bold; border-radius: 12px 12px 0 0; user-select: none; }
-        .admin-body { padding: 10px; display: grid; gap: 5px; max-height: 400px; overflow-y: auto; }
         button{background:#0f0;color:#000;border:none;padding:8px;font-weight:bold;cursor:pointer;border-radius:5px;text-transform:uppercase;width:100%;margin-top:5px;font-size:0.7em}
         input{background:#000;color:#0f0;border:1px solid #0f0;padding:5px;border-radius:4px;width:90%;text-align:center;margin:5px 0;outline:none}
         #click-btn{width:70px;height:70px;border-radius:50%;border:4px solid #0f0;background:#000;color:#0f0;font-size:1.5em;cursor:pointer;box-shadow:0 0 15px #0f0;margin:10px;}
@@ -26,31 +23,6 @@
 <body>
     <canvas id="matrix-canvas"></canvas>
 
-    <!-- АДМИНКА -->
-    <div id="admin-modal">
-        <div id="admin-header">✋ ADMIN CONTROL</div>
-        <div class="admin-body">
-            <!-- ЖЕЛЕЗО ОТ HACLER В АДМИНКЕ -->
-            <button onclick="getProcessorAdmin('hacler ULTRA PRO', 100000)" style="background:linear-gradient(45deg,#ff0055,#ffcc00); color:#fff; font-size:0.8em; border:2px solid #fff;">👑 hacler ULTRA PRO (+100K EN/s)</button>
-            <button onclick="getProcessorAdmin('hacler 132F', 5000)" style="background:linear-gradient(45deg,#ff3300,#ff9900); color:#fff;">⚡ hacler 132F (+5K EN/s)</button>
-            <button onclick="getCoolerAdmin('hacler AQUA', 250)" style="background:linear-gradient(45deg,#00ffff,#0055ff); color:#fff;">🌊 hacler AQUA (-250°C/s)</button>
-            <button onclick="getCoolerAdmin('hacler 111', 25)" style="background:#00ffff; color:#000;">❄️ hacler 111 (-25°C/s)</button>
-            <hr>
-            <button onclick="getRTX(6000, 50)" style="background:#fc0">🔥 RTX 6000</button>
-            <button onclick="getRTX(7000, 500)" style="background:#f0f; color:#fff">🌌 RTX 7000</button>
-            <button onclick="getRTX(8000, 5000)" style="background:#0cf">👑 RTX 8000</button>
-            <button onclick="getRTX(9000, 50000)" style="background:#0f0">🚀 RTX 9000</button>
-            <button onclick="getRTX(10000, 500000)" style="background:linear-gradient(45deg,#0f0,#ff0)">⚡ RTX 10000</button>
-            <button onclick="getRTX(15000, 5000000)" style="background:#f00; color:#fff">💎 RTX 15000</button>
-            <button onclick="getRTX('INFINITY', 500000000)" style="background:linear-gradient(45deg, #000, #fff); color:#f00">🌌 RTX INFINITY</button>
-            <hr>
-            <button onclick="isGold=true; saveGame(); updateUI(); playBuySound();" style="background:#ffcc00">👑 GOLD NAME</button>
-            <button onclick="score += 1e12; saveGame(); updateUI(); playBuySound();" style="background:#0f0">💰 +1B XP</button>
-            <button onclick="fullReset()" style="background:#f00; color:#fff">🗑️ СБРОС (RESET)</button>
-            <button onclick="document.getElementById('admin-modal').style.display='none'">CLOSE</button>
-        </div>
-    </div>
-
     <div id="login-overlay" style="position:fixed; top:0; left:0; width:100%; height:100%; background:#000; z-index:2000; display:flex; align-items:center; justify-content:center">
         <div class="box" style="width:250px; background:#000;">
             <h2>HACLER OS v3.1</h2>
@@ -60,7 +32,7 @@
     </div>
 
     <div id="main-content" class="container" style="display:none">
-        <h2 style="text-align:center;">ШТАБ: <span id="display-name" onclick="openAdmin()" style="cursor:pointer; text-decoration:underline">...</span></h2>
+        <h2 style="text-align:center;">ШТАБ: <span id="display-name">...</span></h2>
         
         <div class="box">
             <h1 id="score-text">0</h1>
@@ -78,7 +50,6 @@
                 <button onclick="buyAntenna()" style="background:#0080ff; color:#fff">📡 АНТЕННА (1M)</button>
                 <button onclick="buyCooler()" style="background:#00aaff; color:#000">❄️ КУЛЕР (50K) <br><span style="font-size:0.7em;">[Охлаждение системы]</span></button>
                 <hr style="border: 1px dashed #f0f;">
-                <!-- ПРОЦЕССОРЫ ОТ HACLER В МАГАЗИНЕ -->
                 <button onclick="buyCPU('i5', 500000, 25)" style="background:#ff6600; color:#fff">⚙️ hacler i5 (500K) <br><span style="font-size:0.7em;">[+25 EN/s]</span></button>
                 <button onclick="buyCPU('i9', 2000000, 150)" style="background:#ff3300; color:#fff">🔥 hacler i9 (2M) <br><span style="font-size:0.7em;">[+150 EN/s]</span></button>
             </div>
@@ -102,93 +73,59 @@
         let energyPerSec = parseFloat(localStorage.getItem('hak_energyPerSec')) || 0; 
         let temperature = parseFloat(localStorage.getItem('hak_temp')) || 30;
         let coolingPower = parseFloat(localStorage.getItem('hak_cooling')) || 0; 
-
         let clickP = 1, userName = localStorage.getItem('hak_name') || '', isGold = localStorage.getItem('hak_gold') === 'true';
         let bots = [];
         let audioCtx = null;
 
-        function initAudio() {
-            if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-        }
+        function initAudio() { if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)(); }
 
         function playDynamicClickSound() {
             try {
-                initAudio();
-                if (audioCtx.state === 'suspended') audioCtx.resume();
-                let osc = audioCtx.createOscillator();
-                let gain = audioCtx.createGain();
-                osc.type = 'sine';
-                let frequency = 400 + Math.min(score / 500, 1100); 
-                osc.frequency.setValueAtTime(frequency, audioCtx.currentTime);
-                gain.gain.setValueAtTime(0.05, audioCtx.currentTime);
-                gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.05);
-                osc.connect(gain); gain.connect(audioCtx.destination);
-                osc.start(); osc.stop(audioCtx.currentTime + 0.05);
+                initAudio(); if (audioCtx.state === 'suspended') audioCtx.resume();
+                let osc = audioCtx.createOscillator(), gain = audioCtx.createGain();
+                osc.type = 'sine'; osc.frequency.setValueAtTime(400 + Math.min(score / 500, 1100), audioCtx.currentTime);
+                gain.gain.setValueAtTime(0.05, audioCtx.currentTime); gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.05);
+                osc.connect(gain); gain.connect(audioCtx.destination); osc.start(); osc.stop(audioCtx.currentTime + 0.05);
             } catch(e) {}
         }
 
         function playBuySound() {
             try {
-                initAudio();
-                if (audioCtx.state === 'suspended') audioCtx.resume();
-                let osc1 = audioCtx.createOscillator();
-                let gain1 = audioCtx.createGain();
-                osc1.type = 'triangle';
-                osc1.frequency.setValueAtTime(523.25, audioCtx.currentTime);
-                gain1.gain.setValueAtTime(0.06, audioCtx.currentTime);
-                gain1.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.08);
-                osc1.connect(gain1); gain1.connect(audioCtx.destination);
-                osc1.start(); osc1.stop(audioCtx.currentTime + 0.08);
-
+                initAudio(); if (audioCtx.state === 'suspended') audioCtx.resume();
+                let osc1 = audioCtx.createOscillator(), gain1 = audioCtx.createGain();
+                osc1.type = 'triangle'; osc1.frequency.setValueAtTime(523.25, audioCtx.currentTime);
+                gain1.gain.setValueAtTime(0.06, audioCtx.currentTime); gain1.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.08);
+                osc1.connect(gain1); gain1.connect(audioCtx.destination); osc1.start(); osc1.stop(audioCtx.currentTime + 0.08);
                 setTimeout(() => {
-                    let osc2 = audioCtx.createOscillator();
-                    let gain2 = audioCtx.createGain();
-                    osc2.type = 'triangle';
-                    osc2.frequency.setValueAtTime(659.25, audioCtx.currentTime);
-                    gain2.gain.setValueAtTime(0.06, audioCtx.currentTime);
-                    gain2.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.12);
-                    osc2.connect(gain2); gain2.connect(audioCtx.destination);
-                    osc2.start(); osc2.stop(audioCtx.currentTime + 0.12);
+                    let osc2 = audioCtx.createOscillator(), gain2 = audioCtx.createGain();
+                    osc2.type = 'triangle'; osc2.frequency.setValueAtTime(659.25, audioCtx.currentTime);
+                    gain2.gain.setValueAtTime(0.06, audioCtx.currentTime); gain2.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.12);
+                    osc2.connect(gain2); gain2.connect(audioCtx.destination); osc2.start(); osc2.stop(audioCtx.currentTime + 0.12);
                 }, 70);
             } catch(e) {}
         }
 
         function playErrorSound() {
             try {
-                initAudio();
-                if (audioCtx.state === 'suspended') audioCtx.resume();
-                let osc = audioCtx.createOscillator();
-                let gain = audioCtx.createGain();
-                osc.type = 'sawtooth';
-                osc.frequency.setValueAtTime(140, audioCtx.currentTime);
-                gain.gain.setValueAtTime(0.08, audioCtx.currentTime);
-                gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.25);
-                osc.connect(gain); gain.connect(audioCtx.destination);
-                osc.start(); osc.stop(audioCtx.currentTime + 0.25);
+                initAudio(); if (audioCtx.state === 'suspended') audioCtx.resume();
+                let osc = audioCtx.createOscillator(), gain = audioCtx.createGain();
+                osc.type = 'sawtooth'; osc.frequency.setValueAtTime(140, audioCtx.currentTime);
+                gain.gain.setValueAtTime(0.08, audioCtx.currentTime); gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.25);
+                osc.connect(gain); gain.connect(audioCtx.destination); osc.start(); osc.stop(audioCtx.currentTime + 0.25);
             } catch(e) {}
         }
 
         function initBots() {
             const names = ["Satoshi", "Elon", "Anonymous", "Pavel", "Hacker", "Shadow", "Ghost", "Neo"];
-            for(let i=1; i<=100; i++) {
-                bots.push({
-                    name: names[Math.floor(Math.random()*names.length)] + "_" + i,
-                    score: Math.floor(Math.random() * 5000),
-                    power: Math.floor(Math.random() * 10) + 1
-                });
-            }
+            for(let i=1; i<=100; i++) { bots.push({ name: names[Math.floor(Math.random()*names.length)] + "_" + i, score: Math.floor(Math.random() * 5000), power: Math.floor(Math.random() * 50) + 20 }); }
         }
         initBots();
 
         function saveGame() {
-            localStorage.setItem('hak_score', score);
-            localStorage.setItem('hak_baseAutoP', baseAutoP);
-            localStorage.setItem('hak_energy', energy);
-            localStorage.setItem('hak_energyPerSec', energyPerSec);
-            localStorage.setItem('hak_temp', temperature);
-            localStorage.setItem('hak_cooling', coolingPower);
-            localStorage.setItem('hak_name', userName);
-            localStorage.setItem('hak_gold', isGold);
+            localStorage.setItem('hak_score', score); localStorage.setItem('hak_baseAutoP', baseAutoP);
+            localStorage.setItem('hak_energy', energy); localStorage.setItem('hak_energyPerSec', energyPerSec);
+            localStorage.setItem('hak_temp', temperature); localStorage.setItem('hak_cooling', coolingPower);
+            localStorage.setItem('hak_name', userName); localStorage.setItem('hak_gold', isGold);
         }
 
         function confirmAccess() {
@@ -197,35 +134,45 @@
             document.getElementById('login-overlay').style.display = 'none';
             document.getElementById('main-content').style.display = 'block';
             document.getElementById('display-name').innerText = userName;
-            initAudio();
-            updateUI();
+            initAudio(); updateUI();
             
             setInterval(() => { 
                 energy += (energyPerSec / 10);
-                
                 let targetTemp = 30 + (energyPerSec * 1.2) + (baseAutoP > 0 ? 5 : 0);
                 targetTemp = Math.max(30, targetTemp - (coolingPower * 2)); 
-                
-                let diff = targetTemp - temperature;
-                temperature += (diff * 0.02); 
-
+                temperature += ((targetTemp - temperature) * 0.02); 
                 if (temperature < 20 && coolingPower < 100) temperature = 20;
 
                 let isThrottling = temperature >= 90;
                 let currentMultiplier = 1 + (energy / 100);
-                
                 if (isThrottling) currentMultiplier *= 0.3; 
                 
-                let finalAutoIncome = baseAutoP * currentMultiplier;
-                score += finalAutoIncome / 10; 
-                
-                updateBots(); 
-                updateUI(); 
+                score += (baseAutoP * currentMultiplier) / 10; 
+                updateBots(); updateUI(); 
             }, 100);
             
             setInterval(saveGame, 2000);
             initMatrix();
         }
+
+        // 📡 ПРИЕМНИК КОМАНД ИЗ СОСЕДНЕЙ ВКЛАДКИ (АДМИНКИ) ЧЕРЕЗ LOCALSTORAGE
+        window.addEventListener('storage', (e) => {
+            if (e.key === 'admin_command') {
+                let cmd = JSON.parse(e.newValue);
+                if (!cmd) return;
+                
+                if (cmd.type === 'add_xp') { score += cmd.amount; playBuySound(); }
+                if (cmd.type === 'gold_name') { isGold = true; playBuySound(); }
+                if (cmd.type === 'get_rtx') { baseAutoP += cmd.reward; playBuySound(); }
+                if (cmd.type === 'get_cpu') { energyPerSec += cmd.reward; playBuySound(); }
+                if (cmd.type === 'get_aqua') { coolingPower += cmd.reward; temperature = 20; playBuySound(); }
+                if (cmd.type === 'crash_bots') { bots.forEach(b => { b.score = 0; b.power = 10; }); playErrorSound(); }
+                if (cmd.type === 'reset') { localStorage.clear(); location.reload(); }
+                
+                saveGame(); updateUI();
+                localStorage.removeItem('admin_command'); // Стираем выполненную команду
+            }
+        });
 
         function updateUI() {
             let isThrottling = temperature >= 90;
@@ -237,207 +184,57 @@
             document.getElementById('auto-val').innerText = Math.floor(finalAutoIncome).toLocaleString();
             document.getElementById('energy-val').innerText = Math.floor(energy).toLocaleString();
             document.getElementById('energy-per-sec').innerText = energyPerSec.toLocaleString();
-            
-            let multText = (1 + (energy / 100)).toFixed(1);
-            document.getElementById('multiplier-val').innerText = isThrottling ? `${multText} (🔥 ТРОТТЛИНГ -70%!)` : multText;
+            document.getElementById('multiplier-val').innerText = isThrottling ? `${(1 + (energy / 100)).toFixed(1)} (🔥 ТРОТТЛИНГ!)` : (1 + (energy / 100)).toFixed(1);
             
             let tempElement = document.getElementById('temp-display');
             document.getElementById('temp-val').innerText = Math.floor(temperature);
-            
-            if (temperature >= 90) {
-                tempElement.style.color = '#ff0000';
-                tempElement.innerHTML = `🚨 КРИТИЧЕСКИЙ ПЕРЕГРЕВ! (${Math.floor(temperature)}°C) ПРОЦЕССОР СБРОСИЛ ЧАСТОТУ!`;
-            } else if (temperature > 65) {
-                tempElement.style.color = '#ffaa00';
-                tempElement.innerHTML = `⚠️ ВЫСОКАЯ НАГРУЗКА: <span id="temp-val">${Math.floor(temperature)}</span>°C`;
-            } else if (temperature > 45) {
-                tempElement.style.color = '#ffff00';
-                tempElement.innerHTML = `⚙️ РАБОЧАЯ ТЕМПЕРАТУРА: <span id="temp-val">${Math.floor(temperature)}</span>°C`;
-            } else {
-                tempElement.style.color = '#0f0';
-                tempElement.innerHTML = `🌡️ СИСТЕМА ОХЛАЖДЕНА: <span id="temp-val">${Math.floor(temperature)}</span>°C`;
-            }
-
-            let nameSpan = document.getElementById('display-name');
-            if (isGold) nameSpan.classList.add('gold-nick');
-            else nameSpan.classList.remove('gold-nick');
+            if (temperature >= 90) { tempElement.style.color = '#f00'; tempElement.innerHTML = `🚨 КРИТИЧЕСКИЙ ПЕРЕГРЕВ! (${Math.floor(temperature)}°C)`; }
+            else if (temperature > 65) { tempElement.style.color = '#fa0'; tempElement.innerHTML = `⚠️ ВЫСОКАЯ НАГРУЗКА: <span id="temp-val">${Math.floor(temperature)}</span>°C`; }
+            else if (temperature > 45) { tempElement.style.color = '#fff000'; tempElement.innerHTML = `⚙️ РАБОЧАЯ ТЕМПЕРАТУРА: <span id="temp-val">${Math.floor(temperature)}</span>°C`; }
+            else { tempElement.style.color = '#0f0'; tempElement.innerHTML = `🌡️ СИСТЕМА ОХЛАЖДЕНА: <span id="temp-val">${Math.floor(temperature)}</span>°C`; }
 
             let fullList = [...bots, { name: userName, score: score, isPlayer: true }];
             fullList.sort((a, b) => b.score - a.score);
-
             let html = '';
             fullList.forEach((item, index) => {
                 if (index < 100) {
                     let styleClass = item.isPlayer ? 'my-pos' : '';
                     let nickStyle = (item.isPlayer && isGold) ? 'class="gold-nick"' : '';
-                    html += `<div class="leader-item ${styleClass}">
-                        <span ${nickStyle}>#${index + 1} ${item.name}</span>
-                        <span>${Math.floor(item.score).toLocaleString()} XP</span>
-                    </div>`;
+                    html += `<div class="leader-item ${styleClass}"><span ${nickStyle}>#${index + 1} ${item.name}</span><span>${Math.floor(item.score).toLocaleString()} XP</span></div>`;
                 }
             });
             document.getElementById('leaderboard').innerHTML = html;
         }
 
-        function mineData(e) {
-            score += clickP;
-            playDynamicClickSound();
-            createParticle(e.clientX, e.clientY, "+" + clickP);
-            updateUI();
-        }
-
+        function mineData(e) { score += clickP; playDynamicClickSound(); createParticle(e.clientX, e.clientY, "+" + clickP); updateUI(); }
         function createParticle(x, y, text) {
-            let p = document.createElement('div');
-            p.className = 'particle';
-            p.innerText = text;
-            p.style.left = x + 'px';
-            p.style.top = y + 'px';
-            let dx = (Math.random() - 0.5) * 120;
-            let dy = (Math.random() - 0.5) * 120 - 60;
-            p.style.setProperty('--dx', dx + 'px');
-            p.style.setProperty('--dy', dy + 'px');
-            document.body.appendChild(p);
-            setTimeout(() => p.remove(), 800);
+            let p = document.createElement('div'); p.className = 'particle'; p.innerText = text; p.style.left = x + 'px'; p.style.top = y + 'px';
+            p.style.setProperty('--dx', (Math.random() - 0.5) * 120 + 'px'); p.style.setProperty('--dy', ((Math.random() - 0.5) * 120 - 60) + 'px');
+            document.body.appendChild(p); setTimeout(() => p.remove(), 800);
         }
 
-        function buyCase() {
-            if (score >= 10000) {
-                score -= 10000;
-                clickP += 5;
-                playBuySound(); 
-                alert('📦 Кейс открыт! Сила клика увеличена на +5!');
-                updateUI();
-            } else {
-                playErrorSound(); 
-                alert('Не хватает XP! Нужно 10,000 XP.');
-            }
-        }
-
-        function buyAntenna() {
-            if (score >= 1000000) {
-                score -= 1000000;
-                baseAutoP += 150; 
-                playBuySound(); 
-                alert('📡 Антенна установлена! Базовая скорость майнинга увеличена на +150/сек!');
-                updateUI();
-            } else {
-                playErrorSound(); 
-                alert('Не хватает XP! Нужно 1,000,000 XP.');
-            }
-        }
-
-        // ПОКУПКА ПРОЦЕССОРОВ С ИСПРАВЛЕННЫМ НАЗВАНИЕМ БРЕНДА
-        function buyCPU(model, price, reward) {
-            if (score >= price) {
-                score -= price;
-                energyPerSec += reward;
-                playBuySound();
-                alert(`⚙️ Установлен процессор hacler ${model}! Генерация энергии выросла на +${reward} EN/sec!`);
-                updateUI();
-            } else {
-                playErrorSound();
-                alert(`Не хватает XP! Нужно ${price.toLocaleString()} XP.`);
-            }
-        }
-
-        function buyCooler() {
-            if (score >= 50000) {
-                score -= 50000;
-                coolingPower += 2.0; 
-                playBuySound();
-                alert('❄️ Кулер установлен! Температура начинает плавно снижаться.');
-                updateUI();
-            } else {
-                playErrorSound();
-                alert('Не хватает XP! Нужно 50,000 XP.');
-            }
-        }
-
-        function transferMoney() {
-            let target = document.getElementById('t-name').value;
-            if (!target) {
-                playErrorSound();
-                return alert('Введите имя получателя!');
-            }
-            playBuySound();
-            alert(`Успешно переведено пользователю ${target}!`);
-        }
-
-        function openAdmin() {
-            try {
-                initAudio();
-                let osc = audioCtx.createOscillator();
-                osc.frequency.setValueAtTime(400, audioCtx.currentTime);
-                let gain = audioCtx.createGain();
-                gain.gain.setValueAtTime(0.05, audioCtx.currentTime);
-                gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.1);
-                osc.connect(gain); gain.connect(audioCtx.destination);
-                osc.start(); osc.stop(audioCtx.currentTime + 0.1);
-            } catch(e) {}
-            document.getElementById('admin-modal').style.display = 'block';
-        }
-
-        function getRTX(model, reward) {
-            baseAutoP += reward;
-            playBuySound();
-            alert(`🚀 Установлена базовая карта RTX ${model}! Базовая скорость: +${reward.toLocaleString()}/sec!`);
-            saveGame();
-            updateUI();
-        }
-
-        function getProcessorAdmin(model, reward) {
-            energyPerSec += reward;
-            playBuySound();
-            alert(`🔥 Сверхразгон энергии! Активирован процессор ${model}!`);
-            saveGame();
-            updateUI();
-        }
-
-        function getCoolerAdmin(model, reward) {
-            coolingPower += reward;
-            playBuySound();
-            alert(`❄️ Ледяной щит активирован! Запущен кулер ${model}!`);
-            saveGame();
-            updateUI();
-        }
-
-        function fullReset() {
-            playErrorSound();
-            localStorage.clear();
-            score = 0; baseAutoP = 0; energy = 0; energyPerSec = 0; temperature = 30; coolingPower = 0; clickP = 1; isGold = false; userName = '';
-            location.reload();
-        }
-
+        function buyCase() { if (score >= 10000) { score -= 10000; clickP += 5; playBuySound(); updateUI(); } else { playErrorSound(); } }
+        function buyAntenna() { if (score >= 1000000) { score -= 1000000; baseAutoP += 150; playBuySound(); updateUI(); } else { playErrorSound(); } }
+        function buyCPU(model, price, reward) { if (score >= price) { score -= price; energyPerSec += reward; playBuySound(); updateUI(); } else { playErrorSound(); } }
+        function buyCooler() { if (score >= 50000) { score -= 50000; coolingPower += 2.0; playBuySound(); updateUI(); } else { playErrorSound(); } }
+        function transferMoney() { let target = document.getElementById('t-name').value; if (!target) return playErrorSound(); playBuySound(); alert(`Переведено пользователю ${target}!`); }
+        
         function updateBots() {
             bots.forEach(bot => {
-                bot.score += bot.power * 0.1;
-                if(Math.random() > 0.95) bot.power += Math.floor(Math.random() * 5);
+                let dynamicBotMultiplier = 1 + (score / 1000); 
+                bot.score += (bot.power * 0.1) * dynamicBotMultiplier;
+                if(Math.random() > 0.95) bot.power += Math.floor(Math.random() * 50) + 10;
             });
         }
-
+        
         function initMatrix() {
-            const canvas = document.getElementById('matrix-canvas');
-            const ctx = canvas.getContext('2d');
-            canvas.width = window.innerWidth;
-            canvas.height = window.innerHeight;
-            const letters = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789@#$%&";
-            const fontSize = 10;
-            const columns = canvas.width / fontSize;
-            const drops = Array(Math.floor(columns)).fill(1);
-
-            function draw() {
-                ctx.fillStyle = 'rgba(0, 0, 0, 0.05)';
-                ctx.fillRect(0, 0, canvas.width, canvas.height);
-                ctx.fillStyle = '#0f0';
-                ctx.font = fontSize + 'px monospace';
-                for (let i = 0; i < drops.length; i++) {
-                    const text = letters[Math.floor(Math.random() * letters.length)];
-                    ctx.fillText(text, i * fontSize, drops[i] * fontSize);
-                    if (drops[i] * fontSize > canvas.height && Math.random() > 0.975) drops[i] = 0;
-                    drops[i]++;
-                }
-            }
-            setInterval(draw, 33);
+            const canvas = document.getElementById('matrix-canvas'), ctx = canvas.getContext('2d');
+            canvas.width = window.innerWidth; canvas.height = window.innerHeight;
+            const letters = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789", fontSize = 10, columns = canvas.width / fontSize, drops = Array(Math.floor(columns)).fill(1);
+            setInterval(() => {
+                ctx.fillStyle = 'rgba(0, 0, 0, 0.05)'; ctx.fillRect(0, 0, canvas.width, canvas.height); ctx.fillStyle = '#0f0'; ctx.font = fontSize + 'px monospace';
+                for (let i = 0; i < drops.length; i++) { ctx.fillText(letters[Math.floor(Math.random() * letters.length)], i * fontSize, drops[i] * fontSize); if (drops[i] * fontSize > canvas.height && Math.random() > 0.975) drops[i] = 0; drops[i]++; }
+            }, 33);
         }
     </script>
 </body>
