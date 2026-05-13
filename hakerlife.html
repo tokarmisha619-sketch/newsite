@@ -3,30 +3,43 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width,initial-scale=1.0">
-    <title>🚨 GLOBAL OPERATIONS: CYBER SHIELD 3D</title>
+    <title>🚨 MISSION PORTUGAL: CYBER SHIELD 3D</title>
     <style>
         body { font-family: monospace; background: #0c0f12; color: #e0e5eb; margin: 0; padding: 10px; overflow: hidden; touch-action: none; }
         .game-layout { display: grid; grid-template-columns: 1fr 300px; gap: 10px; max-width: 1200px; margin: 0 auto; height: 95vh; }
         .screen-box { background: #161a1e; border: 2px solid #4a5568; border-radius: 8px; padding: 10px; display: flex; flex-direction: column; box-shadow: 0 4px 20px rgba(0,0,0,0.5); position: relative; }
-        canvas { width: 100%; height: 350px; background: #000; border: 1px solid #2d3748; border-radius: 4px; }
+        
+        .canvas-container { position: relative; width: 100%; height: 350px; overflow: hidden; border: 1px solid #2d3748; border-radius: 4px; }
+        canvas { width: 100%; height: 100%; background: #000; }
+        
+        /* 🔫 2.5D СПРАЙТ ХАКЕРСКОГО ЭМИ-ОРУЖИЯ */
+        #cyber-weapon { position: absolute; bottom: 0; left: 50%; transform: translateX(-50%); width: 120px; height: 100px; background: linear-gradient(to top, #1a202c, #4a5568); border: 3px solid #00ffff; border-bottom: none; border-radius: 10px 10px 0 0; box-shadow: 0 0 15px #00ffff; pointer-events: none; transition: transform 0.1s; z-index: 5; }
+        #weapon-laser { position: absolute; bottom: 85px; left: 50%; transform: translateX(-50%); width: 14px; height: 14px; background: #00ffff; border-radius: 50%; box-shadow: 0 0 20px #00ffff; pointer-events: none; z-index: 6; }
+        
+        /* 💥 ИСКРЫ ИЗ ДУЛА */
+        .spark { position: absolute; width: 6px; height: 6px; background: #00ffff; border-radius: 50%; box-shadow: 0 0 10px #00ffff; pointer-events: none; z-index: 10; opacity: 1; transition: all 0.2s ease-out; }
+
+        .weapon-fire { transform: translateX(-50%) translateY(15px) scale(0.96) !important; background: linear-gradient(to top, #2d3748, #00ffff) !important; box-shadow: 0 0 25px #00ffff !important; }
+        #explosion-flash { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: #fff; opacity: 0; pointer-events: none; z-index: 100; transition: opacity 0.1s ease-out; }
+
         #radar-canvas { position: absolute; top: 20px; right: 20px; width: 100px; height: 100px; border: 2px solid #4a5568; border-radius: 50%; background: rgba(22,26,30,0.9); box-shadow: 0 0 10px rgba(0,0,0,0.5); z-index: 10; }
         #terminal { flex-grow: 1; background: #0f1115; border: 1px solid #2d3748; padding: 10px; margin-top: 10px; overflow-y: auto; font-size: 0.85em; border-radius: 4px; height: 180px; box-shadow: inset 0 0 10px rgba(0,0,0,0.8); }
         .input-area { display: flex; gap: 5px; margin-top: 5px; }
         input { background: #0f1115; color: #fff; border: 1px solid #4a5568; padding: 8px; font-family: monospace; flex-grow: 1; outline: none; border-radius: 4px; }
-        button { background: #e53e3e; color: #fff; border: none; padding: 8px 15px; font-family: monospace; font-weight: bold; cursor: pointer; border-radius: 4px; text-transform: uppercase; }
-        button:hover { background: #c53030; box-shadow: 0 0 8px #e53e3e; }
+        button { background: #3182ce; color: #fff; border: none; padding: 8px 15px; font-family: monospace; font-weight: bold; cursor: pointer; border-radius: 4px; text-transform: uppercase; }
+        button:hover { background: #2b6cb0; box-shadow: 0 0 8px #3182ce; }
         .sidebar { background: #161a1e; border: 2px solid #4a5568; border-radius: 8px; padding: 15px; font-size: 0.8em; box-shadow: 0 4px 20px rgba(0,0,0,0.5); }
         .nav-btn { width: 50px; height: 40px; margin: 3px; font-size: 1.2em; background: #2d3748; color: #fff; border: 1px solid #4a5568; border-radius: 4px; cursor: pointer; }
         .nav-btn:hover { background: #4a5568; }
         
         .shake-effect { animation: screenShake 0.4s ease-in-out infinite; }
         @keyframes screenShake {
-            0% { transform: translate(2px, 1px) rotate(0deg); }
-            20% { transform: translate(-3px, 0px) rotate(1deg); }
-            40% { transform: translate(1px, -1px) rotate(1deg); }
-            60% { transform: translate(-3px, 1px) rotate(0deg); }
-            80% { transform: translate(-1px, -1px) rotate(1deg); }
-            100% { transform: translate(1px, -2px) rotate(-1deg); }
+            0% { transform: translate(2px, 1px); }
+            20% { transform: translate(-3px, 0px); }
+            40% { transform: translate(1px, -1px); }
+            60% { transform: translate(-2px, 2px); }
+            80% { transform: translate(2px, 1px); }
+            100% { transform: translate(0px, -1px); }
         }
     </style>
 </head>
@@ -34,51 +47,63 @@
 
     <div class="game-layout">
         <div id="main-box" class="screen-box">
-            <canvas id="3d-screen" width="320" height="240"></canvas>
+            <div class="canvas-container" id="fire-zone">
+                <canvas id="3d-screen" width="320" height="240"></canvas>
+                
+                <div id="cyber-weapon"><div id="weapon-laser"></div></div>
+                <div id="explosion-flash"></div>
+            </div>
+            
             <canvas id="radar-canvas" width="100" height="100"></canvas>
             
             <div id="terminal">
                 <div id="mission-title" style="color: #ecc94b; font-weight: bold; text-align: center;">=== ЭТАП 1: ДОМ В США ===</div>
-                <p id="instruction-text">[ДИРЕКТИВА]: Развернись, найди светящуюся КРАСНУЮ ДВЕРЬ здания и войди в неё, чтобы выйти на улицу города.</p>
-                <p style="color: #a0aec0;">Управление: W,A,S,D — ходить, Стрелочки влево/вправо — поворачивать голову.</p>
+                <p id="instruction-text">[ДИРЕКТИВА]: Ты дома. Развернись, найди светящуюся КРАСНУЮ ДВЕРЬ и войди в неё, чтобы выйти на улицу города.</p>
+                <p style="color: #a0aec0;">Управление: W,A,S,D — ходить, Стрелочки — поворот камеры. <b>ПРОБЕЛ — выстрел! Собирай кейсы (желтые) и батареи (синие)</b></p>
                 <hr style="border: 1px dashed #4a5568;">
                 <div id="story-log"></div>
             </div>
             
             <div class="input-area">
-                <input type="text" id="user-input" placeholder="Ожидание заминирования главного сервера..." disabled>
-                <button id="submit-btn" onclick="processDetonation()" disabled>ДЕТОНАЦИЯ</button>
+                <input type="text" id="user-input" placeholder="Доступ закрыт. Ожидайте терминал взлома..." disabled>
+                <button id="submit-btn" onclick="processHack()" disabled>ВЗРЫВ</button>
             </div>
         </div>
 
         <div class="sidebar">
-            <h3 style="color: #3182ce; text-align: center; margin-top: 0;">📟 ТЕРМИНАЛ CYBER SHIELD</h3>
+            <h3 style="color: #3182ce; text-align: center; margin-top: 0;">📟 ШТАБ CYBER SHIELD</h3>
             <hr style="border: 1px dashed #4a5568;">
             <p>📍 ЛОКАЦИЯ: <span id="loc-val" style="color: #fff;">Твой дом (США)</span></p>
             <p>🎯 ЦЕЛЬ: <span id="target-val" style="color: #ecc94b;">Выйти через Красную Дверь</span></p>
-            <p>🏅 ТВОЙ РАНГ: <span id="rank-val" style="color: #9f7aea; font-weight: bold;">Стажер</span></p>
-            <p>💰 КОМПЕНСАЦИЯ: \$<span id="score-val" style="color: #48bb78; font-weight: bold;">0</span></p>
-            <p>💵 ЗАРПЛАТА: <span style="color: #00bfff;">\$<span id="salary-val">0</span>/сек</span></p>
-            <p>💥 ВЗРЫВОВ БАЗ: <span id="hacked-count" style="color: #ed8936; font-weight: bold;">0 зданий</span></p>
+            <p>🏅 РАНГ: <span id="rank-val" style="color: #9f7aea; font-weight: bold;">Стажер</span></p>
+            
+            <!-- ИНВЕНТАРЬ ЗАРЯДОВ ЭМИ -->
+            <p>🔋 ЗАРЯДЫ ЭМИ: <span id="ammo-val" style="color: #00ffff; font-weight: bold;">20 шт</span></p>
+            
+            <p>💰 КОШЕЛЕК ОЧКОВ: $<span id="score-val" style="color: #48bb78; font-weight: bold;">0</span></p>
+            <p>💵 ЗАРПЛАТА: <span style="color: #00bfff;">$<span id="salary-val">0</span>/сек</span></p>
+            <p>💻 ВЗЛОМАНО СЕТЕЙ: <span id="hacked-count" style="color: #ed8936; font-weight: bold;">0 объектов</span></p>
             <p>📊 ДВИЖОК: <span id="fps-val" style="color: #9f7aea; font-weight: bold;">0 FPS</span></p>
             <hr style="border: 1px dashed #4a5568;">
-            <h4 style="text-align: center; margin-bottom: 5px;">КОНТРОЛЛЕР ПЕРЕМЕЩЕНИЯ</h4>
+            <h4 style="text-align: center; margin-bottom: 5px;">ПАНЕЛЬ ДВИЖЕНИЯ И АТАК</h4>
             <div style="text-align: center;">
                 <button class="nav-btn" onclick="movePlayer('w')">W</button><br>
                 <button class="nav-btn" onclick="movePlayer('a')">A</button>
                 <button class="nav-btn" onclick="movePlayer('s')">S</button>
                 <button class="nav-btn" onclick="movePlayer('d')">D</button><br>
-                <button class="nav-btn" style="width: 70px; background: #2b6cb0;" onclick="movePlayer('left')">◀</button>
-                <button class="nav-btn" style="width: 70px; background: #2b6cb0;" onclick="movePlayer('right')">▶</button>
+                <button class="nav-btn" style="width: 45px; background: #00ffff; color:#000;" onclick="fireWeapon()">⚡</button>
+                <button class="nav-btn" style="width: 50px; background: #2b6cb0;" onclick="movePlayer('left')">◀</button>
+                <button class="nav-btn" style="width: 50px; background: #2b6cb0;" onclick="movePlayer('right')">▶</button>
             </div>
         </div>
     </div>
 
     <script>
         let score = 0;
-        let step = 1; // 1-США дом, 2-США дорога, 3-Португалия город, 4-Португалия подрыв, 5-Токио город, 6-Исландия финал, 7-Конец
+        let step = 1; 
         let salary = 0;
-        let destroyedBuildings = 0;
+        let hackedObjects = 0;
+        let ammo = 20; // Стартовое количество патронов
         let audioCtx = null;
         let lastCalledTime, fps;
 
@@ -88,7 +113,7 @@
                 initAudio(); if (audioCtx.state === 'suspended') audioCtx.resume();
                 let osc = audioCtx.createOscillator(), gain = audioCtx.createGain();
                 osc.type = type; osc.frequency.setValueAtTime(freq, audioCtx.currentTime);
-                gain.gain.setValueAtTime(0.02, audioCtx.currentTime); gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + duration);
+                gain.gain.setValueAtTime(0.03, audioCtx.currentTime); gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + duration);
                 osc.connect(gain); gain.connect(audioCtx.destination); osc.start(); osc.stop(audioCtx.currentTime + duration);
             } catch(e) {}
         }
@@ -101,10 +126,51 @@
 
         function updateRank() {
             let rankElement = document.getElementById('rank-val');
-            if (destroyedBuildings === 0) rankElement.innerText = "Стажер 🧑‍💻";
-            else if (destroyedBuildings === 1) rankElement.innerText = "Младший Агент 🕵️‍♂️";
-            else if (destroyedBuildings === 2) rankElement.innerText = "Спецагент ⚡";
-            else rankElement.innerText = "Разрушитель Сетей 👑";
+            if (hackedObjects === 0) rankElement.innerText = "Стажер 🧑‍💻";
+            else if (hackedObjects <= 10) rankElement.innerText = "Младший Агент 🕵️‍♂️";
+            else rankElement.innerText = "Спецагент CYBER SHIELD ⚡";
+        }
+
+        // ВЫСТРЕЛА С ЦИФРОВЫМИ ИСКРАМИ И ОГРАНИЧЕНИЕМ ПАТРОНОВ
+        function fireWeapon() {
+            if (step === 4 || step === 5) return;
+            
+            if (ammo <= 0) {
+                playBeep(150, 0.1, 'sawtooth'); // Звук пустой пушки
+                printLog("⚠️ ВНИМАНИЕ: Энергия ЭМИ-бластера на нуле! Срочно найди синюю батарею на дороге!", "#f56565");
+                return;
+            }
+
+            ammo -= 1;
+            document.getElementById('ammo-val').innerText = ammo + " шт";
+
+            let weapon = document.getElementById('cyber-weapon');
+            weapon.classList.add('weapon-fire');
+            playBeep(850, 0.12, 'sawtooth');
+
+            // Генерация искр
+            let zone = document.getElementById('fire-zone');
+            for(let i=0; i<8; i++) {
+                let spark = document.createElement('div');
+                spark.className = 'spark';
+                spark.style.left = '50%';
+                spark.style.bottom = '95px';
+                zone.appendChild(spark);
+
+                // Случайный разлет искр
+                let angle = (Math.random() * Math.PI) - Math.PI; 
+                let speed = Math.random() * 60 + 30;
+                let dx = Math.cos(angle) * speed;
+                let dy = Math.sin(angle) * speed;
+
+                setTimeout(() => {
+                    spark.style.transform = `translate(${dx}px, ${dy}px) scale(0.1)`;
+                    spark.style.opacity = '0';
+                }, 10);
+                setTimeout(() => spark.remove(), 200);
+            }
+
+            setTimeout(() => weapon.classList.remove('weapon-fire'), 80);
         }
 
         const canvas = document.getElementById('3d-screen');
@@ -113,46 +179,75 @@
         const rCtx = radarCanvas.getContext('2d');
         const mapSize = 12;
         
-        let map = [
-            [1,1,1,1,1,1,1,1,1,1,1,1],
-            [1,0,0,0,0,1,0,0,0,0,0,1],
-            [1,0,0,0,0,1,0,0,0,0,0,1],
-            [1,0,0,0,0,1,0,0,0,0,2,1], // 2 - Красная неоновая дверь дома
-            [1,0,0,0,0,1,0,0,0,0,0,1],
-            [1,1,1,1,1,1,0,0,0,0,0,1],
-            [1,0,0,0,0,0,0,0,0,0,0,1],
-            [1,0,0,0,0,0,0,0,0,0,0,1],
-            [1,0,0,0,0,0,0,0,0,0,0,1],
-            [1,0,0,0,0,0,0,0,0,0,0,1],
-            [1,0,0,0,0,0,0,0,0,0,0,1],
-            [1,1,1,1,1,1,1,1,1,1,1,1]
+        // КАРТЫ (1-Стены, 0-Улица, 2-Цель, 3-Кейс с деньгами, 4-Батарея ЭМИ)
+        let mapUSA_House = [
+           ,
+           ,
+           ,
+           ,
+           ,
+           ,
+           ,
+           ,
+           ,
+           ,
+           ,
+           
         ];
 
+        let mapUSA_Road = [
+           ,
+           ,
+           ,
+           ,
+           ,
+           ,
+           ,
+           ,
+           ,
+           ,
+           ,
+           
+        ];
+
+        let mapPortugal = [
+           ,
+           ,
+           ,
+           ,
+           ,
+           ,
+           ,
+           ,
+           ,
+           ,
+           ,
+           
+        ];
+
+        let map = mapUSA_House; 
         let px = 2.0, py = 2.0, pa = 3.14; 
-        const fov = Math.PI / 3, numRays = 320;
+        const fov = Math.PI / 3, numRays = 160; 
 
         function drawGtaRadar() {
             rCtx.clearRect(0, 0, radarCanvas.width, radarCanvas.height);
             let scale = 8; rCtx.save(); rCtx.translate(50, 50); rCtx.rotate(-pa - Math.PI/2); 
-
             for (let y = 0; y < mapSize; y++) {
                 for (let x = 0; x < mapSize; x++) {
-                    let relX = (x - px) * scale; let relY = (y - py) * scale;
-                    if (map[y][x] === 1) {
-                        rCtx.fillStyle = "#4a5568"; rCtx.fillRect(relX, relY, scale, scale);
-                    } else if (map[y][x] === 2) {
-                        let pulse = Math.sin(Date.now() * 0.01) * 2 + 5;
-                        if (step === 1) rCtx.fillStyle = "#e53e3e"; 
-                        else if (step === 2) rCtx.fillStyle = "#ed8936"; 
-                        else if (step === 3) rCtx.fillStyle = "#3182ce"; 
-                        else if (step === 5) rCtx.fillStyle = "#9f7aea"; 
-                        else rCtx.fillStyle = "#38bdf8"; 
-                        rCtx.beginPath(); rCtx.arc(relX + scale/2, relY + scale/2, pulse, 0, Math.PI*2); rCtx.fill();
+                    if (map[y][x] === 1) { rCtx.fillStyle = "#4a5568"; rCtx.fillRect((x - px) * scale, (y - py) * scale, scale, scale); } 
+                    else if (map[y][x] === 2) {
+                        rCtx.fillStyle = step === 1 ? "#e53e3e" : (step === 2 ? "#ed8936" : "#3182ce");
+                        rCtx.fillRect((x - px) * scale, (y - py) * scale, scale, scale);
+                    } else if (map[y][x] === 3) {
+                        rCtx.fillStyle = "#ecc94b"; // Желтый кейс
+                        rCtx.beginPath(); rCtx.arc((x - px) * scale + 4, (y - py) * scale + 4, 3, 0, Math.PI*2); rCtx.fill();
+                    } else if (map[y][x] === 4) {
+                        rCtx.fillStyle = "#00ffff"; // Голубая батарея патронов
+                        rCtx.beginPath(); rCtx.arc((x - px) * scale + 4, (y - py) * scale + 4, 3, 0, Math.PI*2); rCtx.fill();
                     }
                 }
             }
-            rCtx.restore();
-            rCtx.fillStyle = "#48bb78"; rCtx.beginPath(); rCtx.arc(50, 50, 4, 0, Math.PI * 2); rCtx.fill();
+            rCtx.restore(); rCtx.fillStyle = "#48bb78"; rCtx.beginPath(); rCtx.arc(50, 50, 4, 0, Math.PI * 2); rCtx.fill();
             rCtx.strokeStyle = "#48bb78"; rCtx.lineWidth = 2; rCtx.beginPath(); rCtx.moveTo(50, 50); rCtx.lineTo(50, 38); rCtx.stroke();
         }
 
@@ -160,9 +255,7 @@
             if(!lastCalledTime) { lastCalledTime = performance.now(); fps = 0; } 
             else { let delta = (performance.now() - lastCalledTime)/1000; lastCalledTime = performance.now(); fps = Math.round(1/delta); document.getElementById('fps-val').innerText = fps + " FPS"; }
 
-            if (step === 6) { ctx.fillStyle = "#cbd5e1"; } 
-            else { ctx.fillStyle = "#4299e1"; } 
-            ctx.fillRect(0, 0, canvas.width, canvas.height / 2);
+            ctx.fillStyle = "#4299e1"; ctx.fillRect(0, 0, canvas.width, canvas.height / 2);
             ctx.fillStyle = "#2d3748"; ctx.fillRect(0, canvas.height / 2, canvas.width, canvas.height / 2);
 
             for (let i = 0; i < numRays; i++) {
@@ -170,46 +263,58 @@
                 let distance = 0, hitWall = false, wallType = 0;
                 let eyeX = Math.cos(rayAngle), eyeY = Math.sin(rayAngle);
                 while (!hitWall && distance < 16) {
-                    distance += 0.05; let testX = Math.floor(px + eyeX * distance); let testY = Math.floor(py + eyeY * distance);
+                    distance += 0.1; let testX = Math.floor(px + eyeX * distance); let testY = Math.floor(py + eyeY * distance);
                     if (testX < 0 || testX >= mapSize || testY < 0 || testY >= mapSize) { hitWall = true; distance = 16; } 
                     else if (map[testY][testX] > 0) { hitWall = true; wallType = map[testY][testX]; }
                 }
                 let correctedDist = distance * Math.cos(rayAngle - pa);
                 let wallHeight = Math.min(canvas.height, canvas.height / correctedDist);
+                let xPixel = Math.floor(i * (canvas.width / numRays));
                 
-                if (wallType === 2) {
-                    if (step === 1) ctx.strokeStyle = `rgba(229, 62, 62, ${1 - distance/10})`;
-                    else if (step === 2) ctx.strokeStyle = `rgba(237, 137, 54, ${1 - distance/10})`;
-                    else if (step === 3) ctx.strokeStyle = `rgba(49, 130, 206, ${1 - distance/10})`;
-                    else if (step === 5) ctx.strokeStyle = `rgba(159, 122, 234, ${1 - distance/10})`; 
-                    else ctx.strokeStyle = `rgba(56, 189, 248, ${1 - distance/10})`; 
-                } else {
-                    let wallColor = Math.floor(180 * (1 - distance/12));
-                    if (step === 6) { ctx.strokeStyle = `rgb(${wallColor + 60}, ${wallColor + 60}, ${wallColor + 70})`; } 
-                    else { ctx.strokeStyle = `rgb(${wallColor + 20}, ${wallColor + 20}, ${wallColor + 25})`; }
-                }
-                ctx.beginPath(); ctx.moveTo(i, (canvas.height - wallHeight) / 2); ctx.lineTo(i, (canvas.height + wallHeight) / 2); ctx.stroke();
+                if (wallType === 2) { ctx.strokeStyle = step === 1 ? "#e53e3e" : (step === 2 ? "#ed8936" : "#3182ce"); } 
+                else if (wallType === 3) { ctx.strokeStyle = "#ecc94b"; } 
+                else if (wallType === 4) { ctx.strokeStyle = "#00ffff"; } // Отрисовка патронов в 2.5D мире
+                else { let wallColor = Math.floor(180 * (1 - distance/12)); ctx.strokeStyle = `rgb(${wallColor+20},${wallColor+20},${wallColor+25})`; }
+                ctx.lineWidth = Math.ceil(canvas.width / numRays);
+                ctx.beginPath(); ctx.moveTo(xPixel, (canvas.height - wallHeight) / 2); ctx.lineTo(xPixel, (canvas.height + wallHeight) / 2); ctx.stroke();
             }
             drawGtaRadar(); 
-            if (map[Math.floor(py)][Math.floor(px)] === 2) {
+            
+            let tx = Math.floor(px), ty = Math.floor(py);
+            // Сбор денежного кейса
+            if (map[ty][tx] === 3) {
+                map[ty][tx] = 0;
+                let bonus = Math.floor(Math.random() * 20000) + 5000; score += bonus;
+                document.getElementById('score-val').innerText = score.toLocaleString();
+                playBeep(880, 0.1); printLog(`💰 КЕЙС: Получено +$${bonus.toLocaleString()}`, "#ecc94b");
+            }
+            // Сбор батареи питания (патронов)
+            if (map[ty][tx] === 4) {
+                map[ty][tx] = 0; ammo += 10;
+                document.getElementById('ammo-val').innerText = ammo + " шт";
+                playBeep(600, 0.1); setTimeout(() => playBeep(900, 0.12), 60);
+                printLog(`🔋 ЭНЕРГИЯ: Батарея подобрана! Заряды ЭМИ восстановлены на +10 выстрелов!`, "#00ffff");
+            }
+
+            if (map[ty][tx] === 2) {
                 if (step === 1) startRoadToAirport();
                 else if (step === 2) startPortugalCity();
                 else if (step === 3) startHackerWork();
-                else if (step === 5) startIcelandStage();
-                else if (step === 6) startFinalBattle();
             }
         }
 
         function movePlayer(dir) {
-            if (step === 4 || step === 7) return; 
-            let moveSpeed = 0.22, rotSpeed = 0.16;
+            if (step === 4 || step === 5) return; 
+            let moveSpeed = 0.25, rotSpeed = 0.18;
             if (dir === 'w') {
                 let nx = px + Math.cos(pa) * moveSpeed, ny = py + Math.sin(pa) * moveSpeed;
-                if (map[Math.floor(py)][Math.floor(nx)] !== 1) px = nx; if (map[Math.floor(ny)][Math.floor(px)] !== 1) py = ny; playBeep(140, 0.02);
+                if (map[Math.floor(py)][Math.floor(nx)] !== 1) px = nx; if (map[Math.floor(ny)][Math.floor(px)] !== 1) py = ny; 
+                playBeep(80, 0.04, 'triangle'); 
             }
             if (dir === 's') {
                 let nx = px - Math.cos(pa) * moveSpeed, ny = py - Math.sin(pa) * moveSpeed;
-                if (map[Math.floor(py)][Math.floor(nx)] !== 1) px = nx; if (map[Math.floor(ny)][Math.floor(px)] !== 1) py = ny; playBeep(110, 0.02);
+                if (map[Math.floor(py)][Math.floor(nx)] !== 1) px = nx; if (map[Math.floor(ny)][Math.floor(px)] !== 1) py = ny; 
+                playBeep(80, 0.04, 'triangle'); 
             }
             if (dir === 'a') {
                 let nx = px + Math.cos(pa - Math.PI/2) * moveSpeed, ny = py + Math.sin(pa - Math.PI/2) * moveSpeed;
@@ -224,156 +329,90 @@
         }
 
         function startRoadToAirport() {
-            step = 2; px = 1.5; py = 5.5; pa = 0.0;
-            map = [
-                [1,1,1,1,1,1,1,1,1,1,1,1],
-                [1,0,0,0,0,0,0,0,0,0,2,1], // 2 - Оранжевый Аэропорт
-                [1,0,1,1,1,1,1,1,1,0,0,1],
-                [1,0,1,0,0,0,0,0,1,0,0,1],
-                [1,0,1,0,1,1,1,0,1,0,0,1],
-                [1,0,0,0,1,0,0,0,1,0,0,1],
-                [1,0,1,0,1,1,1,1,1,0,0,1],
-                [1,0,1,0,0,0,0,0,0,0,0,1],
-                [1,0,1,1,1,1,1,1,1,1,0,1],
-                [1,0,0,0,0,0,0,0,0,0,0,1],
-                [1,0,0,0,0,0,0,0,0,0,0,1],
-                [1,1,1,1,1,1,1,1,1,1,1,1]
-            ];
-            playBeep(440, 0.1);
-            document.getElementById('mission-title').innerText = "=== ЭТАП 2: ДОРОГА В АЭРОПОРТ (США) ===";
-            document.getElementById('loc-val').innerText = "Улицы Остина (США)";
-            document.getElementById('target-val').innerText = "Идти до Оранжевого Аэропорта";
-            document.getElementById('instruction-text').innerText = "[ДИРЕКТИВА]: Выходи на длинную улицу города и двигайся к зданию Аэропорта (Оранжевая точка на радаре).";
-            printLog(">> Выход из жилой зоны. Твоя цель — международный терминал.");
+            step = 2; px = 1.5; py = 1.5; pa = 0.0; map = mapUSA_Road; playBeep(440, 0.1);
+            document.getElementById('mission-title').innerText = "=== ЭТАП 2: ДОРОГА В АЭРОПОРТ ===";
+            document.getElementById('loc-val').innerText = "Улицы США"; document.getElementById('target-val').innerText = "Дойти до Оранжевого Аэропорта";
+            document.getElementById('instruction-text').innerText = "[ДИРЕКТИВА]: Ты вышел из дома! Иди прямо по улице до здания Аэропорта. Собирай кейсы и синие батареи заряда пушки!";
+            printLog(">> Выход на городскую трассу выполнен. Системы вооружения переведены в боевой режим.");
             render3D();
         }
 
         function startPortugalCity() {
-            step = 3; px = 1.5; py = 1.5; pa = 0.5;
-            map = [
-                [1,1,1,1,1,1,1,1,1,1,1,1],
-                [1,0,0,0,0,1,0,0,0,0,0,1],
-                [1,0,1,1,0,1,0,1,1,1,0,1],
-                [1,0,1,0,0,1,0,1,0,0,0,1],
-                [1,0,1,0,1,1,0,1,0,1,1,1],
-                [1,0,1,0,0,0,0,1,0,0,0,1],
-                [1,0,1,1,1,1,1,1,1,1,0,1],
-                [1,0,0,0,0,0,0,0,0,1,0,1],
-                [1,1,1,1,1,1,1,1,0,1,0,1],
-                [1,2,0,0,0,0,0,0,0,0,0,1], // 2 - Синий Хакерский Дом
-                [1,1,1,1,1,1,1,1,1,1,1,1],
-                [1,1,1,1,1,1,1,1,1,1,1,1]
-            ];
-            playBeep(523, 0.1);
-            document.getElementById('mission-title').innerText = "=== ЭТАП 3: ГОРОД ЛИССАБОН (ПОРТУГАЛИЯ) ===";
-            document.getElementById('loc-val').innerText = "Лиссабон (Португалия)";
-            document.getElementById('target-val').innerText = "Найти Синий Хакерский Дом";
-            document.getElementById('instruction-text').innerText = "[ДИРЕКТИВА]: Успешное прибытие. Двигайся по кварталам Лиссабона к синему маркеру хакерского дома.";
-            printLog("<br>✈️ Рейс США-Португалия завершен. Найди штаб европейских кодеров.");
+            step = 3; px = 1.5; py = 1.5; pa = 0.5; map = mapPortugal; playBeep(523, 0.1);
+            document.getElementById('mission-title').innerText = "=== ЭТАП 3: ГОРОД ЛИССАБОН ===";
+            document.getElementById('loc-val').innerText = "Лиссабон (Португалия)"; document.getElementById('target-val').innerText = "Найти Синий Хакерский Дом";
+            document.getElementById('instruction-text').innerText = "[ДИРЕКТИВА]: Перелет завершен! Ты в Португалии. Иди по городским дорогам и найди Синий Хакерский Дом.";
+            printLog("<br>✈️ Успешное прибытие в Лиссабон. Выдвигайся к штабу Cyber Shield.");
             render3D();
         }
 
         function startHackerWork() {
             step = 4; canvas.style.display = "none"; radarCanvas.style.display = "none"; 
-            salary = 150; 
-            document.getElementById('salary-val').innerText = salary;
-
-            document.getElementById('mission-title').innerText = "=== ЭТАП 4: ПОДРЫВ ЦЕНТРА МОШЕННИКОВ ===";
-            document.getElementById('target-val').innerText = "Заминировать и взорвать базу";
-            document.getElementById('instruction-text').innerText = "[ДИРЕКТИВА]: Сеть перехвачена. Установи взрывчатку в систему охлаждения главного сервера скамеров.";
-            
-            printLog("<br>🖥️ Ты проник внутрь виллы мошенников. Начислена зарплата: <span style='color: #0cf;'>$150/сек</span>! Вся их база заблокирована.", "#3182ce");
-            printLog("Выбери мощность заряда для уничтожения серверов:<br>1 - Направленный взрыв генератора (Уничтожить базу, +$500,000)<br>2 - Тотальный подрыв всего здания мошенников (Стереть их полностью, +$1,200,000)", "#ffff00");
-            
-            document.getElementById('user-input').disabled = false; document.getElementById('submit-btn').disabled = false;
-            document.getElementById('user-input').placeholder = "Введи 1 или 2 для детонации...";
-        }
-
-        function processDetonation() {
-            let input = document.getElementById('user-input').value.trim(); document.getElementById('user-input').value = "";
-            if (!input) return;
-            
-            let mainBox = document.getElementById('main-box');
-            mainBox.classList.add('shake-effect'); 
-            playBeep(120, 1.5, 'sawtooth');
-
-            setTimeout(() => {
-                mainBox.classList.remove('shake-effect');
-                
-                if (step === 4) { 
-                    destroyedBuildings += 1;
-                    if (input === "1") { score += 500000; } 
-                    else if (input === "2") { score += 1200000; }
-                    document.getElementById('score-val').innerText = score.toLocaleString();
-                    document.getElementById('hacked-count').innerText = destroyedBuildings + " зданий";
-                    updateRank();
-                    startTokyoStage();
-                } 
-                else if (step === 7) { 
-                    destroyedBuildings += 1;
-                    if (input === "1") { score += 3000000; } 
-                    else if (input === "2") { score += 8000000; }
-                    document.getElementById('score-val').innerText = score.toLocaleString();
-                    document.getElementById('hacked-count').innerText = destroyedBuildings + " зданий";
-                    updateRank();
-                    endGame();
-                }
-            }, 1500);
-        }
-
-        function startTokyoStage() {
-            step = 5; salary = 500; 
-            document.getElementById('salary-val').innerText = salary;
-            canvas.style.display = "block"; radarCanvas.style.display = "block";
-            document.getElementById('user-input').disabled = true; document.getElementById('submit-btn').disabled = true;
-            document.getElementById('user-input').placeholder = "Поиск вышки в Токио...";
-
-            px = 1.5; py = 1.5; pa = 0.0;
-            map = [
-                [1,1,1,1,1,1,1,1,1,1,1,1],
-                [1,0,0,0,1,0,0,0,0,0,0,1],
-                [1,0,1,0,1,0,1,1,1,1,0,1],
-                [1,0,1,0,0,0,1,0,0,1,0,1],
-                [1,0,1,1,1,0,1,0,2,1,0,1], // 2 - Фиолетовая вышка Токио
-                [1,0,0,0,1,0,1,1,1,1,0,1],
-                [1,1,1,0,1,0,0,0,0,0,0,1],
-                [1,0,0,0,1,1,1,1,1,1,0,1],
-                [1,0,1,0,0,0,0,0,0,1,0,1],
-                [1,0,1,1,1,1,1,1,0,0,0,1],
-                [1,0,0,0,0,0,0,0,0,0,0,1],
-                [1,1,1,1,1,1,1,1,1,1,1,1]
-            ];
-
-            document.getElementById('mission-title').innerText = "=== ЭТАП 5: НЕОНОВЫЙ ТОКИО (ЯПОНИЯ) ===";
-            document.getElementById('loc-val').innerText = "Токио (Япония)";
-            document.getElementById('target-val').innerText = "Найти Вышку Синдиката (Фиолетовая)";
-            document.getElementById('instruction-text').innerText = "[ДИРЕКТИВА]: Перелет в Азию выполнен. Зарплата выросла! Найди Фиолетовую Серверную Вышку синдиката мошенников на радаре.";
-            printLog("<br>🏮 ТЫ В ТОКИО! Преступный синдикат развернул здесь вышку обмана. Пройди к фиолетовой точке, чтобы заминировать её!");
-            render3D();
-        }
-
-        function startIcelandStage() {
-            step = 6; salary = 1200; 
-            destroyedBuildings += 1; // Успешно взорвана вышка в Токио
-            document.getElementById('hacked-count').innerText = destroyedBuildings + " зданий";
+            document.getElementById('cyber-weapon').style.display = "none"; 
+            hackedObjects += 1; salary = 250; 
+            document.getElementById('hacked-count').innerText = hackedObjects + " объектов";
             document.getElementById('salary-val').innerText = salary;
             updateRank();
 
-            px = 1.5; py = 8.5; pa = 4.7;
-            map = [
-                [1,1,1,1,1,1,1,1,1,1,1,1],
-                [1,0,0,0,0,0,0,0,0,0,0,1],
-                [1,0,1,1,1,1,1,1,1,1,0,1],
-                [1,0,1,0,0,0,0,0,0,1,0,1],
-                [1,0,1,0,1,1,1,1,0,1,0,1],
-                [1,0,1,0,1,2,0,1,0,1,0,1], // 2 - Бирюзовый Ледяной Бункер
-                [1,0,1,0,1,1,0,1,0,1,0,1],
-                [1,0,1,0,0,0,0,1,0,1,0,1],
-                [1,0,1,1,1,1,1,1,0,1,0,1],
-                [1,0,0,0,0,0,0,0,0,0,0,1],
-                [1,1,1,1,1,1,1,1,1,1,1,1],
-                [1,1,1,1,1,1,1,1,1,1,1,1]
-            ];
+            document.getElementById('mission-title').innerText = "=== ЭТАП 4: ПОДРЫВ СЕТИ СКАМЕРОВ ===";
+            document.getElementById('target-val').innerText = "Уничтожение штаб-квартир мошенников";
+            document.getElementById('instruction-text').innerText = "[ДИРЕКТИВА]: Активирована пассивная ставка Cyber Shield. Запусти атаку на подрыв серверов преступников.";
+            
+            printLog("<br>🖥️ Ты внутри главного хакерского дома в Лиссабоне! Твой пассивный оклад запущен: <span style='color: #0cf;'>$250/сек</span>. Обнаружены 2 крупные базы телефонных мошенников.", "#3182ce");
+            printLog("Выбери цель для удаленного взлома и физического подрыва здания мошенников:<br>1 - Уничтожить колл-центр фальшивых лотерей (+20 взломов, +$500K)<br>2 - Полностью взорвать главный серверный бункер скамеров банков (+70 взломов, +$1.5M)", "#ffff00");
+            
+            document.getElementById('user-input').disabled = false; document.getElementById('submit-btn').disabled = false;
+            document.getElementById('user-input').placeholder = "Введи 1 или 2 для подрыва...";
+        }
 
-            document.getElementById('mission-title').innerText = "=== ЭТАП 6: БУНКЕР В ИСЛАНДИИ ===";
-            document.getElementById('loc-val').innerText
+        function processHack() {
+            let input = document.getElementById('user-input').value.trim(); document.getElementById('user-input').value = "";
+            if (step !== 4 || !input) return;
+            
+            let mainBox = document.getElementById('main-box');
+            let flash = document.getElementById('explosion-flash');
+            
+            mainBox.classList.add('shake-effect');
+            flash.style.opacity = "1";
+            setTimeout(() => { flash.style.opacity = "0"; }, 180); // Вспышка взрыва
+
+            playBeep(120, 1.8, 'sawtooth');
+
+            setTimeout(() => {
+                mainBox.classList.remove('shake-effect');
+                if (input === "1") {
+                    score += 500000; hackedObjects += 20;
+                    printLog(">> БУУУМ! Генераторы перегружены! Здание мошенников взлетело на воздух вместе со всей аппаратурой! Ты спас людей!", "#48bb78");
+                    endGame();
+                } else if (input === "2") {
+                    score += 1500000; hackedObjects += 70;
+                    printLog(">> КОЛОССАЛЬНЫЙ ВЗРЫВ! Главный бункер скамеров полностью уничтожен, а их базы данных стерты навсегда!", "#48bb78");
+                    endGame();
+                } else { printLog("Неверный код! Введи 1 или 2.", "#f56565"); }
+                document.getElementById('score-val').innerText = score.toLocaleString();
+                document.getElementById('hacked-count').innerText = hackedObjects + " объектов";
+                updateRank();
+            }, 1500);
+        }
+
+        function endGame() {
+            step = 5; salary = 0; document.getElementById('salary-val').innerText = salary;
+            printLog("<br>🎉 ОПЕРАЦИЯ В ПОРТУГАЛИИ СВЕРХУСПЕШНО ЗАВЕРШЕНА! Сети мошенников ликвидированы. Сумма предотвращенного ущерба: $" + score.toLocaleString(), "#ecc94b");
+            document.getElementById('user-input').disabled = true; document.getElementById('submit-btn').disabled = true;
+        }
+
+        window.addEventListener('keydown', (e) => {
+            if (e.code === 'KeyW' || e.code === 'ArrowUp') movePlayer('w'); 
+            if (e.code === 'KeyS' || e.code === 'ArrowDown') movePlayer('s');
+            if (e.code === 'KeyA' || e.code === 'KeyA') movePlayer('a'); 
+            if (e.code === 'KeyD' || e.code === 'KeyD') movePlayer('d');
+            if (e.code === 'ArrowLeft') movePlayer('left'); 
+            if (e.code === 'ArrowRight') movePlayer('right');
+            if (e.code === 'Space') { e.preventDefault(); fireWeapon(); }
+        });
+
+        setInterval(() => { if (step === 4) { score += salary; document.getElementById('score-val').innerText = score.toLocaleString(); } }, 1000);
+        setInterval(() => { if (step < 4) render3D(); }, 35);
+    </script>
+</body>
+</html>
