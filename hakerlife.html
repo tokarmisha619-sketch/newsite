@@ -3,45 +3,23 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width,initial-scale=1.0">
-    <title>🚨 MISSION PORTUGAL: CYBER SHIELD 3D</title>
+    <title>🚨 GLOBAL OPERATIONS: CYBER SHIELD 3D</title>
     <style>
-        body { font-family: monospace; background: #000; color: #0f0; margin: 0; padding: 10px; overflow: hidden; touch-action: none; }
+        body { font-family: monospace; background: #0c0f12; color: #e0e5eb; margin: 0; padding: 10px; overflow: hidden; touch-action: none; }
         .game-layout { display: grid; grid-template-columns: 1fr 300px; gap: 10px; max-width: 1200px; margin: 0 auto; height: 95vh; }
-        .screen-box { background: #050505; border: 2px solid #0f0; border-radius: 8px; padding: 10px; display: flex; flex-direction: column; box-shadow: 0 0 15px rgba(0,255,0,0.2); position: relative; }
-        
-        /* Анимация сильной тряски экрана */
-        .shake-effect { animation: screenShake 0.4s ease-in-out infinite; }
-        @keyframes screenShake {
-            0% { transform: translate(2px, 1px) rotate(0deg); }
-            10% { transform: translate(-1px, -2px) rotate(-1deg); }
-            20% { transform: translate(-3px, 0px) rotate(1deg); }
-            30% { transform: translate(0px, 2px) rotate(0deg); }
-            40% { transform: translate(1px, -1px) rotate(1deg); }
-            50% { transform: translate(-1px, 2px) rotate(-1deg); }
-            60% { transform: translate(-3px, 1px) rotate(0deg); }
-            70% { transform: translate(2px, 1px) rotate(-1deg); }
-            80% { transform: translate(-1px, -1px) rotate(1deg); }
-            90% { transform: translate(2px, 2px) rotate(0deg); }
-            100% { transform: translate(1px, -2px) rotate(-1deg); }
-        }
-
-        /* Эффект цифровых помех */
-        .glitch-effect { animation: glitchFlash 0.15s ease-in-out infinite; }
-        @keyframes glitchFlash {
-            0% { background-color: #050505; opacity: 1; }
-            50% { background-color: #1a0000; opacity: 0.9; border-color: #ff0055; box-shadow: 0 0 30px #ff0055; }
-            100% { background-color: #000f00; opacity: 1; border-color: #00ff00; }
-        }
-
-        canvas { width: 100%; height: 350px; background: #000; border: 1px solid #040; border-radius: 4px; }
-        #radar-canvas { position: absolute; top: 20px; right: 20px; width: 100px; height: 100px; border: 2px solid #0f0; border-radius: 50%; background: rgba(0,10,0,0.9); box-shadow: 0 0 10px #0f0; z-index: 10; }
-        #terminal { flex-grow: 1; background: #000; border: 1px solid #040; padding: 10px; margin-top: 10px; overflow-y: auto; font-size: 0.85em; border-radius: 4px; height: 180px; }
+        .screen-box { background: #161a1e; border: 2px solid #4a5568; border-radius: 8px; padding: 10px; display: flex; flex-direction: column; box-shadow: 0 4px 20px rgba(0,0,0,0.5); position: relative; }
+        canvas { width: 100%; height: 350px; background: #000; border: 1px solid #2d3748; border-radius: 4px; }
+        #radar-canvas { position: absolute; top: 20px; right: 20px; width: 100px; height: 100px; border: 2px solid #4a5568; border-radius: 50%; background: rgba(22,26,30,0.9); box-shadow: 0 0 10px rgba(0,0,0,0.5); z-index: 10; }
+        #terminal { flex-grow: 1; background: #0f1115; border: 1px solid #2d3748; padding: 10px; margin-top: 10px; overflow-y: auto; font-size: 0.85em; border-radius: 4px; height: 180px; box-shadow: inset 0 0 10px rgba(0,0,0,0.8); }
         .input-area { display: flex; gap: 5px; margin-top: 5px; }
-        input { background: #000; color: #0f0; border: 1px solid #0f0; padding: 8px; font-family: monospace; flex-grow: 1; outline: none; border-radius: 4px; }
-        button { background: #0f0; color: #000; border: none; padding: 8px 15px; font-family: monospace; font-weight: bold; cursor: pointer; border-radius: 4px; text-transform: uppercase; }
-        button:hover { background: #00aa00; box-shadow: 0 0 8px #0f0; }
-        .sidebar { background: #050505; border: 2px solid #0f0; border-radius: 8px; padding: 15px; font-size: 0.8em; box-shadow: 0 0 15px rgba(0,255,0,0.2); }
-        .nav-btn { width: 50px; height: 40px; margin: 3px; font-size: 1.2em; }
+        input { background: #0f1115; color: #fff; border: 1px solid #4a5568; padding: 8px; font-family: monospace; flex-grow: 1; outline: none; border-radius: 4px; }
+        button { background: #3182ce; color: #fff; border: none; padding: 8px 15px; font-family: monospace; font-weight: bold; cursor: pointer; border-radius: 4px; text-transform: uppercase; }
+        button:hover { background: #2b6cb0; box-shadow: 0 0 8px #3182ce; }
+        .sidebar { background: #161a1e; border: 2px solid #4a5568; border-radius: 8px; padding: 15px; font-size: 0.8em; box-shadow: 0 4px 20px rgba(0,0,0,0.5); display: flex; flex-direction: column; justify-content: space-between; }
+        .nav-btn { width: 50px; height: 40px; margin: 3px; font-size: 1.2em; background: #2d3748; color: #fff; border: 1px solid #4a5568; border-radius: 4px; cursor: pointer; }
+        .nav-btn:hover { background: #4a5568; }
+        .pharmacy-btn { background: #cc5c1b; border: 1px solid #ed8936; color: white; padding: 8px; width: 100%; border-radius: 4px; font-weight: bold; cursor: pointer; text-transform: uppercase; margin-top: 5px; }
+        .pharmacy-btn:hover { background: #dd6b20; box-shadow: 0 0 8px #ed8936; }
     </style>
 </head>
 <body>
@@ -52,49 +30,63 @@
             <canvas id="radar-canvas" width="100" height="100"></canvas>
             
             <div id="terminal">
-                <div id="mission-title" style="color: #ff0055; font-weight: bold; text-align: center;">=== ЭТАП 1: ТОЧКА СБОРУ — АЭРОПОРТ (США) ===</div>
-                <p>[ДИРЕКТИВА]: Операция 'Европа'. Твоя цель — пройти по 3D-кварталу города и добраться до Аэропорта (Красная точка на радаре), чтобы вылететь на секретную виллу в Португалию.</p>
-                <p style="color: #00ffff;">Управление: W,A,S,D — перемещение, Стрелочки влево/вправо — вращение камеры.</p>
-                <hr id="term-hr" style="border: 1px dashed #0f0;">
+                <div id="mission-title" style="color: #ecc94b; font-weight: bold; text-align: center;">=== ЭТАП 1: ДОМ В США ===</div>
+                <p id="instruction-text">[ДИРЕКТИВА]: Эллиот, твой разум затуманен. Найди КРАСНУЮ ДВЕРЬ, чтобы покинуть квартиру. Твоя истинная цель — добраться до Аэропорта и ликвидировать серверную инфраструктуру врага.</p>
+                <p style="color: #a0aec0;">Управление: W,A,S,D — движение, Стрелочки влево/вправо — поворот камеры.</p>
+                <hr style="border: 1px dashed #4a5568;">
                 <div id="story-log"></div>
             </div>
             
             <div class="input-area">
-                <input type="text" id="user-input" placeholder="Ожидание подключения к главному серверу..." disabled>
+                <input type="text" id="user-input" placeholder="Доступ ограничен. Активируйте терминал взлома..." disabled>
                 <button id="submit-btn" onclick="processHack()" disabled>ВЗЛОМ</button>
             </div>
         </div>
 
         <div class="sidebar">
-            <h3 style="color: #ff0055; text-align: center; margin-top: 0;">📟 ШТАБ CYBER SHIELD</h3>
-            <hr style="border: 1px dashed #0f0;">
-            <p>📍 ЗОНА ОПЕРАЦИИ: <span id="loc-val" style="color: #00ffff;">Остин, Техас (США)</span></p>
-            <p>🎯 ТЕКУЩАЯ ЦЕЛЬ: <span id="target-val" style="color: #ffff00;">Найти Здание Аэропорта</span></p>
-            <p>💰 КОМПЕНСАЦИЯ: $<span id="score-val" style="color: #00ff00; font-weight: bold;">0</span></p>
-            <p>💵 СТАВКА ЗАРПЛАТЫ: <span style="color: #0cf;">$<span id="salary-val">25</span>/сек</span></p>
-            <p>💻 ВСЕГО ВЗЛОМАНО: <span id="hacked-count" style="color: #ffaa00; font-weight: bold;">0 узлов</span></p>
-            <p>📊 СКОРОСТЬ ДВИЖКА: <span id="fps-val" style="color: #ff00ff; font-weight: bold;">0 FPS</span></p>
-            <hr style="border: 1px dashed #0f0;">
-            <h4 style="text-align: center; margin-bottom: 5px;">ПАНЕЛЬ ДВИЖЕНИЯ</h4>
-            <div style="text-align: center;">
-                <button class="nav-btn" onclick="movePlayer('w')">W</button><br>
-                <button class="nav-btn" onclick="movePlayer('a')">A</button>
-                <button class="nav-btn" onclick="movePlayer('s')">S</button>
-                <button class="nav-btn" onclick="movePlayer('d')">D</button><br>
-                <button class="nav-btn" style="width: 70px; background: #0cf;" onclick="movePlayer('left')">◀</button>
-                <button class="nav-btn" style="width: 70px; background: #0cf;" onclick="movePlayer('right')">▶</button>
+            <div>
+                <h3 style="color: #3182ce; text-align: center; margin-top: 0;">📟 ШТАБ CYBER SHIELD</h3>
+                <hr style="border: 1px dashed #4a5568;">
+                <p>📍 ЛОКАЦИЯ: <span id="loc-val" style="color: #fff;">Твой дом (США)</span></p>
+                <p>🎯 ЦЕЛЬ: <span id="target-val" style="color: #ecc94b;">Выйти через Красную Дверь</span></p>
+                <p>🏅 РАНГ АГЕНТА: <span id="rank-val" style="color: #9f7aea; font-weight: bold;">Стажер</span></p>
+                <p>💰 КОШЕЛЕК ОЧКОВ: \$<span id="score-val" style="color: #48bb78; font-weight: bold;">0</span></p>
+                <p>💵 ЗАРПЛАТА: <span style="color: #00bfff;">\$<span id="salary-val">0</span>/сек</span></p>
+                <p>💻 ВЗЛОМАНО СЕТЕЙ: <span id="hacked-count" style="color: #ed8936; font-weight: bold;">0 объектов</span></p>
+                
+                <!-- МЕХАНИКА ГАЛЛЮЦИНАЦИЙ И ПСИХОЗОВ -->
+                <p>🧠 ГАЛЛЮЦИНАЦИИ: <span id="hallucination-val" style="color: #e53e3e; font-weight: bold;">0%</span></p>
+                <p>📊 ДВИЖОК: <span id="fps-val" style="color: #9f7aea; font-weight: bold;">0 FPS</span></p>
+                
+                <hr style="border: 1px dashed #4a5568;">
+                <!-- АПТЕКА С ЛЕКАРСТВАМИ -->
+                <h4 style="text-align: center; margin: 5px 0;">🏥 МЕДИЦИНСКИЙ ОТДЕЛ</h4>
+                <button class="pharmacy-btn" onclick="buyMedicine()">Купить Лекарства (\$5,000)</button>
+            </div>
+
+            <div>
+                <hr style="border: 1px dashed #4a5568;">
+                <h4 style="text-align: center; margin-bottom: 5px;">КОНТРОЛЛЕР ПЕРЕМЕЩЕНИЯ</h4>
+                <div style="text-align: center;">
+                    <button class="nav-btn" onclick="movePlayer('w')">W</button><br>
+                    <button class="nav-btn" onclick="movePlayer('a')">A</button>
+                    <button class="nav-btn" onclick="movePlayer('s')">S</button>
+                    <button class="nav-btn" onclick="movePlayer('d')">D</button><br>
+                    <button class="nav-btn" style="width: 70px; background: #2b6cb0;" onclick="movePlayer('left')">◀</button>
+                    <button class="nav-btn" style="width: 70px; background: #2b6cb0;" onclick="movePlayer('right')">▶</button>
+                </div>
             </div>
         </div>
     </div>
 
     <script>
         let score = 0;
-        let step = 1; 
-        let salary = 25;
+        let step = 1; // 1-США дом, 2-США дорога, 3-Португалия город, 4-Португалия взрыв, 5-Токио город, 6-Исландия финал, 7-Конец
+        let salary = 0;
         let hackedObjects = 0;
+        let hallucinationLevel = 0; // Уровень психоза
         let audioCtx = null;
-        let lastCalledTime;
-        let fps;
+        let lastCalledTime, fps;
 
         function initAudio() { if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)(); }
         function playBeep(freq, duration, type='sine') {
@@ -102,71 +94,119 @@
                 initAudio(); if (audioCtx.state === 'suspended') audioCtx.resume();
                 let osc = audioCtx.createOscillator(), gain = audioCtx.createGain();
                 osc.type = type; osc.frequency.setValueAtTime(freq, audioCtx.currentTime);
-                gain.gain.setValueAtTime(0.03, audioCtx.currentTime); gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + duration);
+                gain.gain.setValueAtTime(0.02, audioCtx.currentTime); gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + duration);
                 osc.connect(gain); gain.connect(audioCtx.destination); osc.start(); osc.stop(audioCtx.currentTime + duration);
             } catch(e) {}
         }
 
-        function printLog(text, color="#00ff00") {
+        function printLog(text, color="#e2e8f0") {
             let log = document.getElementById('story-log');
             let p = document.createElement('p'); p.style.color = color; p.innerHTML = text;
             log.appendChild(p); document.getElementById('terminal').scrollTop = document.getElementById('terminal').scrollHeight;
         }
 
+        function updateRank() {
+            let rankElement = document.getElementById('rank-val');
+            if (hackedObjects === 0) rankElement.innerText = "Стажер 🧑‍💻";
+            else if (hackedObjects <= 40) rankElement.innerText = "Младший Агент 🕵️‍♂️";
+            else if (hackedObjects <= 100) rankElement.innerText = "Спецагент ⚡";
+            else rankElement.innerText = "Директор Cyber Shield 👑";
+        }
+
+        // КУПИТЬ ЛЕКАРСТВА ДЛЯ СНЯТИЯ СИМПТОМОВ ПСИХОЗА
+        function buyMedicine() {
+            if (score >= 5000) {
+                score -= 5000;
+                hallucinationLevel = 0; // Полное очищение разума
+                document.getElementById('score-val').innerText = score.toLocaleString();
+                document.getElementById('hallucination-val').innerText = "0%";
+                document.getElementById('hallucination-val').style.color = "#48bb78";
+                playBeep(600, 0.2);
+                printLog(">> Препарат принят. Галлюцинации отступили. Разум чист и готов к операциям.", "#48bb78");
+            } else {
+                playBeep(150, 0.2);
+                alert("Недостаточно хак-очков! Требуется \$5,000 компенсации.");
+            }
+        }
+
+        // ТАЙМЕР ГАЛЛЮЦИНАЦИЙ: Каждые 10 секунд уровень бреда растет, создавая фантомных людей
+        setInterval(() => {
+            if (step < 7) {
+                hallucinationLevel += 15;
+                if (hallucinationLevel > 100) hallucinationLevel = 100;
+                document.getElementById('hallucination-val').innerText = hallucinationLevel + "%";
+                
+                if (hallucinationLevel >= 75) {
+                    document.getElementById('hallucination-val').style.color = "#e53e3e";
+                    printLog("⚠️ Сильный психоз! Разум рисует силуэты людей в углах комнат. Срочно прими лекарства!", "#e53e3e");
+                } else if (hallucinationLevel >= 40) {
+                    document.getElementById('hallucination-val').style.color = "#ed8936";
+                    printLog("👁️ Вокруг появляются фантомные образы незнакомцев. Картинка плывет.", "#ed8936");
+                }
+            }
+        }, 10000);
+
         const canvas = document.getElementById('3d-screen');
         const ctx = canvas.getContext('2d');
         const radarCanvas = document.getElementById('radar-canvas');
         const rCtx = radarCanvas.getContext('2d');
-        const mapSize = 12;
+        let mapSize = 12;
         
-        // ВОССТАНОВЛЕННАЯ СЕТКА КАРТЫ (1 - Стены, 0 - Дорога, 2 - Цель)
         let map = [
             [1,1,1,1,1,1,1,1,1,1,1,1],
-            [1,0,0,0,1,0,0,0,0,0,0,1],
-            [1,0,1,0,1,0,1,1,1,1,0,1],
-            [1,0,1,0,0,0,1,0,0,1,0,1],
-            [1,0,1,1,1,0,1,0,0,1,0,1],
-            [1,0,0,0,1,0,0,0,0,1,0,1],
-            [1,1,1,0,1,1,1,1,0,1,0,1],
-            [1,0,0,0,0,0,0,1,0,0,0,1],
-            [1,0,1,1,1,1,0,1,1,1,0,1],
-            [1,0,1,0,0,0,0,0,0,1,2,1], // Цифра 2 — это Аэропорт
-            [1,0,0,0,1,1,1,1,0,0,0,1],
+            [1,0,0,0,0,1,0,0,0,0,0,1],
+            [1,0,0,0,0,0,0,0,0,0,0,1],
+            [1,0,0,0,0,1,0,0,0,0,0,2], // Дверь дома (2)
+            [1,0,0,0,0,1,1,1,0,0,0,1],
+            [1,1,1,0,1,1,1,1,0,1,1,1],
+            [1,0,0,0,0,0,0,0,0,0,0,1],
+            [1,0,1,1,1,1,1,1,1,0,0,1],
+            [1,0,1,0,0,0,0,0,1,0,0,1],
+            [1,0,0,0,0,0,0,0,0,0,0,1],
+            [1,0,0,0,0,0,0,0,0,0,0,1],
             [1,1,1,1,1,1,1,1,1,1,1,1]
         ];
 
-        let px = 1.5, py = 1.5, pa = 0.0;
+        let px = 2.0, py = 2.0, pa = 3.14; 
         const fov = Math.PI / 3, numRays = 320;
 
         function drawGtaRadar() {
             rCtx.clearRect(0, 0, radarCanvas.width, radarCanvas.height);
-            let scale = 8; 
-            rCtx.save(); rCtx.translate(50, 50); rCtx.rotate(-pa - Math.PI/2); 
+            let scale = 8; rCtx.save(); rCtx.translate(50, 50); rCtx.rotate(-pa - Math.PI/2); 
 
             for (let y = 0; y < mapSize; y++) {
                 for (let x = 0; x < mapSize; x++) {
-                    let relX = (x - px) * scale;
-                    let relY = (y - py) * scale;
+                    let relX = (x - px) * scale; let relY = (y - py) * scale;
                     if (map[y][x] === 1) {
-                        rCtx.fillStyle = "#333333"; rCtx.fillRect(relX, relY, scale, scale);
+                        rCtx.fillStyle = "#4a5568"; rCtx.fillRect(relX, relY, scale, scale);
                     } else if (map[y][x] === 2) {
                         let pulse = Math.sin(Date.now() * 0.01) * 2 + 5;
-                        rCtx.fillStyle = step === 1 ? "#ff0055" : "#00aaff";
+                        if (step === 1) rCtx.fillStyle = "#e53e3e"; 
+                        else if (step === 2) rCtx.fillStyle = "#ed8936"; 
+                        else if (step === 3) rCtx.fillStyle = "#3182ce"; 
+                        else if (step === 5) rCtx.fillStyle = "#9f7aea"; 
+                        else rCtx.fillStyle = "#38bdf8"; 
                         rCtx.beginPath(); rCtx.arc(relX + scale/2, relY + scale/2, pulse, 0, Math.PI*2); rCtx.fill();
                     }
                 }
             }
             rCtx.restore();
-            rCtx.fillStyle = "#00ff00"; rCtx.beginPath(); rCtx.arc(50, 50, 4, 0, Math.PI * 2); rCtx.fill();
-            rCtx.strokeStyle = "#00ff00"; rCtx.lineWidth = 2; rCtx.beginPath(); rCtx.moveTo(50, 50); rCtx.lineTo(50, 38); rCtx.stroke();
+            rCtx.fillStyle = "#48bb78"; rCtx.beginPath(); rCtx.arc(50, 50, 4, 0, Math.PI * 2); rCtx.fill();
+            rCtx.strokeStyle = "#48bb78"; rCtx.lineWidth = 2; rCtx.beginPath(); rCtx.moveTo(50, 50); rCtx.lineTo(50, 38); rCtx.stroke();
         }
 
         function render3D() {
             if(!lastCalledTime) { lastCalledTime = performance.now(); fps = 0; } 
             else { let delta = (performance.now() - lastCalledTime)/1000; lastCalledTime = performance.now(); fps = Math.round(1/delta); document.getElementById('fps-val').innerText = fps + " FPS"; }
 
-            ctx.fillStyle = step === 1 ? "#020c02" : "#0d0202"; ctx.fillRect(0, 0, canvas.width, canvas.height / 2);
-            ctx.fillStyle = "#050505"; ctx.fillRect(0, canvas.height / 2, canvas.width, canvas.height / 2);
+            // ПСИХОДЕЛИЧЕСКИЙ СДВИГ ЦВЕТА ИЗ-ЗА ГАЛЛЮЦИНАЦИЙ
+            let glitchFactor = hallucinationLevel / 100;
+            let skyR = Math.floor(66 + glitchFactor * 100);
+            let skyG = Math.floor(153 - glitchFactor * 100);
+            let skyB = Math.floor(225 - glitchFactor * 50);
+
+            ctx.fillStyle = `rgb(${skyR}, ${skyG}, ${skyB})`; ctx.fillRect(0, 0, canvas.width, canvas.height / 2);
+            ctx.fillStyle = "#2d3748"; ctx.fillRect(0, canvas.height / 2, canvas.width, canvas.height / 2);
 
             for (let i = 0; i < numRays; i++) {
                 let rayAngle = pa - fov / 2 + (i / numRays) * fov;
@@ -179,19 +219,45 @@
                 }
                 let correctedDist = distance * Math.cos(rayAngle - pa);
                 let wallHeight = Math.min(canvas.height, canvas.height / correctedDist);
-                if (wallType === 2) ctx.strokeStyle = step === 1 ? `rgba(255, 0, 85, ${1 - distance/10})` : `rgba(0, 150, 255, ${1 - distance/10})`;
-                else ctx.strokeStyle = step === 1 ? `rgba(0, ${Math.floor(200 * (1 - distance/12))}, 0, 1)` : `rgba(${Math.floor(180 * (1 - distance/12))}, ${Math.floor(50 * (1 - distance/12))}, 0, 1)`;
+                
+                if (wallType === 2) {
+                    if (step === 1) ctx.strokeStyle = `rgba(229, 62, 62, ${1 - distance/10})`;
+                    else if (step === 2) ctx.strokeStyle = `rgba(237, 137, 54, ${1 - distance/10})`;
+                    else if (step === 3) ctx.strokeStyle = `rgba(49, 130, 206, ${1 - distance/10})`;
+                    else if (step === 5) ctx.strokeStyle = `rgba(159, 122, 234, ${1 - distance/10})`; 
+                    else ctx.strokeStyle = `rgba(56, 189, 248, ${1 - distance/10})`; 
+                } else {
+                    let wallColor = Math.floor(180 * (1 - distance/12));
+                    // Бред искажает прорисовку стен, делая их красными при высоком психозе
+                    let rWall = Math.floor(wallColor + 20 + glitchFactor * 80);
+                    let gWall = Math.floor(wallColor + 20 - glitchFactor * 20);
+                    ctx.strokeStyle = `rgb(${rWall}, ${gWall}, ${wallColor + 25})`;
+                }
                 ctx.beginPath(); ctx.moveTo(i, (canvas.height - wallHeight) / 2); ctx.lineTo(i, (canvas.height + wallHeight) / 2); ctx.stroke();
             }
+
+            // МЕХАНИКА ОТРИСОВКИ ФАНТОМНЫХ ЛЮДЕЙ ПРЯМО НА ЭКРАНЕ
+            if (hallucinationLevel >= 40) {
+                ctx.fillStyle = `rgba(255, 0, 0, ${(hallucinationLevel-30)/100})`;
+                // Рисуем силуэты "людей" в зависимости от уровня безумия
+                ctx.fillRect(80, 100, 15, 60); 
+                if (hallucinationLevel >= 75) {
+                    ctx.fillRect(220, 110, 12, 50);
+                }
+            }
+
             drawGtaRadar(); 
             if (map[Math.floor(py)][Math.floor(px)] === 2) {
-                if (step === 1) startPortugalStage();
-                else if (step === 2) startFinalHackMode();
+                if (step === 1) startRoadToAirport();
+                else if (step === 2) startPortugalCity();
+                else if (step === 3) startHackerWork();
+                else if (step === 5) startIcelandStage();
+                else if (step === 6) startFinalBattle();
             }
         }
 
         function movePlayer(dir) {
-            if (step === 3) return; let moveSpeed = 0.22, rotSpeed = 0.16;
+            if (step === 4 || step === 7) return; let moveSpeed = 0.22, rotSpeed = 0.16;
             if (dir === 'w') {
                 let nx = px + Math.cos(pa) * moveSpeed, ny = py + Math.sin(pa) * moveSpeed;
                 if (map[Math.floor(py)][Math.floor(nx)] !== 1) px = nx; if (map[Math.floor(ny)][Math.floor(px)] !== 1) py = ny; playBeep(140, 0.02);
@@ -212,97 +278,94 @@
             render3D();
         }
 
-        function startPortugalStage() {
-            step = 2; hackedObjects += 1; salary += 75; 
-            document.getElementById('hacked-count').innerText = hackedObjects + " узлов";
-            document.getElementById('salary-val').innerText = salary;
-            px = 1.5; py = 1.5; pa = 0.0; 
-            
-            // НОВАЯ КАРТА ДЛЯ ХАКЕРСКОЙ ВИЛЛЫ МОШЕННИКОВ
+        function startRoadToAirport() {
+            step = 2; px = 1.5; py = 5.5; pa = 0.0;
             map = [
                 [1,1,1,1,1,1,1,1,1,1,1,1],
-                [1,0,0,0,0,0,1,0,0,0,0,1],
-                [1,0,1,1,1,0,1,0,1,1,0,1],
-                [1,0,1,2,1,0,0,0,1,1,0,1], // Цифра 2 — это Главный Сервер
-                [1,0,1,1,1,1,1,0,1,1,0,1],
-                [1,0,0,0,0,0,1,0,0,0,0,1],
-                [1,1,1,1,1,0,1,1,1,1,1,1],
-                [1,0,0,0,1,0,0,0,0,0,0,1],
-                [1,0,1,0,1,1,1,1,1,1,0,1],
-                [1,0,1,0,0,0,0,0,0,0,0,1],
+                [1,0,0,0,0,0,0,0,0,0,0,1],
                 [1,0,1,1,1,1,1,1,1,1,0,1],
+                [1,0,1,0,0,0,0,0,0,1,0,1],
+                [1,0,1,0,1,1,1,1,0,1,0,1],
+                [1,0,0,0,1,0,0,1,0,1,0,1],
+                [1,0,1,0,1,0,0,1,0,1,0,1],
+                [1,0,1,0,1,1,0,1,0,1,0,1],
+                [1,0,1,0,0,0,0,1,0,0,0,1],
+                [1,0,1,1,1,1,1,1,1,1,0,1],
+                [1,0,0,0,0,0,0,0,0,0,0,2], // Аэропорт
                 [1,1,1,1,1,1,1,1,1,1,1,1]
             ];
-            
-            playBeep(523, 0.1); setTimeout(() => playBeep(659, 0.1), 100); setTimeout(() => playBeep(784, 0.2), 200);
-            document.getElementById('mission-title').innerText = "=== ЭТАП 2: МИНИ ХАКЕРСКИЙ ДОМ (ПОРТУГАЛИЯ) ===";
-            document.getElementById('loc-val').innerText = "Лиссабон (Португалия)";
-            document.getElementById('target-val').innerText = "Взломать Защищенный Сервер Киберпреступников";
-            
-            printLog("<br>✈️ Перелет завершен. Ты прибыл на секретную европейскую виллу CYBER SHIELD!", "#00ff00");
-            printLog("Штаб повысил твой оклад за успешный транзит: текущая ставка <span style='color: #0cf;'>$" + salary + "/сек</span>.", "#00ffff");
-            printLog("Пройди по внутренним коридорам базы и найди Синий Главный Сервер группировки (мигающая точка на радаре), чтобы изолировать их сеть!", "#00ffff");
+            playBeep(440, 0.1);
+            document.getElementById('mission-title').innerText = "=== ЭТАП 2: ДОРОГА В АЭРОПОРТ (США) ===";
+            document.getElementById('loc-val').innerText = "Улицы Остина (США)";
+            document.getElementById('target-val').innerText = "Идти до Оранжевого Аэропорта";
+            document.getElementById('instruction-text').innerText = "[ДИРЕКТИВА]: Выходи на улицы города. Двигайся к зданию Аэропорта (Оранжевая точка на радаре).";
+            printLog(">> Выход из жилой зоны. Твоя цель — международный терминал.");
             render3D();
         }
 
-        function startFinalHackMode() {
-            step = 3; hackedObjects += 1; salary += 300; 
-            document.getElementById('hacked-count').innerText = hackedObjects + " узла(ов)";
+        function startPortugalCity() {
+            step = 3; px = 1.5; py = 1.5; pa = 0.5;
+            map = [
+                [1,1,1,1,1,1,1,1,1,1,1,1],
+                [1,0,0,0,0,1,0,0,0,0,0,1],
+                [1,0,1,1,0,1,0,1,1,1,0,1],
+                [1,0,1,0,0,0,0,0,0,1,0,1],
+                [1,0,1,0,1,1,1,1,0,1,0,1],
+                [1,0,1,0,1,0,0,1,0,1,0,1],
+                [1,0,0,0,1,0,0,1,0,1,0,1],
+                [1,0,1,1,1,0,0,1,1,1,0,1],
+                [1,0,0,0,0,0,0,0,0,0,0,1],
+                [1,1,1,1,1,1,1,1,1,1,0,1],
+                [1,0,0,0,0,0,0,0,0,0,0,2], // Хакерский дом
+                [1,1,1,1,1,1,1,1,1,1,1,1]
+            ];
+            playBeep(523, 0.1);
+            document.getElementById('mission-title').innerText = "=== ЭТАП 3: ГОРОД ЛИССАБОН (ПОРТУГАЛИЯ) ===";
+            document.getElementById('loc-val').innerText = "Лиссабон (Португалия)";
+            document.getElementById('target-val').innerText = "Найти Синий Хакерский Дом";
+            document.getElementById('instruction-text').innerText = "[ДИРЕКТИВА]: Успешное прибытие. Двигайся по кварталам Лиссабона к синему маркеру хакерского дома.";
+            printLog("<br>✈️ Рейс США-Португалия завершен. Найди штаб европейских кодеров.");
+            render3D();
+        }
+
+        // МИССИЯ ПО ПОДРЫВУ ЗДАНИЯ КОЛЛ-ЦЕНТРА В ПОРТУГАЛИИ
+        function startHackerWork() {
+            step = 4; canvas.style.display = "none"; radarCanvas.style.display = "none"; 
+            hackedObjects += 1; salary = 150; 
+            document.getElementById('hacked-count').innerText = hackedObjects + " объектов";
             document.getElementById('salary-val').innerText = salary;
-            canvas.style.display = "none"; radarCanvas.style.display = "none"; 
-            document.getElementById('mission-title').innerText = "=== ЭТАП 3: ФИНАЛЬНАЯ НЕЙТРАЛИЗАЦИЯ СЕТИ ===";
-            document.getElementById('target-val').innerText = "Полная блокировка угроз";
-            playBeep(880, 0.1); setTimeout(() => playBeep(440, 0.3), 120);
+            updateRank();
+
+            document.getElementById('mission-title').innerText = "=== ЭТАП 4: ПОДРЫВ ИНФРАСТРУКТУРЫ ===";
+            document.getElementById('target-val').innerText = "Уничтожение штаб-квартиры мошенников";
+            document.getElementById('instruction-text').innerText = "[ДИРЕКТИВА]: Перегрузи трансформаторы, чтобы взорвать здание.";
             
-            printLog("<br>🚨 ТЕРМИНАЛ ДЕАКТИВАЦИИ ДОСТУПЕН! Ты подключен к ядру системы. Ставка повышена до <span style='color: #0cf;'>$" + salary + "/сек</span>!", "#00ffff");
-            printLog("Обнаружена активная хакерская атака на серверы крупного банка! Преступники пытаются украсть личные данные миллионов людей. Время запустить протоколы CYBER SHIELD!", "#ff0055");
-            printLog("Выбери тип защитного алгоритма:<br>1 - Развернуть глобальный Firewall и заблокировать внешние порты взломщиков<br>2 - Перехватить управление их ботнетом и полностью стереть их сервера", "#00ffff");
+            printLog("<br>🖥️ Ты внутри виллы. Начислена зарплата: <span style='color: #0cf;'>$150/сек</span>! Удаленный доступ к генераторам получен.", "#3182ce");
+            printLog("Выбери метод диверсии:<br>1 - Вызвать короткое замыкание и подорвать главный серверный зал (+40 взломов)<br>2 - Запереть скамеров внутри и полностью сжечь здание перегрузкой питания (+110 взломов)", "#ffff00");
+            
             document.getElementById('user-input').disabled = false; document.getElementById('submit-btn').disabled = false;
+            document.getElementById('user-input').placeholder = "Введи 1 или 2 для подрыва...";
         }
 
         function processHack() {
             let input = document.getElementById('user-input').value.trim(); document.getElementById('user-input').value = "";
-            if (step !== 3 || !input) return;
+            if (!input) return;
             
             let mainBox = document.getElementById('main-box');
             mainBox.classList.add('shake-effect', 'glitch-effect');
-            
-            playBeep(250, 1.5, 'sawtooth');
-            setTimeout(() => playBeep(180, 1.0, 'sawtooth'), 300);
+            playBeep(120, 1.5, 'sawtooth');
 
             setTimeout(() => {
                 mainBox.classList.remove('shake-effect', 'glitch-effect');
                 
-                if (input === "1") {
-                    score += 750000; document.getElementById('score-val').innerText = score.toLocaleString(); hackedObjects += 30;
-                    document.getElementById('hacked-count').innerText = hackedObjects + " узлов";
-                    printLog(">> ОТЛИЧНО! Внешний Firewall заблокировал атаку. Серверы банка в безопасности. Угроза устранена!", "#00ff00");
-                    endGame();
-                } else if (input === "2") {
-                    score += 1500000; document.getElementById('score-val').innerText = score.toLocaleString(); hackedObjects += 95;
-                    document.getElementById('hacked-count').innerText = hackedObjects + " узлов";
-                    printLog(">> ПОЛНЫЙ РАЗГРОМ! Ботнет перехвачен, базы данных преступников уничтожены без возможности восстановления!", "#ffcc00");
-                    endGame();
-                } else { 
-                    printLog("Неверный код директивы! Введи 1 или 2.", "#f00"); 
-                }
-            }, 2000); 
-        }
-
-        function endGame() {
-            step = 4; salary = 0; document.getElementById('salary-val').innerText = salary;
-            printLog("<br>🎉 ОПЕРАЦИЯ 'ЕВРОПА' ЗАВЕРШЕНА! Кибер-безопасность региона восстановлена. Сумма предотвращенного ущерба: $" + score.toLocaleString(), "#ff0055");
-            document.getElementById('user-input').disabled = true; document.getElementById('submit-btn').disabled = true;
-        }
-
-        window.addEventListener('keydown', (e) => {
-            if (e.code === 'KeyW' || e.code === 'ArrowUp') movePlayer('w'); if (e.code === 'KeyS' || e.code === 'ArrowDown') movePlayer('s');
-            if (e.code === 'KeyA') movePlayer('a'); if (e.code === 'KeyD') movePlayer('d');
-            if (e.code === 'ArrowLeft') movePlayer('left'); if (e.code === 'ArrowRight') movePlayer('right');
-        });
-
-        setInterval(() => { if (step < 4) { score += salary; document.getElementById('score-val').innerText = score.toLocaleString(); } }, 1000);
-        setInterval(() => { if (step < 3) render3D(); }, 30);
-    </script>
-</body>
-</html>
+                if (step === 4) { 
+                    if (input === "1") { score += 450000; hackedObjects += 40; printLog(">> БУМ! Замыкание вызвало взрыв серверов. Здание мошенников частично разрушено!", "#48bb78"); } 
+                    else if (input === "2") { score += 950000; hackedObjects += 110; printLog(">> КАТАСТРОФА! Силовые кабели взорвались, полностью уничтожив весь колл-центр мошенников!", "#48bb78"); }
+                    document.getElementById('score-val').innerText = score.toLocaleString();
+                    document.getElementById('hacked-count').innerText = hackedObjects + " объектов";
+                    updateRank();
+                    startTokyoStage();
+                } 
+                else if (step === 7) { 
+                    if (input === "1") { score += 3000000; hackedObjects += 50; printLog(">> ВЗРЫВ! Термоядерные батареи бункера взорваны. Вся база синдиката ушла под лед!", "#48bb78"); } 
+                    else if (input === "2") { score += 8000000; hackedObjects += 200; printLog(">> ТОТАЛЬНОЕ УНИЧТОЖЕНИЕ! Подземный взрыв полностью стер бункер преступников с лица земли!", "#48bb78"); }
