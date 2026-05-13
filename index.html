@@ -155,7 +155,6 @@
             initMatrix();
         }
 
-        // 📡 ПРИЕМНИК КОМАНД ИЗ СОСЕДНЕЙ ВКЛАДКИ (АДМИНКИ) ЧЕРЕЗ LOCALSTORAGE
         window.addEventListener('storage', (e) => {
             if (e.key === 'admin_command') {
                 let cmd = JSON.parse(e.newValue);
@@ -170,7 +169,7 @@
                 if (cmd.type === 'reset') { localStorage.clear(); location.reload(); }
                 
                 saveGame(); updateUI();
-                localStorage.removeItem('admin_command'); // Стираем выполненную команду
+                localStorage.removeItem('admin_command');
             }
         });
 
@@ -217,7 +216,6 @@
         function buyAntenna() { if (score >= 1000000) { score -= 1000000; baseAutoP += 150; playBuySound(); updateUI(); } else { playErrorSound(); } }
         function buyCPU(model, price, reward) { if (score >= price) { score -= price; energyPerSec += reward; playBuySound(); updateUI(); } else { playErrorSound(); } }
         function buyCooler() { if (score >= 50000) { score -= 50000; coolingPower += 2.0; playBuySound(); updateUI(); } else { playErrorSound(); } }
-        function transferMoney() { let target = document.getElementById('t-name').value; if (!target) return playErrorSound(); playBuySound(); alert(`Переведено пользователю ${target}!`); }
         
         function updateBots() {
             bots.forEach(bot => {
