@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>⚡ HACLER OS: SECRET PANEL</title>
+    <style>
+        body { font-family: monospace; background: #110000; color: #f00; padding: 20px; text-align: center; }
+        .panel { max-width: 400px; margin: 0 auto; background: #000; border: 3px double #f00; padding: 20px; border-radius: 15px; box-shadow: 0 0 30px #f00; }
+        h2 { text-shadow: 0 0 10px #f00; letter-spacing: 2px; }
+        button { background: #000; color: #f00; border: 2px solid #f00; padding: 10px; width: 100%; font-weight: bold; cursor: pointer; border-radius: 6px; margin: 6px 0; text-transform: uppercase; font-size: 0.8em; }
+        button:hover { background: #f00; color: #000; box-shadow: 0 0 15px #ff0000; }
+        input { background: #000; color: #00ff00; border: 2px dashed #00ff00; padding: 10px; width: 90%; text-align: center; font-family: monospace; font-size: 1.1em; border-radius: 6px; margin-bottom: 5px; outline: none; }
+        .blue-btn { border-color: #00ffff !important; color: #00ffff !important; }
+        .blue-btn:hover { background: #00ffff !important; color: #000 !important; }
+        .gold-btn { border-color: #ffcc00 !important; color: #ffcc00 !important; }
+        .gold-btn:hover { background: #ffcc00 !important; color: #000 !important; }
+        .green-btn { border-color: #00ff00 !important; color: #00ff00 !important; }
+        .green-btn:hover { background: #00ff00 !important; color: #000 !important; }
+        hr { border: 1px dashed #f00; margin: 15px 0; }
+    </style>
+</head>
+<body>
+
+    <div class="panel">
+        <h2>✋ HACLER CONTROL STATION</h2>
+        <p style="color: #ffaaaa; font-size: 0.8em;">Открой игру (index.html) в соседней вкладке браузера и нажимай кнопки здесь!</p>
+        <hr>
+        
+        <!-- НОВОЕ СВОБОДНОЕ ПОЛЕ ВВОДА ЧИСЛА -->
+        <p style="color:#00ff00; font-size:0.8em; margin:5px 0;">ВВЕДИ СВОЁ ЧИСЛО XP ДЛЯ ВЗЛОМА:</p>
+        <input type="number" id="custom-xp-input" value="500000" placeholder="Сколько XP начислить?">
+        <button class="green-btn" onclick="sendCustomXP()">🔥 ГЕНЕРИРОВАТЬ СВОЁ ЧИСЛО XP</button>
+        
+        <hr>
+        <button class="gold-btn" onclick="sendCommand('gold_name')">👑 ДАТЬ GOLD NAME</button>
+        <button class="green-btn" onclick="sendCommand('add_xp', 1e12)">💰 НАЧИСЛИТЬ +1B XP</button>
+        <button onclick="sendCommand('crash_bots')">☣️ ВЗЛОМАТЬ И СБРОСИТЬ БОТОВ</button>
+        
+        <hr>
+        <p style="color:#aaa; font-size:0.7em;">ОХЛАЖДЕНИЕ И ПРОЦЕССОРЫ</p>
+        <button class="blue-btn" onclick="sendCommand('get_aqua', 50000)">🌊 АКТИВИРОВАТЬ hacler AQUA (-50K°C)</button>
+        <button class="blue-btn" onclick="sendCommand('get_aqua', 25)">❄️ АКТИВИРОВАТЬ hacler 111 (-25°C/s)</button>
+        <button style="border-color:#ff5500; color:#ff5500;" onclick="sendCommand('get_cpu', 100000)">⚙️ УСТАНОВИТЬ ULTRA PRO CPU</button>
+        <button style="border-color:#ff9900; color:#ff9900;" onclick="sendCommand('get_cpu', 5000)">⚙️ УСТАНОВИТЬ hacler 132F</button>
+        
+        <hr>
+        <p style="color:#aaa; font-size:0.7em;">ВИДЕОКАРТЫ RTX</p>
+        <button style="border-color:#fc0; color:#fc0;" onclick="sendCommand('get_rtx', 500000000)">🌌 RTX INFINITY</button>
+        <button style="border-color:#fc0; color:#fc0;" onclick="sendCommand('get_rtx', 500000)">⚡ RTX 10000</button>
+        
+        <hr>
+        <button style="border-color:#fff; color:#fff;" onclick="sendCommand('reset')">🗑️ ПОЛНЫЙ СБРОС ИГРЫ</button>
+    </div>
+
+    <script>
+        // Функция отправки стандартных фиксированных команд
+        function sendCommand(type, val = 0) {
+            let commandData = {
+                type: type,
+                amount: val,
+                reward: val,
+                time: Date.now()
+            };
+            localStorage.setItem('admin_command', JSON.stringify(commandData));
+        }
+
+        // НОВАЯ ФУНКЦИЯ ДЛЯ ЧТЕНИЯ ЧИСЛА ИЗ ПОЛЯ ВВОДА И ОТПРАВКИ В ИГРУ
+        function sendCustomXP() {
+            let inputVal = document.getElementById('custom-xp-input').value;
+            let xpAmount = parseFloat(inputVal);
+            
+            if (isNaN(xpAmount) || xpAmount <= 0) {
+                alert("Введите правильное положительное число!");
+                return;
+            }
+            
+            sendCommand('add_xp', xpAmount);
+        }
+    </script>
+</body>
+</html>
