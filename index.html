@@ -26,10 +26,6 @@
 <body>
     <canvas id="matrix-canvas"></canvas>
 
-    <!-- ЗВУКИ (ОБНОВЛЕННЫЕ ССЫЛКИ) -->
-    <audio id="buy-sound" src="https://myinstants.com" preload="auto"></audio>
-    <audio id="click-sound" src="https://myinstants.com" preload="auto"></audio>
-
     <!-- АДМИНКА -->
     <div id="admin-modal">
         <div id="admin-header">✋ ADMIN CONTROL</div>
@@ -42,8 +38,8 @@
             <button onclick="getRTX(15000, 1e21)" style="background:#f00; color:#fff">💎 RTX 15000</button>
             <button onclick="getRTX('INFINITY', 1e30)" style="background:linear-gradient(45deg, #000, #fff); color:#f00">🌌 RTX INFINITY</button>
             <hr>
-            <button onclick="isGold=true; saveGame(); updateUI()" style="background:#ffcc00">👑 GOLD NAME</button>
-            <button onclick="score += 1e24; saveGame(); updateUI()" style="background:#0f0">💰 +1Sx XP</button>
+            <button onclick="isGold=true; saveGame(); updateUI(); playBuyMelody();" style="background:#ffcc00">👑 GOLD NAME</button>
+            <button onclick="score += 1e24; saveGame(); updateUI(); playBuyMelody();" style="background:#0f0">💰 +1Sx XP</button>
             <button onclick="fullReset()" style="background:#f00; color:#fff">🗑️ СБРОС (RESET)</button>
             <button onclick="document.getElementById('admin-modal').style.display='none'">CLOSE</button>
         </div>
@@ -90,6 +86,87 @@
         let autoP = parseFloat(localStorage.getItem('hak_autoP')) || 0;
         let clickP = 1, userName = localStorage.getItem('hak_name') || '', isGold = localStorage.getItem('hak_gold') === 'true';
         let bots = [];
+        let audioCtx = null;
+
+        // Базовая музыкальная функция
+        function playSound(frequency, type, duration, startTimeOffset = 0) {
+            try {
+                if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+                if (audioCtx.state === 'suspended') audioCtx.resume();
+                
+                let osc = audioCtx.createOscillator();
+                let gain = audioCtx.createGain();
+                
+                osc.type = type || 'sine'; 
+                osc.frequency.setValueAtTime(frequency, audioCtx.currentTime + startTimeOffset);
+                
+                gain.gain.setValueAtTime(0.08, audioCtx.currentTime + startTimeOffset);
+                gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + startTimeOffset + duration);
+                
+                osc.connect(gain);
+                gain.connect(audioCtx.destination);
+                
+                osc.start(audioCtx.currentTime + startTimeOffset);
+                osc.stop(audioCtx.currentTime + startTimeOffset + duration);
+            } catch (e) {}
+        }
+
+        // РЕАЛИСТИЧНЫЙ ТРЕСК ДОЗИМЕТРА ГЕЙГЕРА (БЕЛЫЙ ШУМ) ДЛЯ КЛИКОВ
+        function playGeigerClick() {
+            try {
+                if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+                if (audioCtx.state === 'suspended') audioCtx.resume();
+
+                // Делаем несколько случайных быстрых тресков при одном нажатии
+                let clicksCount = Math.floor(Math.random() * 3) + 2; 
+                
+                for (let i = 0; i < clicksCount; i++) {
+                    let timeOffset = Math.random() * 0.08; // Случайный разброс времени треска
+                    
+                    let bufferSize = audioCtx.sampleRate * 0.01; // Очень короткий звук
+                    let buffer = audioCtx.createBuffer(1, bufferSize, audioCtx.sampleRate);
+                    let data = buffer.getChannelData(0);
+                    
+                    // Заполняем буфер шумом
+                    for (let j = 0; j < bufferSize; j++) {
+                        data[j] = Math.random() * 2 - 1;
+                    }
+                    
+                    let noise = audioCtx.createBufferSource();
+                    noise.buffer = buffer;
+                    
+                    // Фильтр, чтобы звук был глухим и пластиковым, как в Сталкере
+                    let filter = audioCtx.createBiquadFilter();
+                    filter.type = 'bandpass';
+                    filter.frequency.value = 1200; 
+                    
+                    let gain = audioCtx.createGain();
+                    gain.gain.setValueAtTime(0.15, audioCtx.currentTime + timeOffset);
+                    gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + timeOffset + 0.005);
+                    
+                    noise.connect(filter);
+                    filter.connect(gain);
+                    gain.connect(audioCtx.destination);
+                    
+                    noise.start(audioCtx.currentTime + timeOffset);
+                }
+            } catch(e) {}
+        }
+
+        // СТАЛКЕРСКАЯ МЕЛОДИЯ УСПЕШНОЙ ПОКУПКИ: ТУ-ТУ-ТУ-У
+        function playBuyMelody() {
+            const now = 0;
+            playSound(293.66, 'sawtooth', 0.08, now);       
+            playSound(293.66, 'sawtooth', 0.08, now + 0.1); 
+            playSound(293.66, 'sawtooth', 0.08, now + 0.2); 
+            playSound(220.00, 'sawtooth', 0.25, now + 0.3); 
+        }
+
+        function playErrorMelody() {
+            const now = 0;
+            playSound(130, 'sawtooth', 0.15, now);
+            playSound(100, 'sawtooth', 0.25, now + 0.15);
+        }
 
         function initBots() {
             const names = ["Satoshi", "Elon", "Anonymous", "Pavel", "Hacker", "Shadow", "Ghost", "Neo"];
@@ -97,7 +174,7 @@
                 bots.push({
                     name: names[Math.floor(Math.random()*names.length)] + "_" + i,
                     score: Math.floor(Math.random() * 5000),
-                    power: Math.floor(Math.random() * 1000000) + 10000
+                    power: Math.floor(Math.random() * 10) + 1
                 });
             }
         }
@@ -116,95 +193,151 @@
             document.getElementById('login-overlay').style.display = 'none';
             document.getElementById('main-content').style.display = 'block';
             document.getElementById('display-name').innerText = userName;
-            // Важно: загружаем звуки после первого взаимодействия
-            document.getElementById('click-sound').load();
-            document.getElementById('buy-sound').load();
+            
+            audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+
             updateUI();
-            setInterval(() => { score += autoP/10; updateUI(); }, 100);
+            setInterval(() => { score += autoP/10; updateBots(); updateUI(); }, 100);
             setInterval(saveGame, 2000);
+            initMatrix();
         }
 
         function updateUI() {
             document.getElementById('score-text').innerText = Math.floor(score).toLocaleString();
             document.getElementById('auto-val').innerText = autoP.toLocaleString();
-            if(isGold) document.getElementById('display-name').className = 'gold-nick';
             
+            let nameSpan = document.getElementById('display-name');
+            if (isGold) {
+                nameSpan.classList.add('gold-nick');
+            } else {
+                nameSpan.classList.remove('gold-nick');
+            }
+
+            let fullList = [...bots, { name: userName, score: score, isPlayer: true }];
+            fullList.sort((a, b) => b.score - a.score);
+
             let html = '';
-            let sorted = [...bots, {name: userName, score: score, isMe: true}].sort((a,b) => b.score - a.score);
-            sorted.forEach((p, i) => {
-                if(i < 100) html += `<div class="leader-item ${p.isMe?'my-pos':''}"><span>#${i+1} ${p.name}</span><span>${Math.floor(p.score)}</span></div>`;
+            fullList.forEach((item, index) => {
+                if (index < 100) {
+                    let styleClass = item.isPlayer ? 'my-pos' : '';
+                    let nickStyle = (item.isPlayer && isGold) ? 'class="gold-nick"' : '';
+                    html += `<div class="leader-item ${styleClass}">
+                        <span ${nickStyle}>#${index + 1} ${item.name}</span>
+                        <span>${Math.floor(item.score).toLocaleString()} XP</span>
+                    </div>`;
+                }
             });
             document.getElementById('leaderboard').innerHTML = html;
         }
 
-        function mineData(e) { 
-            score += clickP; 
-            const s = document.getElementById('click-sound');
-            s.currentTime = 0;
-            s.play().catch(()=>{}); // Игнорим ошибки браузера
-            createParticles(e); 
-            updateUI(); 
+        function mineData(e) {
+            score += clickP;
+            playGeigerClick(); // При клике трещит дозиметр!
+            createParticle(e.clientX, e.clientY, "+" + clickP);
+            updateUI();
+        }
+
+        function createParticle(x, y, text) {
+            let p = document.createElement('div');
+            p.className = 'particle';
+            p.innerText = text;
+            p.style.left = x + 'px';
+            p.style.top = y + 'px';
+            let dx = (Math.random() - 0.5) * 100;
+            let dy = (Math.random() - 0.5) * 100 - 50;
+            p.style.setProperty('--dx', dx + 'px');
+            p.style.setProperty('--dy', dy + 'px');
+            document.body.appendChild(p);
+            setTimeout(() => p.remove(), 800);
         }
 
         function buyCase() {
-            if(score >= 10000) {
+            if (score >= 10000) {
                 score -= 10000;
-                document.getElementById('buy-sound').play().catch(()=>{});
-                const models = ["RTX 2060", "RTX 3070", "RTX 4090", "RTX TITAN"];
-                let idx = Math.floor(Math.random()*models.length);
-                let win = (idx + 1) * 2000;
-                autoP += win;
-                alert("ВЫПАЛО: " + models[idx] + " (+" + win + "/sec)");
-                saveGame();
+                clickP += 5;
+                playBuyMelody(); 
+                alert('📦 Кейс открыт! Сила клика увеличена на +5!');
                 updateUI();
+            } else {
+                playErrorMelody(); 
+                alert('Не хватает XP! Нужно 10,000 XP.');
             }
         }
 
         function buyAntenna() {
-            if(score >= 1000000) {
+            if (score >= 1000000) {
                 score -= 1000000;
-                document.getElementById('buy-sound').play().catch(()=>{});
-                autoP += 50000;
-                saveGame();
+                autoP += 50;
+                playBuyMelody(); 
+                alert('📡 Антенна установлена! Авто-майнинг увеличен на +50/сек!');
                 updateUI();
+            } else {
+                playErrorMelody(); 
+                alert('Не хватает XP! Нужно 1,000,000 XP.');
             }
         }
 
-        function openAdmin() { if(userName.toLowerCase() === 'миша') document.getElementById('admin-modal').style.display = 'block'; }
-        function getRTX(m, p) { autoP += p; saveGame(); updateUI(); }
-        function fullReset() { localStorage.clear(); window.location.reload(); }
-
-        function createParticles(e) {
-            const chars = ["0", "1", "{", "}"];
-            for(let i=0; i<6; i++) {
-                const p = document.createElement('div');
-                p.className = 'particle';
-                p.innerText = chars[Math.floor(Math.random()*chars.length)];
-                p.style.left = (e.clientX || window.innerWidth/2) + 'px';
-                p.style.top = (e.clientY || window.innerHeight/2) + 'px';
-                p.style.setProperty('--dx', (Math.random()-0.5)*240 + 'px');
-                p.style.setProperty('--dy', (Math.random()-0.5)*240 + 'px');
-                document.body.appendChild(p);
-                setTimeout(() => p.remove(), 800);
+        function transferMoney() {
+            let target = document.getElementById('t-name').value;
+            if (!target) {
+                playErrorMelody();
+                return alert('Введите имя получателя!');
             }
+            playBuyMelody();
+            alert(`Успешно переведено пользователю ${target}!`);
         }
 
-        const canvas = document.getElementById('matrix-canvas');
-        const ctx = canvas.getContext('2d');
-        canvas.width = window.innerWidth; canvas.height = window.innerHeight;
-        const columns = Math.floor(canvas.width / 20);
-        const drops = new Array(columns).fill(1);
-        function drawMatrix() {
-            ctx.fillStyle = 'rgba(0, 0, 0, 0.05)';
-            ctx.fillRect(0, 0, canvas.width, canvas.height);
-            ctx.fillStyle = '#0f0';
-            drops.forEach((y, i) => {
-                ctx.fillText(Math.floor(Math.random()*2), i*20, y*20);
-                if(y*20 > canvas.height && Math.random() > 0.975) drops[i] = 0;
-                drops[i]++;
+        function openAdmin() {
+            playSound(300, 'sawtooth', 0.1);
+            document.getElementById('admin-modal').style.display = 'block';
+        }
+
+        function getRTX(model, reward) {
+            autoP += reward;
+            playBuyMelody();
+            alert(`🚀 Установлена видеокарта RTX ${model}! Прирост скорости: +${reward.toLocaleString()}/sec!`);
+            saveGame();
+            updateUI();
+        }
+
+        function fullReset() {
+            playErrorMelody();
+            localStorage.clear();
+            score = 0; autoP = 0; clickP = 1; isGold = false; userName = '';
+            location.reload();
+        }
+
+        function updateBots() {
+            bots.forEach(bot => {
+                bot.score += bot.power * 0.1;
+                if(Math.random() > 0.95) bot.power += Math.floor(Math.random() * 5);
             });
         }
-        setInterval(drawMatrix, 50);
+
+        function initMatrix() {
+            const canvas = document.getElementById('matrix-canvas');
+            const ctx = canvas.getContext('2d');
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+            const letters = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789@#$%&";
+            const fontSize = 10;
+            const columns = canvas.width / fontSize;
+            const drops = Array(Math.floor(columns)).fill(1);
+
+            function draw() {
+                ctx.fillStyle = 'rgba(0, 0, 0, 0.05)';
+                ctx.fillRect(0, 0, canvas.width, canvas.height);
+                ctx.fillStyle = '#0f0';
+                ctx.font = fontSize + 'px monospace';
+                for (let i = 0; i < drops.length; i++) {
+                    const text = letters[Math.floor(Math.random() * letters.length)];
+                    ctx.fillText(text, i * fontSize, drops[i] * fontSize);
+                    if (drops[i] * fontSize > canvas.height && Math.random() > 0.975) drops[i] = 0;
+                    drops[i]++;
+                }
+            }
+            setInterval(draw, 33);
+        }
     </script>
 </body>
 </html>
