@@ -8,8 +8,33 @@
         body { font-family: monospace; background: #000; color: #0f0; margin: 0; padding: 10px; overflow: hidden; touch-action: none; }
         .game-layout { display: grid; grid-template-columns: 1fr 300px; gap: 10px; max-width: 1200px; margin: 0 auto; height: 95vh; }
         .screen-box { background: #050505; border: 2px solid #0f0; border-radius: 8px; padding: 10px; display: flex; flex-direction: column; box-shadow: 0 0 15px rgba(0,255,0,0.2); position: relative; }
+        
+        /* Анимация сильной тряски экрана */
+        .shake-effect { animation: screenShake 0.4s ease-in-out infinite; }
+        @keyframes screenShake {
+            0% { transform: translate(2px, 1px) rotate(0deg); }
+            10% { transform: translate(-1px, -2px) rotate(-1deg); }
+            20% { transform: translate(-3px, 0px) rotate(1deg); }
+            30% { transform: translate(0px, 2px) rotate(0deg); }
+            40% { transform: translate(1px, -1px) rotate(1deg); }
+            50% { transform: translate(-1px, 2px) rotate(-1deg); }
+            60% { transform: translate(-3px, 1px) rotate(0deg); }
+            70% { transform: translate(2px, 1px) rotate(-1deg); }
+            80% { transform: translate(-1px, -1px) rotate(1deg); }
+            90% { transform: translate(2px, 2px) rotate(0deg); }
+            100% { transform: translate(1px, -2px) rotate(-1deg); }
+        }
+
+        /* Эффект цифровых помех */
+        .glitch-effect { animation: glitchFlash 0.15s ease-in-out infinite; }
+        @keyframes glitchFlash {
+            0% { background-color: #050505; opacity: 1; }
+            50% { background-color: #1a0000; opacity: 0.9; border-color: #ff0055; box-shadow: 0 0 30px #ff0055; }
+            100% { background-color: #000f00; opacity: 1; border-color: #00ff00; }
+        }
+
         canvas { width: 100%; height: 350px; background: #000; border: 1px solid #040; border-radius: 4px; }
-        #radar-canvas { position: absolute; top: 20px; right: 20px; width: 100px; height: 100px; border: 2px solid #0f0; border-radius: 50%; background: rgba(0,10,0,0.85); box-shadow: 0 0 10px #0f0; }
+        #radar-canvas { position: absolute; top: 20px; right: 20px; width: 100px; height: 100px; border: 2px solid #0f0; border-radius: 50%; background: rgba(0,10,0,0.9); box-shadow: 0 0 10px #0f0; z-index: 10; }
         #terminal { flex-grow: 1; background: #000; border: 1px solid #040; padding: 10px; margin-top: 10px; overflow-y: auto; font-size: 0.85em; border-radius: 4px; height: 180px; }
         .input-area { display: flex; gap: 5px; margin-top: 5px; }
         input { background: #000; color: #0f0; border: 1px solid #0f0; padding: 8px; font-family: monospace; flex-grow: 1; outline: none; border-radius: 4px; }
@@ -22,7 +47,7 @@
 <body>
 
     <div class="game-layout">
-        <div class="screen-box">
+        <div id="main-box" class="screen-box">
             <canvas id="3d-screen" width="320" height="240"></canvas>
             <canvas id="radar-canvas" width="100" height="100"></canvas>
             
@@ -72,11 +97,11 @@
         let fps;
 
         function initAudio() { if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)(); }
-        function playBeep(freq, duration) {
+        function playBeep(freq, duration, type='sine') {
             try {
                 initAudio(); if (audioCtx.state === 'suspended') audioCtx.resume();
                 let osc = audioCtx.createOscillator(), gain = audioCtx.createGain();
-                osc.type = 'sine'; osc.frequency.setValueAtTime(freq, audioCtx.currentTime);
+                osc.type = type; osc.frequency.setValueAtTime(freq, audioCtx.currentTime);
                 gain.gain.setValueAtTime(0.03, audioCtx.currentTime); gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + duration);
                 osc.connect(gain); gain.connect(audioCtx.destination); osc.start(); osc.stop(audioCtx.currentTime + duration);
             } catch(e) {}
@@ -94,19 +119,20 @@
         const rCtx = radarCanvas.getContext('2d');
         const mapSize = 12;
         
+        // ВОССТАНОВЛЕННАЯ СЕТКА КАРТЫ (1 - Стены, 0 - Дорога, 2 - Цель)
         let map = [
-           ,
-           ,
-           ,
-           ,
-           ,
-           ,
-           ,
-           ,
-           ,
-           ,
-           ,
-           
+            [1,1,1,1,1,1,1,1,1,1,1,1],
+            [1,0,0,0,1,0,0,0,0,0,0,1],
+            [1,0,1,0,1,0,1,1,1,1,0,1],
+            [1,0,1,0,0,0,1,0,0,1,0,1],
+            [1,0,1,1,1,0,1,0,0,1,0,1],
+            [1,0,0,0,1,0,0,0,0,1,0,1],
+            [1,1,1,0,1,1,1,1,0,1,0,1],
+            [1,0,0,0,0,0,0,1,0,0,0,1],
+            [1,0,1,1,1,1,0,1,1,1,0,1],
+            [1,0,1,0,0,0,0,0,0,1,2,1], // Цифра 2 — это Аэропорт
+            [1,0,0,0,1,1,1,1,0,0,0,1],
+            [1,1,1,1,1,1,1,1,1,1,1,1]
         ];
 
         let px = 1.5, py = 1.5, pa = 0.0;
@@ -191,20 +217,23 @@
             document.getElementById('hacked-count').innerText = hackedObjects + " узлов";
             document.getElementById('salary-val').innerText = salary;
             px = 1.5; py = 1.5; pa = 0.0; 
+            
+            // НОВАЯ КАРТА ДЛЯ ХАКЕРСКОЙ ВИЛЛЫ МОШЕННИКОВ
             map = [
-               ,
-               ,
-               ,
-               ,
-               ,
-               ,
-               ,
-               ,
-               ,
-               ,
-               ,
-               
+                [1,1,1,1,1,1,1,1,1,1,1,1],
+                [1,0,0,0,0,0,1,0,0,0,0,1],
+                [1,0,1,1,1,0,1,0,1,1,0,1],
+                [1,0,1,2,1,0,0,0,1,1,0,1], // Цифра 2 — это Главный Сервер
+                [1,0,1,1,1,1,1,0,1,1,0,1],
+                [1,0,0,0,0,0,1,0,0,0,0,1],
+                [1,1,1,1,1,0,1,1,1,1,1,1],
+                [1,0,0,0,1,0,0,0,0,0,0,1],
+                [1,0,1,0,1,1,1,1,1,1,0,1],
+                [1,0,1,0,0,0,0,0,0,0,0,1],
+                [1,0,1,1,1,1,1,1,1,1,0,1],
+                [1,1,1,1,1,1,1,1,1,1,1,1]
             ];
+            
             playBeep(523, 0.1); setTimeout(() => playBeep(659, 0.1), 100); setTimeout(() => playBeep(784, 0.2), 200);
             document.getElementById('mission-title').innerText = "=== ЭТАП 2: МИНИ ХАКЕРСКИЙ ДОМ (ПОРТУГАЛИЯ) ===";
             document.getElementById('loc-val').innerText = "Лиссабон (Португалия)";
@@ -212,7 +241,7 @@
             
             printLog("<br>✈️ Перелет завершен. Ты прибыл на секретную европейскую виллу CYBER SHIELD!", "#00ff00");
             printLog("Штаб повысил твой оклад за успешный транзит: текущая ставка <span style='color: #0cf;'>$" + salary + "/сек</span>.", "#00ffff");
-            printLog("Пройди по внутренним коридорам базы и найди Синий Главный Сервер преступной группировки (мигающая точка на радаре), чтобы изолировать их сеть!", "#00ffff");
+            printLog("Пройди по внутренним коридорам базы и найди Синий Главный Сервер группировки (мигающая точка на радаре), чтобы изолировать их сеть!", "#00ffff");
             render3D();
         }
 
@@ -234,17 +263,30 @@
         function processHack() {
             let input = document.getElementById('user-input').value.trim(); document.getElementById('user-input').value = "";
             if (step !== 3 || !input) return;
-            if (input === "1") {
-                score += 750000; document.getElementById('score-val').innerText = score.toLocaleString(); hackedObjects += 30;
-                document.getElementById('hacked-count').innerText = hackedObjects + " узлов";
-                printLog(">> ОТЛИЧНО! Внешний Firewall заблокировал атаку. Серверы банка в безопасности. Угроза устранена!", "#00ff00");
-                endGame();
-            } else if (input === "2") {
-                score += 1500000; document.getElementById('score-val').innerText = score.toLocaleString(); hackedObjects += 95;
-                document.getElementById('hacked-count').innerText = hackedObjects + " узлов";
-                printLog(">> ПОЛНЫЙ РАЗГРОМ! Ботнет перехвачен, базы данных преступников уничтожены без возможности восстановления!", "#ffcc00");
-                endGame();
-            } else { printLog("Неверный код директивы! Введи 1 или 2.", "#f00"); }
+            
+            let mainBox = document.getElementById('main-box');
+            mainBox.classList.add('shake-effect', 'glitch-effect');
+            
+            playBeep(250, 1.5, 'sawtooth');
+            setTimeout(() => playBeep(180, 1.0, 'sawtooth'), 300);
+
+            setTimeout(() => {
+                mainBox.classList.remove('shake-effect', 'glitch-effect');
+                
+                if (input === "1") {
+                    score += 750000; document.getElementById('score-val').innerText = score.toLocaleString(); hackedObjects += 30;
+                    document.getElementById('hacked-count').innerText = hackedObjects + " узлов";
+                    printLog(">> ОТЛИЧНО! Внешний Firewall заблокировал атаку. Серверы банка в безопасности. Угроза устранена!", "#00ff00");
+                    endGame();
+                } else if (input === "2") {
+                    score += 1500000; document.getElementById('score-val').innerText = score.toLocaleString(); hackedObjects += 95;
+                    document.getElementById('hacked-count').innerText = hackedObjects + " узлов";
+                    printLog(">> ПОЛНЫЙ РАЗГРОМ! Ботнет перехвачен, базы данных преступников уничтожены без возможности восстановления!", "#ffcc00");
+                    endGame();
+                } else { 
+                    printLog("Неверный код директивы! Введи 1 или 2.", "#f00"); 
+                }
+            }, 2000); 
         }
 
         function endGame() {
