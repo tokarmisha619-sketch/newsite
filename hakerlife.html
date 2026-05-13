@@ -3,34 +3,25 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width,initial-scale=1.0">
-    <title>🚨 GLOBAL OPERATIONS: CYBER SHIELD 3D</title>
+    <title>🚨 OPERATIONS: CYBER SHIELD 3D</title>
     <style>
         body { font-family: monospace; background: #0c0f12; color: #e0e5eb; margin: 0; padding: 10px; overflow: hidden; touch-action: none; }
         .game-layout { display: grid; grid-template-columns: 1fr 300px; gap: 10px; max-width: 1200px; margin: 0 auto; height: 95vh; }
         .screen-box { background: #161a1e; border: 2px solid #4a5568; border-radius: 8px; padding: 10px; display: flex; flex-direction: column; box-shadow: 0 4px 20px rgba(0,0,0,0.5); position: relative; }
         canvas { width: 100%; height: 350px; background: #000; border: 1px solid #2d3748; border-radius: 4px; }
         #radar-canvas { position: absolute; top: 20px; right: 20px; width: 100px; height: 100px; border: 2px solid #4a5568; border-radius: 50%; background: rgba(22,26,30,0.9); box-shadow: 0 0 10px rgba(0,0,0,0.5); z-index: 10; }
-        #terminal { flex-grow: 1; background: #0f1115; border: 1px solid #2d3748; padding: 10px; margin-top: 10px; overflow-y: auto; font-size: 0.85em; border-radius: 4px; height: 180px; box-shadow: inset 0 0 10px rgba(0,0,0,0.8); }
+        #terminal { flex-grow: 1; background: #0f1115; border: 1px solid #2d3748; padding: 10px; margin-top: 10px; overflow-y: auto; font-size: 0.85em; border-radius: 4px; height: 140px; box-shadow: inset 0 0 10px rgba(0,0,0,0.8); }
         .input-area { display: flex; gap: 5px; margin-top: 5px; }
         input { background: #0f1115; color: #fff; border: 1px solid #4a5568; padding: 8px; font-family: monospace; flex-grow: 1; outline: none; border-radius: 4px; }
         button { background: #3182ce; color: #fff; border: none; padding: 8px 15px; font-family: monospace; font-weight: bold; cursor: pointer; border-radius: 4px; text-transform: uppercase; }
         button:hover { background: #2b6cb0; box-shadow: 0 0 8px #3182ce; }
-        .sidebar { background: #161a1e; border: 2px solid #4a5568; border-radius: 8px; padding: 15px; font-size: 0.8em; box-shadow: 0 4px 20px rgba(0,0,0,0.5); }
-        .nav-btn { width: 50px; height: 40px; margin: 3px; font-size: 1.2em; background: #2d3748; color: #fff; border: 1px solid #4a5568; border-radius: 4px; cursor: pointer; }
+        .sidebar { background: #161a1e; border: 2px solid #4a5568; border-radius: 8px; padding: 15px; font-size: 0.8em; box-shadow: 0 4px 20px rgba(0,0,0,0.5); overflow-y: auto; }
+        .nav-btn { width: 44px; height: 35px; margin: 2px; font-size: 1.1em; background: #2d3748; color: #fff; border: 1px solid #4a5568; border-radius: 4px; cursor: pointer; }
         .nav-btn:hover { background: #4a5568; }
-        
-        /* ЭФФЕКТЫ ГАЛЛЮЦИНАЦИЙ И ТРЯСКИ */
-        .hallucination-shake { animation: crazyShake 0.15s ease-in-out infinite !important; filter: hue-rotate(90deg) saturate(2) !important; }
-        @keyframes crazyShake {
-            0% { transform: translate(3px, 2px) rotate(1deg); }
-            50% { transform: translate(-3px, -2px) rotate(-1deg); }
-            100% { transform: translate(2px, -3px) rotate(1deg); }
-        }
-        .bomb-shake { animation: explosionShake 0.05s ease-in-out infinite !important; filter: invert(1) !important; }
-        @keyframes explosionShake {
-            0% { transform: translate(10px, 10px); }
-            100% { transform: translate(-10px, -10px); }
-        }
+        .med-btn { background: #e53e3e; color: white; border: 1px solid #fff; padding: 8px; font-size: 0.9em; width: 100%; border-radius: 4px; font-weight: bold; cursor: pointer; margin-top: 5px; }
+        .med-btn:hover { background: #c53030; box-shadow: 0 0 10px #e53e3e; }
+        .hallucination-screen { animation: ghostVision 0.5s ease-in-out infinite alternate; }
+        @keyframes ghostVision { 0% { filter: hue-rotate(0deg) saturate(1); } 100% { filter: hue-rotate(45deg) saturate(2) contrast(1.2); } }
     </style>
 </head>
 <body>
@@ -42,59 +33,57 @@
             
             <div id="terminal">
                 <div id="mission-title" style="color: #ecc94b; font-weight: bold; text-align: center;">=== ЭТАП 1: ДОМ В США ===</div>
-                <p id="instruction-text">[ДИРЕКТИВА]: Ты находишься у себя дома. Тебе нужно развернуться, найти светящуюся КРАСНУЮ ДВЕРЬ здания и войти в неё, чтобы выйти на улицу города.</p>
-                <p style="color: #a0aec0;">Управление: W,A,S,D — ходить, Стрелочки влево/вправо — поворачивать голову.</p>
+                <p id="instruction-text">[ДИРЕКТИВА]: Вокруг стены твоей комнаты. Найди светящуюся КРАСНУЮ ДВЕРЬ и войди в неё, чтобы начать операцию.</p>
+                <p style="color: #a0aec0;">Управление: W,A,S,D — ходить, Стрелочки — поворот камеры.</p>
                 <hr style="border: 1px dashed #4a5568;">
                 <div id="story-log"></div>
             </div>
             
             <div class="input-area">
-                <input type="text" id="user-input" placeholder="Доступ заблокирован. Ожидайте терминал взлома..." disabled>
-                <button id="submit-btn" onclick="processHack()" disabled>ВЗЛОМ</button>
+                <input type="text" id="user-input" placeholder="Доступ заблокирован. Ожидайте терминал действий..." disabled>
+                <button id="submit-btn" onclick="processHack()" disabled>ВЫПОЛНИТЬ</button>
             </div>
         </div>
 
         <div class="sidebar">
-            <h3 style="color: #3182ce; text-align: center; margin-top: 0;">📟 ТЕРМИНАЛ ЭЛЛИОТА</h3>
+            <h3 style="color: #3182ce; text-align: center; margin-top: 0;">📟 ШТАБ CYBER SHIELD</h3>
             <hr style="border: 1px dashed #4a5568;">
-            <p>📍 ЛОКАЦИЯ: <span id="loc-val" style="color: #00ffff;">Твой дом (США)</span></p>
+            <p>📍 ЛОКАЦИЯ: <span id="loc-val" style="color: #fff;">Твой дом (США)</span></p>
             <p>🎯 ЦЕЛЬ: <span id="target-val" style="color: #ecc94b;">Выйти через Красную Дверь</span></p>
             <p>🏅 РАНГ: <span id="rank-val" style="color: #9f7aea; font-weight: bold;">Стажер 🧑‍💻</span></p>
-            <p>💰 КОШЕЛЕК ОЧКОВ: \$<span id="score-val" style="color: #48bb78; font-weight: bold;">0</span></p>
-            <p>💵 ЗАРПЛАТА: <span style="color: #0cf;">\$<span id="salary-val">0</span>/сек</span></p>
+            
+            <!-- СОСТОЯНИЕ ЗДОРОВЬЯ И ЛЕКАРСТВА -->
+            <p>❤️ СТАБИЛЬНОСТЬ: <span id="health-val" style="color: #48bb78; font-weight: bold;">100%</span></p>
+            <div style="background: rgba(255,255,255,0.05); padding: 5px; border-radius: 4px; margin-bottom: 8px;">
+                <span style="color: #ff8888; font-size: 0.9em;">🛒 АПТЕКА CYBER SHIELD:</span>
+                <button class="med-btn" onclick="buyMedicine()">💊 КУПИТЬ ЛЕКАРСТВО (\$150)</button>
+            </div>
+
+            <p>💰 СЧЕТ XP: \$<span id="score-val" style="color: #48bb78; font-weight: bold;">0</span></p>
+            <p>💵 ЗАРПЛАТА: <span style="color: #00bfff;">\$<span id="salary-val">0</span>/сек</span></p>
             <p>💻 ВЗЛОМАНО СЕТЕЙ: <span id="hacked-count" style="color: #ed8936; font-weight: bold;">0 объектов</span></p>
             <p>📊 ДВИЖОК: <span id="fps-val" style="color: #9f7aea; font-weight: bold;">0 FPS</span></p>
-            
-            <!-- 🛒 АПТЕКА С ЛЕКАРСТВОМ ОТ ГАЛЛЮЦИНАЦИЙ -->
             <hr style="border: 1px dashed #4a5568;">
-            <h4 style="text-align: center; color: #ff0055; margin: 5px 0;">🏥 АПТЕКА CYBER SHIELD</h4>
-            <button onclick="buyMedicine()" style="background: #e53e3e; color: #fff; width: 100%; border: 1px solid #fff; font-size: 0.75em; padding: 5px;">💊 КУПИТЬ АНТИДОТ (Cost: \$2,000)</button>
-            <p id="hallucination-status" style="font-size: 0.75em; color: #48bb78; text-align: center; margin-top: 3px;">Разум чист и стабилен 🟢</p>
-            
-            <hr style="border: 1px dashed #4a5568;">
-            <h4 style="text-align: center; margin-bottom: 5px; margin-top: 5px;">КОНТРОЛЛЕР ПЕРЕМЕЩЕНИЯ</h4>
             <div style="text-align: center;">
                 <button class="nav-btn" onclick="movePlayer('w')">W</button><br>
                 <button class="nav-btn" onclick="movePlayer('a')">A</button>
                 <button class="nav-btn" onclick="movePlayer('s')">S</button>
                 <button class="nav-btn" onclick="movePlayer('d')">D</button><br>
-                <button class="nav-btn" style="width: 70px; background: #2b6cb0;" onclick="movePlayer('left')">◀</button>
-                <button class="nav-btn" style="width: 70px; background: #2b6cb0;" onclick="movePlayer('right')">▶</button>
+                <button class="nav-btn" style="width: 65px; background: #2b6cb0;" onclick="movePlayer('left')">◀</button>
+                <button class="nav-btn" style="width: 65px; background: #2b6cb0;" onclick="movePlayer('right')">▶</button>
             </div>
         </div>
     </div>
 
     <script>
         let score = 0;
-        let step = 1; // 1-США дом, 2-США дорога, 3-Португалия город, 4-Португалия штаб, 5-Токио город, 6-Токио взрыв, 7-Исландия город, 8-Исландия финал, 9-Конец
+        let step = 1; // 1-США дом, 2-США дорога, 3-Португалия город, 4-Португалия штаб, 5-Токио город, 6-Исландия бункер, 7-Уничтожение, 8-Конец
         let salary = 0;
         let hackedObjects = 0;
+        let health = 100;
+        let isHallucinating = false;
         let audioCtx = null;
         let lastCalledTime, fps;
-
-        // Переменные для галлюцинаций
-        let isHallucinating = false;
-        let phantomX = 0, phantomY = 0; // Координаты фантома
 
         function initAudio() { if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)(); }
         function playBeep(freq, duration, type='sine') {
@@ -114,51 +103,51 @@
         }
 
         function updateRank() {
-            let rankElement = document.getElementById('rank-val');
-            if (hackedObjects === 0) rankElement.innerText = "Стажер 🧑‍💻";
-            else if (hackedObjects <= 40) rankElement.innerText = "Младший Агент 🕵️‍♂️";
-            else if (hackedObjects <= 100) rankElement.innerText = "Спецагент ⚡";
-            else rankElement.innerText = "Директор Cyber Shield 👑";
+            let r = document.getElementById('rank-val');
+            if (hackedObjects === 0) r.innerText = "Стажер 🧑‍💻";
+            else if (hackedObjects <= 40) r.innerText = "Младший Агент 🕵️‍♂️";
+            else if (hackedObjects <= 100) r.innerText = "Спецагент ⚡";
+            else r.innerText = "Директор Cyber Shield 👑";
         }
 
-        // ==========================================
-        // СИСТЕМА АПТЕКИ И ЛЕКАРСТВ
-        // ==========================================
+        // КУПИТЬ ЛЕКАРСТВО В МАГАЗИНЕ
         function buyMedicine() {
-            if (score >= 2000) {
-                score -= 2000;
-                document.getElementById('score-val').innerText = score.toLocaleString();
+            if (score >= 150) {
+                score -= 150;
+                health = 100;
                 isHallucinating = false;
-                document.getElementById('main-box').classList.remove('hallucination-shake');
-                document.getElementById('hallucination-status').innerText = "Разум чист и стабилен 🟢";
-                document.getElementById('hallucination-status').style.color = "#48bb78";
-                playBeep(600, 0.2);
-                printLog(">> Ты принял лекарство. Галлюцинации отступили, фантомы исчезли с радаров.", "#48bb78");
+                document.getElementById('score-val').innerText = score.toLocaleString();
+                let hLabel = document.getElementById('health-val');
+                hLabel.innerText = "100%"; hLabel.style.color = "#48bb78";
+                document.getElementById('main-box').classList.remove('hallucination-screen');
+                playBeep(600, 0.15);
+                printLog(">> Ты принял лекарство. Сознание очистилось, галлюцинации мошенников исчезли.", "#48bb78");
             } else {
-                playBeep(150, 0.2);
-                alert("Недостаточно хак-очков! Антидот стоит \$2,000.");
+                playBeep(150, 0.2, 'sawtooth');
+                alert("Недостаточно очков на балансе! Стоимость лекарства — \$150.");
             }
         }
 
-        // Автоматический запуск галлюцинаций каждые 15 секунд для динамики
+        // ТАЙМЕР НАЧАЛА ЛОМКИ И ПОЯВЛЕНИЯ ПРИЗРАКОВ
         setInterval(() => {
-            if (step < 8) {
-                isHallucinating = true;
-                document.getElementById('main-box').classList.add('hallucination-shake');
-                document.getElementById('hallucination-status').innerText = "🚨 КРИЗИС: ВИДИТЕ ФАНТОМОВ!";
-                document.getElementById('hallucination-status').style.color = "#e53e3e";
-                
-                // Генерируем фантома недалеко от игрока
-                phantomX = Math.floor(px) + (Math.random() > 0.5 ? 2 : -2);
-                phantomY = Math.floor(py) + (Math.random() > 0.5 ? 2 : -2);
-                if (phantomX < 0 || phantomX >= mapSize || phantomY < 0 || phantomY >= mapSize) {
-                    phantomX = 3; phantomY = 3;
+            if (step < 7) {
+                health -= 10;
+                if (health <= 40) {
+                    isHallucinating = true;
+                    document.getElementById('main-box').classList.add('hallucination-screen');
+                    printLog("⚠️ ВНИМАНИЕ: Начинается ломка! В глазах двоится. На карте прорисовываются силуэты фантомных мошенников!", "#f56565");
                 }
                 
-                playBeep(180, 0.4, 'sawtooth');
-                printLog("<br>⚠️ [КРИЗИС ТВОЕГО РАЗУМА]: Рассудок Эллиота затуманился! Экран плывет, а на радаре и улицах сами по себе материализуются призрачные люди! Срочно прими лекарство в аптеке!", "#e53e3e");
+                let hLabel = document.getElementById('health-val');
+                hLabel.innerText = health + "%";
+                if (health <= 40) hLabel.style.color = "#e53e3e";
+                
+                if (health <= 0) {
+                    alert("Персонаж потерял сознание от нехватки медикаментов! Перезагрузка системы...");
+                    localStorage.clear(); location.reload();
+                }
             }
-        }, 15000);
+        }, 15000); // Каждые 15 секунд здоровье падает на 10% (для динамики игры)
 
         const canvas = document.getElementById('3d-screen');
         const ctx = canvas.getContext('2d');
@@ -166,18 +155,19 @@
         const rCtx = radarCanvas.getContext('2d');
         const mapSize = 12;
         
+        // КАРТА НА 100% ИСПРАВЛЕНА (1-Стена, 0-Дорога, 2-Цель миссии)
         let map = [
             [1,1,1,1,1,1,1,1,1,1,1,1],
             [1,0,0,0,1,0,0,0,0,0,0,1],
+            [1,0,0,0,1,0,1,1,1,1,0,1],
+            [1,0,0,0,2,0,1,0,0,1,0,1], // 2 - Красная дверь твоего дома
+            [1,1,1,1,1,0,1,0,0,1,0,1],
+            [1,0,0,0,0,0,1,0,0,1,0,1],
+            [1,0,1,1,1,1,1,0,0,1,0,1],
+            [1,0,1,0,0,0,0,0,0,1,0,1],
+            [1,0,1,0,1,1,1,1,1,1,0,1],
             [1,0,0,0,1,0,0,0,0,0,0,1],
-            [1,0,0,0,0,0,0,1,1,1,0,1],
-            [1,0,0,0,1,0,0,1,0,0,0,1],
-            [1,0,0,0,1,0,0,1,0,1,2,1], // 2 — Красная неоновая дверь
-            [1,0,0,0,1,0,0,0,0,1,1,1],
-            [1,1,1,0,1,1,1,1,0,1,1,1],
-            [1,0,0,0,0,0,0,0,0,1,1,1],
-            [1,0,0,0,1,1,1,1,1,1,1,1],
-            [1,0,0,0,0,0,0,0,0,0,0,1],
+            [1,0,0,0,1,0,0,0,0,0,0,1],
             [1,1,1,1,1,1,1,1,1,1,1,1]
         ];
 
@@ -202,17 +192,14 @@
                         else rCtx.fillStyle = "#38bdf8"; 
                         rCtx.beginPath(); rCtx.arc(relX + scale/2, relY + scale/2, pulse, 0, Math.PI*2); rCtx.fill();
                     }
+                    
+                    // ЕСЛИ ГАЛЛЮЦИНАЦИЯ — РИСУЕМ ФАНТОМНЫХ МОШЕННИКОВ НА РАДАРЕ КРАСНЫМИ ТОЧКАМИ
+                    if (isHallucinating && map[y][x] === 0 && (x+y)%4 === 0) {
+                        rCtx.fillStyle = "rgba(255, 0, 0, 0.6)";
+                        rCtx.fillRect(relX + scale/4, relY + scale/4, scale/2, scale/2);
+                    }
                 }
             }
-            
-            // Если галлюцинация активна — рисуем фантома белой мигающей точкой на радаре
-            if (isHallucinating) {
-                let fRelX = (phantomX - px) * scale;
-                let fRelY = (phantomY - py) * scale;
-                rCtx.fillStyle = "#ffffff";
-                rCtx.beginPath(); rCtx.arc(fRelX + scale/2, fRelY + scale/2, 4, 0, Math.PI*2); rCtx.fill();
-            }
-
             rCtx.restore();
             rCtx.fillStyle = "#48bb78"; rCtx.beginPath(); rCtx.arc(50, 50, 4, 0, Math.PI * 2); rCtx.fill();
             rCtx.strokeStyle = "#48bb78"; rCtx.lineWidth = 2; rCtx.beginPath(); rCtx.moveTo(50, 50); rCtx.lineTo(50, 38); rCtx.stroke();
@@ -222,8 +209,7 @@
             if(!lastCalledTime) { lastCalledTime = performance.now(); fps = 0; } 
             else { let delta = (performance.now() - lastCalledTime)/1000; lastCalledTime = performance.now(); fps = Math.round(1/delta); document.getElementById('fps-val').innerText = fps + " FPS"; }
 
-            // Реалистичные цвета: голубое небо и серый пол
-            ctx.fillStyle = step === 7 ? "#cbd5e1" : "#4299e1"; ctx.fillRect(0, 0, canvas.width, canvas.height / 2);
+            ctx.fillStyle = step === 6 ? "#cbd5e1" : "#4299e1"; ctx.fillRect(0, 0, canvas.width, canvas.height / 2);
             ctx.fillStyle = "#2d3748"; ctx.fillRect(0, canvas.height / 2, canvas.width, canvas.height / 2);
 
             for (let i = 0; i < numRays; i++) {
@@ -246,19 +232,14 @@
                     else ctx.strokeStyle = `rgba(56, 189, 248, ${1 - distance/10})`; 
                 } else {
                     let wallColor = Math.floor(180 * (1 - distance/12));
-                    if (step === 7) ctx.strokeStyle = `rgb(${wallColor + 60}, ${wallColor + 60}, ${wallColor + 70})`; // Исландия (Лед)
-                    else ctx.strokeStyle = `rgb(${wallColor + 20}, ${wallColor + 20}, ${wallColor + 25})`; // Реалистичные серые стены зданий
+                    ctx.strokeStyle = step === 6 ? `rgb(${wallColor + 60}, ${wallColor + 60}, ${wallColor + 70})` : `rgb(${wallColor + 20}, ${wallColor + 20}, ${wallColor + 25})`;
                 }
                 ctx.beginPath(); ctx.moveTo(i, (canvas.height - wallHeight) / 2); ctx.lineTo(i, (canvas.height + wallHeight) / 2); ctx.stroke();
-                
-                // РИСУЕМ ФАНТОМНЫХ ЛЮДЕЙ ПРЯМО НА 3D ЭКРАНЕ ПРИ КРИЗИСЕ РАЗУМА
-                if (isHallucinating && i === 160) { // Центр экрана
-                    let testX = Math.floor(px + eyeX * distance);
-                    let testY = Math.floor(py + eyeY * distance);
-                    if (testX === phantomX && testY === phantomY) {
-                        ctx.fillStyle = "rgba(255,255,255,0.7)";
-                        ctx.fillRect(145, (canvas.height - wallHeight)/2, 30, wallHeight); // Призрачный белый силуэт человека
-                    }
+
+                // РЕНДЕРИНГ ГАЛЛЮЦИНАЦИЙ И ПРИЗРАКОВ МОШЕННИКОВ ПРЯМО НА УЛИЦАХ
+                if (isHallucinating && i % 40 === 0 && distance > 3 && distance < 8) {
+                    ctx.fillStyle = "rgba(255, 0, 50, 0.15)";
+                    ctx.fillRect(i - 10, (canvas.height - wallHeight)/2, 20, wallHeight);
                 }
             }
             drawGtaRadar(); 
@@ -266,13 +247,13 @@
                 if (step === 1) startRoadToAirport();
                 else if (step === 2) startPortugalCity();
                 else if (step === 3) startHackerWork();
-                else if (step === 5) startTokyoExplosion();
-                else if (step === 7) startIcelandFinal();
+                else if (step === 5) startIcelandStage();
+                else if (step === 6) startFinalBattle();
             }
         }
 
         function movePlayer(dir) {
-            if (step === 4 || step === 6 || step === 8 || step === 9) return; let moveSpeed = 0.22, rotSpeed = 0.16;
+            if (step === 4 || step === 7 || step === 8) return; let moveSpeed = 0.22, rotSpeed = 0.16;
             if (dir === 'w') {
                 let nx = px + Math.cos(pa) * moveSpeed, ny = py + Math.sin(pa) * moveSpeed;
                 if (map[Math.floor(py)][Math.floor(nx)] !== 1) px = nx; if (map[Math.floor(ny)][Math.floor(px)] !== 1) py = ny; playBeep(140, 0.02);
@@ -297,13 +278,13 @@
             step = 2; px = 1.5; py = 10.5; pa = 0.0;
             map = [
                 [1,1,1,1,1,1,1,1,1,1,1,1],
-                [1,0,0,0,0,0,0,0,0,0,2,1], // Аэропорт (2) в конце длинной дороги
+                [1,0,0,0,0,0,0,0,0,0,2,1], // 2 - Оранжевый Аэропорт
                 [1,0,1,1,1,1,1,1,1,1,1,1],
                 [1,0,1,1,1,1,1,1,1,1,1,1],
-                [1,0,1,1,1,1,1,1,1,1,1,1],
-                [1,0,1,1,1,1,1,1,1,1,1,1],
-                [1,0,1,1,1,1,1,1,1,1,1,1],
-                [1,0,1,1,1,1,1,1,1,1,1,1],
+                [1,0,0,0,0,0,0,0,0,0,0,1],
+                [1,1,1,1,1,1,1,1,1,1,0,1],
+                [1,1,1,1,1,1,1,1,1,1,0,1],
+                [1,0,0,0,0,0,0,0,0,0,0,1],
                 [1,0,1,1,1,1,1,1,1,1,1,1],
                 [1,0,1,1,1,1,1,1,1,1,1,1],
                 [1,0,0,0,0,0,0,0,0,0,0,1],
@@ -313,8 +294,8 @@
             document.getElementById('mission-title').innerText = "=== ЭТАП 2: ДОРОГА В АЭРОПОРТ (США) ===";
             document.getElementById('loc-val').innerText = "Улицы Остина (США)";
             document.getElementById('target-val').innerText = "Идти до Оранжевого Аэропорта";
-            document.getElementById('instruction-text').innerText = "[ДИРЕКТИВА]: Выходи на длинную улицу города и двигайся к зданию Аэропорта (Оранжевая точка на радаре).";
-            printLog(">> Выход из жилой зоны. Твоя цель — международный терминал.");
+            document.getElementById('instruction-text').innerText = "[ДИРЕКТИВА]: Двигайся вперед по дорогам города к Аэропорту (Оранжевый маркер).";
+            printLog(">> Выход во внешний город выполнен. Ноутбук в рюкзаке. Двигайся вперед.");
             render3D();
         }
 
@@ -322,24 +303,24 @@
             step = 3; px = 1.5; py = 1.5; pa = 0.5;
             map = [
                 [1,1,1,1,1,1,1,1,1,1,1,1],
-                [1,0,0,0,1,0,0,0,1,0,0,1],
-                [1,0,1,0,1,0,1,0,1,0,1,1],
+                [1,0,0,0,1,0,0,0,0,0,0,1],
+                [1,0,1,0,1,0,1,1,1,1,0,1],
                 [1,0,1,0,0,0,1,0,0,0,0,1],
-                [1,0,1,1,1,1,1,1,1,1,0,1],
-                [1,0,0,0,0,0,0,0,0,1,0,1],
-                [1,1,1,1,1,1,1,1,0,1,0,1],
-                [1,0,0,0,0,0,0,1,0,1,0,1],
-                [1,0,1,1,1,1,0,1,0,1,0,1],
-                [1,0,1,0,0,1,0,1,0,0,0,1],
-                [1,0,0,0,0,1,0,0,0,1,2,1], // Хакерский дом (2)
+                [1,0,1,1,1,1,1,0,1,1,1,1],
+                [1,0,0,0,0,0,0,0,1,0,0,1],
+                [1,1,1,1,1,1,1,0,1,0,1,1],
+                [1,0,0,0,0,0,1,0,1,0,0,1],
+                [1,0,1,1,1,0,1,0,1,1,0,1],
+                [1,0,1,0,0,0,1,0,0,0,0,1],
+                [1,0,1,0,1,1,1,1,1,1,2,1], // 2 - Синий хакерский дом
                 [1,1,1,1,1,1,1,1,1,1,1,1]
             ];
             playBeep(523, 0.1);
             document.getElementById('mission-title').innerText = "=== ЭТАП 3: ГОРОД ЛИССАБОН (ПОРТУГАЛИЯ) ===";
             document.getElementById('loc-val').innerText = "Лиссабон (Португалия)";
             document.getElementById('target-val').innerText = "Найти Синий Хакерский Дом";
-            document.getElementById('instruction-text').innerText = "[ДИРЕКТИВА]: Перелет завершен! Ты в Португалии. Найди Синий Хакерский Дом на радаре.";
-            printLog("<br>✈️ Рейс США-Португалия завершен. Найди штаб европейских кодеров.");
+            document.getElementById('instruction-text').innerText = "[ДИРЕКТИВА]: Перелет завершен. Найди синий маркер Хакерского Дома на радаре.";
+            printLog("<br>✈️ Ты в Европе. Исследуй улицы и найди штаб-квартиру кодеров.");
             render3D();
         }
 
@@ -352,17 +333,31 @@
 
             document.getElementById('mission-title').innerText = "=== ЭТАП 4: СЕТЕВАЯ ОПЕРАЦИЯ ===";
             document.getElementById('target-val').innerText = "Ликвидация фишинговой угрозы";
-            document.getElementById('instruction-text').innerText = "[ДИРЕКТИВА]: Подключение активно. Запусти хакерскую атаку на сервера мошенников.";
+            document.getElementById('instruction-text').innerText = "[ДИРЕКТИВА]: Подключение активно. Проведи кибератаку на сеть мошенников.";
             
-            printLog("<br>🖥️ Ты внутри виллы. Начислена зарплата: <span style='color: #0cf;'>$150/сек</span>! Ликвидируй фишинговые сайты мошенников.", "#3182ce");
-            printLog("Выбери метод атаки:<br>1 - Изолировать сеть скамеров (+40 взломов)<br>2 - Перехват ядра и возврат денег людям (+110 взломов)", "#ffff00");
+            printLog("<br>🖥️ Ты вошел в сеть виллы. Начислена зарплата: <span style='color: #0cf;'>$150/сек</span>! Скамеры пытаются взломать банк.", "#3182ce");
+            printLog("Выбери метод атаки:<br>1 - Изолировать сеть скамеров (+40 взломов)<br>2 - Перехватить управление и вернуть деньги людям (+110 взломов)", "#ffff00");
             
             document.getElementById('user-input').disabled = false; document.getElementById('submit-btn').disabled = false;
             document.getElementById('user-input').placeholder = "Введи 1 или 2...";
         }
 
-        // МИССИЯ ПОДРЫВА В ТОКИО
         function startTokyoStage() {
             step = 5; salary = 500; 
             document.getElementById('salary-val').innerText = salary;
-            canvas.style.display = "block"; radarCanvas.style.display =
+            canvas.style.display = "block"; radarCanvas.style.display = "block";
+            document.getElementById('user-input').disabled = true; document.getElementById('submit-btn').disabled = true;
+            document.getElementById('user-input').placeholder = "Поиск вышки в Токио...";
+
+            px = 1.5; py = 1.5; pa = 0.0;
+            map = [
+                [1,1,1,1,1,1,1,1,1,1,1,1],
+                [1,0,0,0,0,0,0,1,0,0,0,1],
+                [1,0,1,1,1,1,0,1,0,1,0,1],
+                [1,0,1,0,0,1,0,1,0,1,0,1],
+                [1,0,1,0,1,1,0,1,0,1,0,1],
+                [1,0,0,0,1,0,0,0,0,1,0,1],
+                [1,1,1,0,1,1,1,1,1,1,0,1],
+                [1,0,0,0,0,0,0,0,0,1,0,1],
+                [1,0,1,1,1,1,1,1,0,1,0,1],
+                [1,0,1,0,0,0,0,1,0,0,0,1
