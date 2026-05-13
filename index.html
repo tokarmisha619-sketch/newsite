@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width,initial-scale=1.0">
-    <title>HAKCLIKER 3.1: WATER COOLING UPDATE</title>
+    <title>HACLER CLICKER 3.1: REALISTIC TEMP UPDATE</title>
     <style>
         body{font-family:monospace;background:#000;color:#0f0;margin:0;padding:10px;overflow:hidden;touch-action:none}
         #matrix-canvas{position:fixed;top:0;left:0;width:100%;height:100%;z-index:-1;opacity:0.2}
@@ -30,10 +30,11 @@
     <div id="admin-modal">
         <div id="admin-header">✋ ADMIN CONTROL</div>
         <div class="admin-body">
-            <!-- СЕКРЕТНАЯ ВОДЯНКА -->
-            <button onclick="getCoolerAdmin('HACKER AQUA', 50000)" style="background:linear-gradient(45deg,#00ffff,#0055ff); color:#fff; font-size:0.8em; border:2px solid #fff; box-shadow: 0 0 10px #00ffff;">🌊 HACKER AQUA (-50K°C/s)</button>
-            <button onclick="getCoolerAdmin('HACKER 111', 1000)" style="background:#00ffff; color:#000;">❄️ HACKER 111 (-1K°C/s)</button>
-            <button onclick="getProcessorAdmin('HACKER 132F', 5000)" style="background:linear-gradient(45deg,#ff3300,#ff9900); color:#fff;">⚡ HACKER 132F (+5K EN/s)</button>
+            <!-- ЖЕЛЕЗО ОТ HACLER В АДМИНКЕ -->
+            <button onclick="getProcessorAdmin('hacler ULTRA PRO', 100000)" style="background:linear-gradient(45deg,#ff0055,#ffcc00); color:#fff; font-size:0.8em; border:2px solid #fff;">👑 hacler ULTRA PRO (+100K EN/s)</button>
+            <button onclick="getProcessorAdmin('hacler 132F', 5000)" style="background:linear-gradient(45deg,#ff3300,#ff9900); color:#fff;">⚡ hacler 132F (+5K EN/s)</button>
+            <button onclick="getCoolerAdmin('hacler AQUA', 250)" style="background:linear-gradient(45deg,#00ffff,#0055ff); color:#fff;">🌊 hacler AQUA (-250°C/s)</button>
+            <button onclick="getCoolerAdmin('hacler 111', 25)" style="background:#00ffff; color:#000;">❄️ hacler 111 (-25°C/s)</button>
             <hr>
             <button onclick="getRTX(6000, 50)" style="background:#fc0">🔥 RTX 6000</button>
             <button onclick="getRTX(7000, 500)" style="background:#f0f; color:#fff">🌌 RTX 7000</button>
@@ -45,14 +46,14 @@
             <hr>
             <button onclick="isGold=true; saveGame(); updateUI(); playBuySound();" style="background:#ffcc00">👑 GOLD NAME</button>
             <button onclick="score += 1e12; saveGame(); updateUI(); playBuySound();" style="background:#0f0">💰 +1B XP</button>
-            <button onclick="fullReset()" style="background:#f0f0; color:#fff">🗑️ СБРОС (RESET)</button>
+            <button onclick="fullReset()" style="background:#f00; color:#fff">🗑️ СБРОС (RESET)</button>
             <button onclick="document.getElementById('admin-modal').style.display='none'">CLOSE</button>
         </div>
     </div>
 
     <div id="login-overlay" style="position:fixed; top:0; left:0; width:100%; height:100%; background:#000; z-index:2000; display:flex; align-items:center; justify-content:center">
         <div class="box" style="width:250px; background:#000;">
-            <h2>HAKCLIKER OS</h2>
+            <h2>HACLER OS v3.1</h2>
             <input type="text" id="user-login" placeholder="LOGIN...">
             <button onclick="confirmAccess()">START</button>
         </div>
@@ -71,12 +72,15 @@
         </div>
 
         <div style="display:grid; grid-template-columns: 1fr 1fr; gap:10px;">
-            <div class="box" style="border-color: #f0f;">
+            <div class="box" style="border-color: #f0f; height: 320px; overflow-y: auto;">
                 <h3>🛒 МАГАЗИН</h3>
                 <button onclick="buyCase()" style="background:#f0f; color:#fff">🌈 КЕЙС RTX (10K)</button>
                 <button onclick="buyAntenna()" style="background:#0080ff; color:#fff">📡 АНТЕННА (1M)</button>
-                <button onclick="buyProcessor()" style="background:#ff5500; color:#fff">⚙️ ПРОЦЕССОР (100K) <br><span style="font-size:0.7em;">[+5 EN/s | +1.5°C/s]</span></button>
-                <button onclick="buyCooler()" style="background:#00aaff; color:#000">❄️ КУЛЕР (50K) <br><span style="font-size:0.7em;">[-1.0°C/s]</span></button>
+                <button onclick="buyCooler()" style="background:#00aaff; color:#000">❄️ КУЛЕР (50K) <br><span style="font-size:0.7em;">[Охлаждение системы]</span></button>
+                <hr style="border: 1px dashed #f0f;">
+                <!-- ПРОЦЕССОРЫ ОТ HACLER В МАГАЗИНЕ -->
+                <button onclick="buyCPU('i5', 500000, 25)" style="background:#ff6600; color:#fff">⚙️ hacler i5 (500K) <br><span style="font-size:0.7em;">[+25 EN/s]</span></button>
+                <button onclick="buyCPU('i9', 2000000, 150)" style="background:#ff3300; color:#fff">🔥 hacler i9 (2M) <br><span style="font-size:0.7em;">[+150 EN/s]</span></button>
             </div>
             <div class="box" style="border-color: #0cf;">
                 <h3>📤 ПЕРЕВОД</h3>
@@ -199,17 +203,22 @@
             setInterval(() => { 
                 energy += (energyPerSec / 10);
                 
-                let heatingRate = (energyPerSec * 0.3) + (baseAutoP > 0 ? 0.5 : 0);
-                let tempChange = heatingRate - coolingPower;
+                let targetTemp = 30 + (energyPerSec * 1.2) + (baseAutoP > 0 ? 5 : 0);
+                targetTemp = Math.max(30, targetTemp - (coolingPower * 2)); 
                 
-                temperature += (tempChange / 10);
-                if (temperature < 20 && coolingPower < 500) temperature = 20;
+                let diff = targetTemp - temperature;
+                temperature += (diff * 0.02); 
 
-                let isOverheated = temperature >= 100;
-                let currentMultiplier = isOverheated ? 0 : (1 + (energy / 100));
-                let finalAutoIncome = baseAutoP * currentMultiplier;
+                if (temperature < 20 && coolingPower < 100) temperature = 20;
+
+                let isThrottling = temperature >= 90;
+                let currentMultiplier = 1 + (energy / 100);
                 
+                if (isThrottling) currentMultiplier *= 0.3; 
+                
+                let finalAutoIncome = baseAutoP * currentMultiplier;
                 score += finalAutoIncome / 10; 
+                
                 updateBots(); 
                 updateUI(); 
             }, 100);
@@ -219,27 +228,34 @@
         }
 
         function updateUI() {
-            let isOverheated = temperature >= 100;
-            let currentMultiplier = isOverheated ? 0 : (1 + (energy / 100));
+            let isThrottling = temperature >= 90;
+            let currentMultiplier = 1 + (energy / 100);
+            if (isThrottling) currentMultiplier *= 0.3;
             let finalAutoIncome = baseAutoP * currentMultiplier;
 
             document.getElementById('score-text').innerText = Math.floor(score).toLocaleString();
             document.getElementById('auto-val').innerText = Math.floor(finalAutoIncome).toLocaleString();
             document.getElementById('energy-val').innerText = Math.floor(energy).toLocaleString();
             document.getElementById('energy-per-sec').innerText = energyPerSec.toLocaleString();
-            document.getElementById('multiplier-val').innerText = isOverheated ? "0.0 (ПЕРЕГРЕВ!)" : currentMultiplier.toFixed(1);
+            
+            let multText = (1 + (energy / 100)).toFixed(1);
+            document.getElementById('multiplier-val').innerText = isThrottling ? `${multText} (🔥 ТРОТТЛИНГ -70%!)` : multText;
             
             let tempElement = document.getElementById('temp-display');
             document.getElementById('temp-val').innerText = Math.floor(temperature);
-            if (isOverheated) {
+            
+            if (temperature >= 90) {
                 tempElement.style.color = '#ff0000';
-                tempElement.innerText = `🚨 СИСТЕМА ПЕРЕГРЕТА! (${Math.floor(temperature)}°C) ЖДИТЕ ОХЛАЖДЕНИЯ!`;
-            } else if (temperature > 75) {
+                tempElement.innerHTML = `🚨 КРИТИЧЕСКИЙ ПЕРЕГРЕВ! (${Math.floor(temperature)}°C) ПРОЦЕССОР СБРОСИЛ ЧАСТОТУ!`;
+            } else if (temperature > 65) {
                 tempElement.style.color = '#ffaa00';
-                tempElement.innerHTML = `⚠️ КРИТИЧЕСКИЙ НАГРЕВ: <span id="temp-val">${Math.floor(temperature)}</span>°C`;
+                tempElement.innerHTML = `⚠️ ВЫСОКАЯ НАГРУЗКА: <span id="temp-val">${Math.floor(temperature)}</span>°C`;
+            } else if (temperature > 45) {
+                tempElement.style.color = '#ffff00';
+                tempElement.innerHTML = `⚙️ РАБОЧАЯ ТЕМПЕРАТУРА: <span id="temp-val">${Math.floor(temperature)}</span>°C`;
             } else {
                 tempElement.style.color = '#0f0';
-                tempElement.innerHTML = `🌡️ ТЕМПЕРАТУРА: <span id="temp-val">${Math.floor(temperature)}</span>°C`;
+                tempElement.innerHTML = `🌡️ СИСТЕМА ОХЛАЖДЕНА: <span id="temp-val">${Math.floor(temperature)}</span>°C`;
             }
 
             let nameSpan = document.getElementById('display-name');
@@ -310,25 +326,26 @@
             }
         }
 
-        function buyProcessor() {
-            if (score >= 100000) {
-                score -= 100000;
-                energyPerSec += 5; 
+        // ПОКУПКА ПРОЦЕССОРОВ С ИСПРАВЛЕННЫМ НАЗВАНИЕМ БРЕНДА
+        function buyCPU(model, price, reward) {
+            if (score >= price) {
+                score -= price;
+                energyPerSec += reward;
                 playBuySound();
-                alert('⚙️ Процессор запущен! Мощность выросла, но увеличился нагрев!');
+                alert(`⚙️ Установлен процессор hacler ${model}! Генерация энергии выросла на +${reward} EN/sec!`);
                 updateUI();
             } else {
                 playErrorSound();
-                alert('Не хватает XP! Нужно 100,000 XP.');
+                alert(`Не хватает XP! Нужно ${price.toLocaleString()} XP.`);
             }
         }
 
         function buyCooler() {
             if (score >= 50000) {
                 score -= 50000;
-                coolingPower += 1.0; 
+                coolingPower += 2.0; 
                 playBuySound();
-                alert('❄️ Кулер установлен! Система охлаждается эффективнее.');
+                alert('❄️ Кулер установлен! Температура начинает плавно снижаться.');
                 updateUI();
             } else {
                 playErrorSound();
@@ -379,7 +396,7 @@
         function getCoolerAdmin(model, reward) {
             coolingPower += reward;
             playBuySound();
-            alert(`❄️ Ледяной щит активирован! Запущен кулер ${model}! Система охлаждается со скоростью -${reward.toLocaleString()}°C/s!`);
+            alert(`❄️ Ледяной щит активирован! Запущен кулер ${model}!`);
             saveGame();
             updateUI();
         }
