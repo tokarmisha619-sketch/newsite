@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width,initial-scale=1.0,user-scalable=no">
-    <title>⚽ MISHA VIPERSKY №5: PRO DRIBBING</title>
+    <title>⚽ MISHA VIPERSKY №5: MOBILE STRIKER</title>
     <style>
         body { font-family: monospace; background: #1a202c; color: #fff; margin: 0; padding: 10px; display: flex; flex-direction: column; align-items: center; overflow: hidden; touch-action: none; -webkit-user-select: none; user-select: none; }
         .menu-bar { display: flex; gap: 15px; margin-bottom: 10px; z-index: 10; }
@@ -15,9 +15,13 @@
         #goal-banner { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%) scale(0); background: rgba(0,0,0,0.85); color: #ecc94b; border: 3px solid #ecc94b; padding: 20px 40px; font-size: 3em; font-weight: bold; border-radius: 10px; text-shadow: 0 0 10px #ecc94b; transition: transform 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275); pointer-events: none; z-index: 100; text-align: center; }
         .active-goal { transform: translate(-50%, -50%) scale(1) !important; }
         
-        /* Стили мобильного джойстика */
-        #joystick-zone { position: fixed; bottom: 20px; left: 20px; width: 110px; height: 110px; background: rgba(255,255,255,0.15); border: 3px solid rgba(255,255,255,0.4); border-radius: 50%; z-index: 1000; display: flex; align-items: center; justify-content: center; }
-        #joystick-stick { width: 45px; height: 45px; background: rgba(255,255,255,0.8); border-radius: 50%; box-shadow: 0 4px 10px rgba(0,0,0,0.4); }
+        /* Мобильный джойстик (слева) */
+        #joystick-zone { position: fixed; bottom: 30px; left: 30px; width: 110px; height: 110px; background: rgba(255,255,255,0.15); border: 3px solid rgba(255,255,255,0.4); border-radius: 50%; z-index: 1000; display: flex; align-items: center; justify-content: center; }
+        #joystick-stick { width: 45px; height: 45px; background: rgba(255,255,255,0.85); border-radius: 50%; box-shadow: 0 4px 10px rgba(0,0,0,0.4); pointer-events: none; }
+
+        /* Кнопка удара (справа) */
+        #kick-btn { position: fixed; bottom: 35px; right: 35px; width: 85px; height: 85px; background: #e53e3e; border: 4px solid #fff; border-radius: 50%; z-index: 1000; display: flex; align-items: center; justify-content: center; font-family: monospace; font-weight: bold; font-size: 1.1em; color: #fff; box-shadow: 0 6px 12px rgba(0,0,0,0.4); text-shadow: 1px 1px 2px #000; cursor: pointer; transition: transform 0.05s; }
+        #kick-btn:active { transform: scale(0.9); background: #c53030; }
     </style>
 </head>
 <body>
@@ -41,13 +45,14 @@
         <div id="goal-banner">ГООООЛ! ⚽🔥</div>
     </div>
 
-    <!-- СЕНСОРНЫЙ ДЖОЙСТИК -->
+    <!-- ИНТЕРФЕЙС ДЛЯ СМАРТФОНОВ -->
     <div id="joystick-zone">
         <div id="joystick-stick"></div>
     </div>
+    <div id="kick-btn">УДАР</div>
 
     <p style="color: #a0aec0; margin-top: 10px; font-size: 0.85em; text-align: center; padding: 0 10px;">
-        Ошибки исправлены! Тренировка работает, веди мяч и забивай голы медленному вратарю.
+        На телефоне: бегай джойстиком слева, бей кнопкой справа. На ПК: для удара жми Пробел (Space)!
     </p>
 
     <script>
@@ -56,6 +61,7 @@
         const goalBanner = document.getElementById('goal-banner');
         const stick = document.getElementById('joystick-stick');
         const joystickZone = document.getElementById('joystick-zone');
+        const kickBtn = document.getElementById('kick-btn');
 
         let currentGameMode = 'match'; 
         let myGoals = 0;
@@ -134,8 +140,12 @@
                     this.targetX = this.x;
                     this.targetY = this.y;
                 } else {
-                    this.x += (this.targetX - this.x) * 0.15;
-                    this.y += (this.targetY - this.y) * 0.15;
+                    let mDx = this.targetX - this.x;
+                    let mDy = this.targetY - this.y;
+                    if (Math.sqrt(mDx*mDx + mDy*mDy) > 2) {
+                        this.x += mDx * 0.15;
+                        this.y += mDy * 0.15;
+                    }
                 }
 
                 this.x = Math.max(this.radius, Math.min(canvas.width - this.radius, this.x));
@@ -148,22 +158,39 @@
                 let dx = ball.x - this.x, dy = ball.y - this.y;
                 let dist = Math.sqrt(dx*dx + dy*dy);
                 
-                if (dist < this.radius + ball.radius + 3) {
+                if (dist < this.radius + ball.radius + 4) {
                     let angle = Math.atan2(dy, dx);
-                    let isMoving = Math.abs(this.moveVx) > 0.2 || Math.abs(this.moveVy) > 0.2;
+                    let playerSpeed = Math.sqrt(this.moveVx * this.moveVx + this.moveVy * this.moveVy);
                     
-                    if (isMoving) {
+                    if (playerSpeed < 0.25) {
+                        ball.x = this.x + Math.cos(angle) * (this.radius + ball.radius);
+                        ball.y = this.y + Math.sin(angle) * (this.radius + ball.radius);
+                        ball.vx = 0; ball.vy = 0;
+                    } else {
                         ball.x = this.x + Math.cos(angle) * (this.radius + ball.radius - 1);
                         ball.y = this.y + Math.sin(angle) * (this.radius + ball.radius - 1);
                         ball.vx = this.moveVx * 1.05;
                         ball.vy = this.moveVy * 1.05;
-                    } else {
-                        ball.vx = Math.cos(angle) * 9.5;
-                        ball.vy = Math.sin(angle) * 9.5;
-                        playSound(450, 0.08, 'triangle');
                     }
                 }
             }
+            
+            // ФУНКЦИЯ КНОПКИ БУЦАНИЯ
+            kick() {
+                if (isLock) return;
+                let dx = ball.x - this.x, dy = ball.y - this.y;
+                let dist = Math.sqrt(dx*dx + dy*dy);
+                
+                // Буцать можно, если мяч находится близко к тебе (в радиусе контроля)
+                if (dist < this.radius + ball.radius + 15) {
+                    let angle = Math.atan2(dy, dx);
+                    // Мощный удар в направлении от игрока к мячу
+                    ball.vx = Math.cos(angle) * 14.0; 
+                    ball.vy = Math.sin(angle) * 14.0;
+                    playSound(550, 0.12, 'triangle');
+                }
+            }
+            
             draw() {
                 ctx.save(); ctx.beginPath(); ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2);
                 ctx.fillStyle = "#1e3a8a"; ctx.fill(); ctx.strokeStyle = "#ecc94b"; ctx.lineWidth = 3; ctx.stroke();
@@ -246,8 +273,10 @@
             new AIBot(460, 340, false, "11", 2.3, 'att')
         ];
 
+        // ОБРАБОТКА ДЖОЙСТИКА
         function handleJoystick(e) {
             e.preventDefault();
+            if (!e.touches || e.touches.length === 0) return;
             const touch = e.touches[0];
             const rect = joystickZone.getBoundingClientRect();
             const centerX = rect.left + rect.width / 2;
@@ -256,12 +285,11 @@
             let deltaX = touch.clientX - centerX;
             let deltaY = touch.clientY - centerY;
             let distance = Math.sqrt(deltaX * deltaX + deltaY * deltaY);
-            const maxDistance = 40;
+            const maxDistance = 45;
 
             if (distance > maxDistance) {
                 deltaX = (deltaX / distance) * maxDistance;
                 deltaY = (deltaY / distance) * maxDistance;
-                distance = maxDistance;
             }
 
             stick.style.transform = `translate(${deltaX}px, ${deltaY}px)`;
@@ -272,9 +300,23 @@
 
         joystickZone.addEventListener('touchstart', handleJoystick);
         joystickZone.addEventListener('touchmove', handleJoystick);
-        joystickZone.addEventListener('touchend', (e) => {
+        joystickZone.addEventListener('touchend', () => {
             stick.style.transform = 'translate(0px, 0px)';
             joyX = 0; joyY = 0; isTouching = false;
+        });
+
+        // СЛУШАТЕЛЬ НАЖАТИЯ НА КНОПКУ УДАРА (Для смартфонов)
+        kickBtn.addEventListener('touchstart', (e) => {
+            e.preventDefault();
+            player.kick();
+        });
+
+        // СЛУШАТЕЛЬ ДЛЯ ПК (Пробел выполняет удар)
+        window.addEventListener('keydown', (e) => {
+            if (e.code === 'Space') {
+                e.preventDefault();
+                player.kick();
+            }
         });
 
         document.getElementById('field-container').addEventListener('mousemove', (e) => {
@@ -319,9 +361,8 @@
             ball.update(); ball.draw();
             player.update(); player.draw();
 
-            // ИСПРАВЛЕНО: Теперь в режиме тренировки вратарь соперника (enemies[0]) создается правильно без ошибок в коде
             let activeTeammates = (currentGameMode === 'match') ? teammates : [];
-            let activeEnemies = (currentGameMode === 'match') ? enemies : [enemies[0]];
+            let activeEnemies = (currentGameMode === 'match') ? enemies : [enemies];
 
             let allList = [player, ...activeTeammates, ...activeEnemies];
 
