@@ -17,7 +17,7 @@
         
         /* Стили мобильного джойстика */
         #joystick-zone { position: fixed; bottom: 20px; left: 20px; width: 110px; height: 110px; background: rgba(255,255,255,0.15); border: 3px solid rgba(255,255,255,0.4); border-radius: 50%; z-index: 1000; display: flex; align-items: center; justify-content: center; }
-        #joystick-stick { width: 45px; height: 45px; background: rgba(255,255,255,0.8); border-radius: 50%; box-shadow: 0 4px 10px rgba(0,0,0,0.4); transition: transform 0.05s linear; }
+        #joystick-stick { width: 45px; height: 45px; background: rgba(255,255,255,0.8); border-radius: 50%; box-shadow: 0 4px 10px rgba(0,0,0,0.4); }
     </style>
 </head>
 <body>
@@ -47,7 +47,7 @@
     </div>
 
     <p style="color: #a0aec0; margin-top: 10px; font-size: 0.85em; text-align: center; padding: 0 10px;">
-        Система дриблинга FIFA: мяч мягко магнитится к ногам при ведении. Обыграй ИИ на технике!
+        Ошибки исправлены! Тренировка работает, веди мяч и забивай голы медленному вратарю.
     </p>
 
     <script>
@@ -141,7 +141,6 @@
                 this.x = Math.max(this.radius, Math.min(canvas.width - this.radius, this.x));
                 this.y = Math.max(this.radius, Math.min(canvas.height - this.radius, this.y));
 
-                // Считаем текущую скорость игрока для дриблинга
                 this.moveVx = this.x - oldX;
                 this.moveVy = this.y - oldY;
 
@@ -149,19 +148,16 @@
                 let dx = ball.x - this.x, dy = ball.y - this.y;
                 let dist = Math.sqrt(dx*dx + dy*dy);
                 
-                // ЭФФЕКТ КОНТРОЛЯ МЯЧА (FIFA DRIBBILING)
                 if (dist < this.radius + ball.radius + 3) {
                     let angle = Math.atan2(dy, dx);
                     let isMoving = Math.abs(this.moveVx) > 0.2 || Math.abs(this.moveVy) > 0.2;
                     
                     if (isMoving) {
-                        // Если игрок плавно идет, мяч мягко магнитится перед ним
                         ball.x = this.x + Math.cos(angle) * (this.radius + ball.radius - 1);
                         ball.y = this.y + Math.sin(angle) * (this.radius + ball.radius - 1);
                         ball.vx = this.moveVx * 1.05;
                         ball.vy = this.moveVy * 1.05;
                     } else {
-                        // Если игрок бьет с разбега или натыкается на месте — мяч летит вперед
                         ball.vx = Math.cos(angle) * 9.5;
                         ball.vy = Math.sin(angle) * 9.5;
                         playSound(450, 0.08, 'triangle');
@@ -252,7 +248,7 @@
 
         function handleJoystick(e) {
             e.preventDefault();
-            const touch = e.touches;
+            const touch = e.touches[0];
             const rect = joystickZone.getBoundingClientRect();
             const centerX = rect.left + rect.width / 2;
             const centerY = rect.top + rect.height / 2;
@@ -323,8 +319,9 @@
             ball.update(); ball.draw();
             player.update(); player.draw();
 
+            // ИСПРАВЛЕНО: Теперь в режиме тренировки вратарь соперника (enemies[0]) создается правильно без ошибок в коде
             let activeTeammates = (currentGameMode === 'match') ? teammates : [];
-            let activeEnemies = (currentGameMode === 'match') ? enemies : [enemies];
+            let activeEnemies = (currentGameMode === 'match') ? enemies : [enemies[0]];
 
             let allList = [player, ...activeTeammates, ...activeEnemies];
 
