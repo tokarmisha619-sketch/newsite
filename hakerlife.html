@@ -2,19 +2,22 @@
 <html>
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width,initial-scale=1.0">
-    <title>⚽ MISHA VIPERSKY №5: PRO FOOTBALL</title>
+    <meta name="viewport" content="width=device-width,initial-scale=1.0,user-scalable=no">
+    <title>⚽ MISHA VIPERSKY №5: PRO DRIBBING</title>
     <style>
-        body { font-family: monospace; background: #1a202c; color: #fff; margin: 0; padding: 10px; display: flex; flex-direction: column; align-items: center; overflow: hidden; touch-action: none; }
-        .menu-bar { display: flex; gap: 15px; margin-bottom: 10px; }
-        .mode-btn { background: #4a5568; color: #fff; border: 2px solid #718096; padding: 8px 16px; border-radius: 6px; cursor: pointer; font-family: monospace; font-weight: bold; transition: all 0.2s; }
+        body { font-family: monospace; background: #1a202c; color: #fff; margin: 0; padding: 10px; display: flex; flex-direction: column; align-items: center; overflow: hidden; touch-action: none; -webkit-user-select: none; user-select: none; }
+        .menu-bar { display: flex; gap: 15px; margin-bottom: 10px; z-index: 10; }
+        .mode-btn { background: #4a5568; color: #fff; border: 2px solid #718096; padding: 8px 16px; border-radius: 6px; cursor: pointer; font-family: monospace; font-weight: bold; transition: all 0.2s; font-size: 0.9em; }
         .mode-btn.active { background: #3182ce; border-color: #63b3ed; box-shadow: 0 0 10px rgba(99,179,237,0.6); }
-        .mode-btn:hover { background: #2b6cb0; }
-        .score-board { display: flex; gap: 30px; background: #2d3748; padding: 10px 20px; border: 2px solid #4a5568; border-radius: 8px; margin-bottom: 10px; box-shadow: 0 4px 10px rgba(0,0,0,0.3); font-size: 1.1em; }
-        #field-container { position: relative; width: 800px; height: 450px; background: #38a169; border: 5px solid #fff; border-radius: 4px; box-shadow: 0 6px 20px rgba(0,0,0,0.5); cursor: none; }
-        canvas { width: 100%; height: 100%; }
+        .score-board { display: flex; gap: 30px; background: #2d3748; padding: 10px 20px; border: 2px solid #4a5568; border-radius: 8px; margin-bottom: 10px; box-shadow: 0 4px 10px rgba(0,0,0,0.3); font-size: 1.1em; z-index: 10; }
+        #field-container { position: relative; width: 800px; height: 450px; background: #38a169; border: 5px solid #fff; border-radius: 4px; box-shadow: 0 6px 20px rgba(0,0,0,0.5); }
+        canvas { width: 100%; height: 100%; display: block; }
         #goal-banner { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%) scale(0); background: rgba(0,0,0,0.85); color: #ecc94b; border: 3px solid #ecc94b; padding: 20px 40px; font-size: 3em; font-weight: bold; border-radius: 10px; text-shadow: 0 0 10px #ecc94b; transition: transform 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275); pointer-events: none; z-index: 100; text-align: center; }
         .active-goal { transform: translate(-50%, -50%) scale(1) !important; }
+        
+        /* Стили мобильного джойстика */
+        #joystick-zone { position: fixed; bottom: 20px; left: 20px; width: 110px; height: 110px; background: rgba(255,255,255,0.15); border: 3px solid rgba(255,255,255,0.4); border-radius: 50%; z-index: 1000; display: flex; align-items: center; justify-content: center; }
+        #joystick-stick { width: 45px; height: 45px; background: rgba(255,255,255,0.8); border-radius: 50%; box-shadow: 0 4px 10px rgba(0,0,0,0.4); transition: transform 0.05s linear; }
     </style>
 </head>
 <body>
@@ -22,14 +25,14 @@
     <!-- ВЫБОР РЕЖИМА ИГРЫ -->
     <div class="menu-bar">
         <button id="btn-match" class="mode-btn active" onclick="setGameMode('match')">🏆 МАТЧ 5х5</button>
-        <button id="btn-training" class="mode-btn" onclick="setGameMode('training')">🎯 ТРЕНИРОВКА (1 на 1)</button>
+        <button id="btn-training" class="mode-btn" onclick="setGameMode('training')">🎯 ТРЕНИРОВКА</button>
     </div>
 
     <!-- ТАБЛО СЧЕТА -->
     <div class="score-board">
-        <div>👤 КОМАНДА МИШИ: <span id="my-score" style="color: #48bb78; font-weight: bold;">0</span></div>
+        <div>👤 МЫ: <span id="my-score" style="color: #48bb78; font-weight: bold;">0</span></div>
         <div>🆚 СЧЕТ</div>
-        <div>🤖 СОПЕРНИКИ: <span id="enemy-score" style="color: #e53e3e; font-weight: bold;">0</span></div>
+        <div>🤖 ОНИ: <span id="enemy-score" style="color: #e53e3e; font-weight: bold;">0</span></div>
     </div>
 
     <!-- ИГРОВОЕ ПОЛЕ -->
@@ -38,18 +41,31 @@
         <div id="goal-banner">ГООООЛ! ⚽🔥</div>
     </div>
 
-    <p style="color: #a0aec0; margin-top: 10px; font-size: 0.9em;">Управление: Двигай мышку. В режиме тренировки защитники уходят, тренируй удары против вратаря!</p>
+    <!-- СЕНСОРНЫЙ ДЖОЙСТИК -->
+    <div id="joystick-zone">
+        <div id="joystick-stick"></div>
+    </div>
+
+    <p style="color: #a0aec0; margin-top: 10px; font-size: 0.85em; text-align: center; padding: 0 10px;">
+        Система дриблинга FIFA: мяч мягко магнитится к ногам при ведении. Обыграй ИИ на технике!
+    </p>
 
     <script>
         const canvas = document.getElementById('football-field');
         const ctx = canvas.getContext('2d');
         const goalBanner = document.getElementById('goal-banner');
+        const stick = document.getElementById('joystick-stick');
+        const joystickZone = document.getElementById('joystick-zone');
 
-        let currentGameMode = 'match'; // 'match' или 'training'
+        let currentGameMode = 'match'; 
         let myGoals = 0;
         let enemyGoals = 0;
         let isLock = false; 
         let audioCtx = null;
+
+        let isTouching = false;
+        let joyX = 0;
+        let joyY = 0;
 
         function initAudio() { if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)(); }
         function playSound(freq, duration, type='sine') {
@@ -62,21 +78,15 @@
             } catch(e) {}
         }
 
-        // Переключение режимов
         function setGameMode(mode) {
             currentGameMode = mode;
-            myGoals = 0;
-            enemyGoals = 0;
+            myGoals = 0; enemyGoals = 0;
             document.getElementById('my-score').innerText = 0;
             document.getElementById('enemy-score').innerText = 0;
-            
             document.getElementById('btn-match').classList.toggle('active', mode === 'match');
             document.getElementById('btn-training').classList.toggle('active', mode === 'training');
-            
-            ball.reset(400, 225);
-            player.reset();
-            teammates.forEach(t => t.reset());
-            enemies.forEach(e => e.reset());
+            ball.reset(400, 225); player.reset();
+            teammates.forEach(t => t.reset()); enemies.forEach(e => e.reset());
         }
 
         class Ball {
@@ -113,18 +123,49 @@
         }
 
         class Player {
-            constructor() { this.x = 150; this.y = 225; this.radius = 18; this.targetX = 150; this.targetY = 225; }
+            constructor() { this.x = 150; this.y = 225; this.radius = 18; this.targetX = 150; this.targetY = 225; this.moveVx = 0; this.moveVy = 0; }
             update() {
-                this.x += (this.targetX - this.x) * 0.15; this.y += (this.targetY - this.y) * 0.15;
+                let oldX = this.x;
+                let oldY = this.y;
+
+                if (isTouching) {
+                    this.x += joyX * 4.5;
+                    this.y += joyY * 4.5;
+                    this.targetX = this.x;
+                    this.targetY = this.y;
+                } else {
+                    this.x += (this.targetX - this.x) * 0.15;
+                    this.y += (this.targetY - this.y) * 0.15;
+                }
+
                 this.x = Math.max(this.radius, Math.min(canvas.width - this.radius, this.x));
                 this.y = Math.max(this.radius, Math.min(canvas.height - this.radius, this.y));
 
+                // Считаем текущую скорость игрока для дриблинга
+                this.moveVx = this.x - oldX;
+                this.moveVy = this.y - oldY;
+
                 if (isLock) return;
                 let dx = ball.x - this.x, dy = ball.y - this.y;
-                if (Math.sqrt(dx*dx + dy*dy) < this.radius + ball.radius) {
+                let dist = Math.sqrt(dx*dx + dy*dy);
+                
+                // ЭФФЕКТ КОНТРОЛЯ МЯЧА (FIFA DRIBBILING)
+                if (dist < this.radius + ball.radius + 3) {
                     let angle = Math.atan2(dy, dx);
-                    ball.vx = Math.cos(angle) * 9.5; ball.vy = Math.sin(angle) * 9.5;
-                    playSound(450, 0.08, 'triangle');
+                    let isMoving = Math.abs(this.moveVx) > 0.2 || Math.abs(this.moveVy) > 0.2;
+                    
+                    if (isMoving) {
+                        // Если игрок плавно идет, мяч мягко магнитится перед ним
+                        ball.x = this.x + Math.cos(angle) * (this.radius + ball.radius - 1);
+                        ball.y = this.y + Math.sin(angle) * (this.radius + ball.radius - 1);
+                        ball.vx = this.moveVx * 1.05;
+                        ball.vy = this.moveVy * 1.05;
+                    } else {
+                        // Если игрок бьет с разбега или натыкается на месте — мяч летит вперед
+                        ball.vx = Math.cos(angle) * 9.5;
+                        ball.vy = Math.sin(angle) * 9.5;
+                        playSound(450, 0.08, 'triangle');
+                    }
                 }
             }
             draw() {
@@ -133,7 +174,7 @@
                 ctx.fillStyle = "#ecc94b"; ctx.font = "bold 15px monospace"; ctx.textAlign = "center"; ctx.textBaseline = "middle";
                 ctx.fillText("5", this.x, this.y); ctx.restore();
             }
-            reset() { this.x = 150; this.y = 225; this.targetX = 150; this.targetY = 225; }
+            reset() { this.x = 150; this.y = 225; this.targetX = 150; this.targetY = 225; this.moveVx = 0; this.moveVy = 0; }
         }
 
         class AIBot {
@@ -143,19 +184,14 @@
             }
             update(hasBallFocus, allPlayers) {
                 if (isLock) return;
-                
-                let targetX = this.startX;
-                let targetY = this.startY;
+                let targetX = this.startX, targetY = this.startY;
 
                 if (this.role === 'gk') {
                     let inZone = this.isTeammate ? ball.x < 200 : ball.x > 580;
-                    targetX = this.startX;
-                    targetY = inZone ? ball.y : 225;
-                    if (targetY < 150) targetY = 150;
-                    if (targetY > 300) targetY = 300;
+                    targetX = this.startX; targetY = inZone ? ball.y : 225;
+                    if (targetY < 150) targetY = 150; if (targetY > 300) targetY = 300;
                 } else if (hasBallFocus) {
-                    targetX = ball.x;
-                    targetY = ball.y;
+                    targetX = ball.x; targetY = ball.y;
                 } else {
                     let ballOffset = (ball.x - 400) * 0.3;
                     targetX = this.startX + ballOffset;
@@ -166,18 +202,12 @@
                     if (p === this) return;
                     let pDx = this.x - p.x, pDy = this.y - p.y;
                     let pDist = Math.sqrt(pDx*pDx + pDy*pDy);
-                    if (pDist < 75) {
-                        targetX += (pDx / pDist) * 35;
-                        targetY += (pDy / pDist) * 35;
-                    }
+                    if (pDist < 75) { targetX += (pDx / pDist) * 35; targetY += (pDy / pDist) * 35; }
                 });
 
                 let dx = targetX - this.x, dy = targetY - this.y;
                 let dist = Math.sqrt(dx*dx + dy*dy);
-                if (dist > 5) {
-                    this.x += (dx / dist) * this.speed;
-                    this.y += (dy / dist) * this.speed;
-                }
+                if (dist > 5) { this.x += (dx / dist) * this.speed; this.y += (dy / dist) * this.speed; }
 
                 let bDx = ball.x - this.x, bDy = ball.y - this.y;
                 if (Math.sqrt(bDx*bDx + bDy*bDy) < this.radius + ball.radius) {
@@ -206,21 +236,53 @@
         const player = new Player();
 
         const teammates = [
-            new AIBot(50, 225, true, "1", 2.6, 'gk'),
+            new AIBot(50, 225, true, "1", 1.6, 'gk'),
             new AIBot(220, 225, true, "2", 2.2, 'def'),
             new AIBot(380, 110, true, "4", 2.3, 'att'),
             new AIBot(380, 340, true, "7", 2.3, 'att')
         ];
 
         const enemies = [
-            new AIBot(750, 225, false, "1", 2.6, 'gk'), // Вратарь врага (остается всегда!)
+            new AIBot(750, 225, false, "1", 1.6, 'gk'), 
             new AIBot(580, 130, false, "3", 2.2, 'def'),
             new AIBot(580, 320, false, "9", 2.2, 'def'),
             new AIBot(460, 110, false, "10", 2.3, 'att'),
             new AIBot(460, 340, false, "11", 2.3, 'att')
         ];
 
+        function handleJoystick(e) {
+            e.preventDefault();
+            const touch = e.touches;
+            const rect = joystickZone.getBoundingClientRect();
+            const centerX = rect.left + rect.width / 2;
+            const centerY = rect.top + rect.height / 2;
+            
+            let deltaX = touch.clientX - centerX;
+            let deltaY = touch.clientY - centerY;
+            let distance = Math.sqrt(deltaX * deltaX + deltaY * deltaY);
+            const maxDistance = 40;
+
+            if (distance > maxDistance) {
+                deltaX = (deltaX / distance) * maxDistance;
+                deltaY = (deltaY / distance) * maxDistance;
+                distance = maxDistance;
+            }
+
+            stick.style.transform = `translate(${deltaX}px, ${deltaY}px)`;
+            joyX = deltaX / maxDistance;
+            joyY = deltaY / maxDistance;
+            isTouching = true;
+        }
+
+        joystickZone.addEventListener('touchstart', handleJoystick);
+        joystickZone.addEventListener('touchmove', handleJoystick);
+        joystickZone.addEventListener('touchend', (e) => {
+            stick.style.transform = 'translate(0px, 0px)';
+            joyX = 0; joyY = 0; isTouching = false;
+        });
+
         document.getElementById('field-container').addEventListener('mousemove', (e) => {
+            if (isTouching) return;
             let rect = canvas.getBoundingClientRect();
             player.targetX = (e.clientX - rect.left) * (canvas.width / rect.width);
             player.targetY = (e.clientY - rect.top) * (canvas.height / rect.height);
@@ -261,22 +323,11 @@
             ball.update(); ball.draw();
             player.update(); player.draw();
 
-            // ФИЛЬТРАЦИЯ ИГРОКОВ В ЗАВИСИМОСТИ ОТ РЕЖИМА
-            let activeTeammates = [];
-            let activeEnemies = [];
-
-            if (currentGameMode === 'match') {
-                // В режиме матча активны все боты
-                activeTeammates = teammates;
-                activeEnemies = enemies;
-            } else if (currentGameMode === 'training') {
-                // В режиме тренировки активен только вратарь соперника (первый элемент в enemies)
-                activeEnemies = [enemies[0]];
-            }
+            let activeTeammates = (currentGameMode === 'match') ? teammates : [];
+            let activeEnemies = (currentGameMode === 'match') ? enemies : [enemies];
 
             let allList = [player, ...activeTeammates, ...activeEnemies];
 
-            // Назначение прессинга для активных игроков
             let closestTeammate = null, minTDist = Infinity;
             let closestEnemy = null, minEDist = Infinity;
 
@@ -291,7 +342,6 @@
                 if (d < minEDist) { minEDist = d; closestEnemy = e; }
             });
 
-            // Обновление и отрисовка только тех ботов, которые включены в режиме
             activeTeammates.forEach(t => { t.update(t === closestTeammate, allList); t.draw(); });
             activeEnemies.forEach(e => { e.update(e === closestEnemy, allList); e.draw(); });
 
