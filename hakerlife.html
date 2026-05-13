@@ -1,0 +1,266 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1.0">
+    <title>🚨 MISSION PORTUGAL: CYBER SHIELD 3D</title>
+    <style>
+        body { font-family: monospace; background: #000; color: #0f0; margin: 0; padding: 10px; overflow: hidden; touch-action: none; }
+        .game-layout { display: grid; grid-template-columns: 1fr 300px; gap: 10px; max-width: 1200px; margin: 0 auto; height: 95vh; }
+        .screen-box { background: #050505; border: 2px solid #0f0; border-radius: 8px; padding: 10px; display: flex; flex-direction: column; box-shadow: 0 0 15px rgba(0,255,0,0.2); position: relative; }
+        canvas { width: 100%; height: 350px; background: #000; border: 1px solid #040; border-radius: 4px; }
+        #radar-canvas { position: absolute; top: 20px; right: 20px; width: 100px; height: 100px; border: 2px solid #0f0; border-radius: 50%; background: rgba(0,10,0,0.85); box-shadow: 0 0 10px #0f0; }
+        #terminal { flex-grow: 1; background: #000; border: 1px solid #040; padding: 10px; margin-top: 10px; overflow-y: auto; font-size: 0.85em; border-radius: 4px; height: 180px; }
+        .input-area { display: flex; gap: 5px; margin-top: 5px; }
+        input { background: #000; color: #0f0; border: 1px solid #0f0; padding: 8px; font-family: monospace; flex-grow: 1; outline: none; border-radius: 4px; }
+        button { background: #0f0; color: #000; border: none; padding: 8px 15px; font-family: monospace; font-weight: bold; cursor: pointer; border-radius: 4px; text-transform: uppercase; }
+        button:hover { background: #00aa00; box-shadow: 0 0 8px #0f0; }
+        .sidebar { background: #050505; border: 2px solid #0f0; border-radius: 8px; padding: 15px; font-size: 0.8em; box-shadow: 0 0 15px rgba(0,255,0,0.2); }
+        .nav-btn { width: 50px; height: 40px; margin: 3px; font-size: 1.2em; }
+    </style>
+</head>
+<body>
+
+    <div class="game-layout">
+        <div class="screen-box">
+            <canvas id="3d-screen" width="320" height="240"></canvas>
+            <canvas id="radar-canvas" width="100" height="100"></canvas>
+            
+            <div id="terminal">
+                <div id="mission-title" style="color: #ff0055; font-weight: bold; text-align: center;">=== ЭТАП 1: ТОЧКА СБОРУ — АЭРОПОРТ (США) ===</div>
+                <p>[ДИРЕКТИВА]: Операция 'Европа'. Твоя цель — пройти по 3D-кварталу города и добраться до Аэропорта (Красная точка на радаре), чтобы вылететь на секретную виллу в Португалию.</p>
+                <p style="color: #00ffff;">Управление: W,A,S,D — перемещение, Стрелочки влево/вправо — вращение камеры.</p>
+                <hr id="term-hr" style="border: 1px dashed #0f0;">
+                <div id="story-log"></div>
+            </div>
+            
+            <div class="input-area">
+                <input type="text" id="user-input" placeholder="Ожидание подключения к главному серверу..." disabled>
+                <button id="submit-btn" onclick="processHack()" disabled>ВЗЛОМ</button>
+            </div>
+        </div>
+
+        <div class="sidebar">
+            <h3 style="color: #ff0055; text-align: center; margin-top: 0;">📟 ШТАБ CYBER SHIELD</h3>
+            <hr style="border: 1px dashed #0f0;">
+            <p>📍 ЗОНА ОПЕРАЦИИ: <span id="loc-val" style="color: #00ffff;">Остин, Техас (США)</span></p>
+            <p>🎯 ТЕКУЩАЯ ЦЕЛЬ: <span id="target-val" style="color: #ffff00;">Найти Здание Аэропорта</span></p>
+            <p>💰 КОМПЕНСАЦИЯ: $<span id="score-val" style="color: #00ff00; font-weight: bold;">0</span></p>
+            <p>💵 СТАВКА ЗАРПЛАТЫ: <span style="color: #0cf;">$<span id="salary-val">25</span>/сек</span></p>
+            <p>💻 ВСЕГО ВЗЛОМАНО: <span id="hacked-count" style="color: #ffaa00; font-weight: bold;">0 узлов</span></p>
+            <p>📊 СКОРОСТЬ ДВИЖКА: <span id="fps-val" style="color: #ff00ff; font-weight: bold;">0 FPS</span></p>
+            <hr style="border: 1px dashed #0f0;">
+            <h4 style="text-align: center; margin-bottom: 5px;">ПАНЕЛЬ ДВИЖЕНИЯ</h4>
+            <div style="text-align: center;">
+                <button class="nav-btn" onclick="movePlayer('w')">W</button><br>
+                <button class="nav-btn" onclick="movePlayer('a')">A</button>
+                <button class="nav-btn" onclick="movePlayer('s')">S</button>
+                <button class="nav-btn" onclick="movePlayer('d')">D</button><br>
+                <button class="nav-btn" style="width: 70px; background: #0cf;" onclick="movePlayer('left')">◀</button>
+                <button class="nav-btn" style="width: 70px; background: #0cf;" onclick="movePlayer('right')">▶</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let score = 0;
+        let step = 1; 
+        let salary = 25;
+        let hackedObjects = 0;
+        let audioCtx = null;
+        let lastCalledTime;
+        let fps;
+
+        function initAudio() { if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)(); }
+        function playBeep(freq, duration) {
+            try {
+                initAudio(); if (audioCtx.state === 'suspended') audioCtx.resume();
+                let osc = audioCtx.createOscillator(), gain = audioCtx.createGain();
+                osc.type = 'sine'; osc.frequency.setValueAtTime(freq, audioCtx.currentTime);
+                gain.gain.setValueAtTime(0.03, audioCtx.currentTime); gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + duration);
+                osc.connect(gain); gain.connect(audioCtx.destination); osc.start(); osc.stop(audioCtx.currentTime + duration);
+            } catch(e) {}
+        }
+
+        function printLog(text, color="#00ff00") {
+            let log = document.getElementById('story-log');
+            let p = document.createElement('p'); p.style.color = color; p.innerHTML = text;
+            log.appendChild(p); document.getElementById('terminal').scrollTop = document.getElementById('terminal').scrollHeight;
+        }
+
+        const canvas = document.getElementById('3d-screen');
+        const ctx = canvas.getContext('2d');
+        const radarCanvas = document.getElementById('radar-canvas');
+        const rCtx = radarCanvas.getContext('2d');
+        const mapSize = 12;
+        
+        let map = [
+           ,
+           ,
+           ,
+           ,
+           ,
+           ,
+           ,
+           ,
+           ,
+           ,
+           ,
+           
+        ];
+
+        let px = 1.5, py = 1.5, pa = 0.0;
+        const fov = Math.PI / 3, numRays = 320;
+
+        function drawGtaRadar() {
+            rCtx.clearRect(0, 0, radarCanvas.width, radarCanvas.height);
+            let scale = 8; 
+            rCtx.save(); rCtx.translate(50, 50); rCtx.rotate(-pa - Math.PI/2); 
+
+            for (let y = 0; y < mapSize; y++) {
+                for (let x = 0; x < mapSize; x++) {
+                    let relX = (x - px) * scale;
+                    let relY = (y - py) * scale;
+                    if (map[y][x] === 1) {
+                        rCtx.fillStyle = "#333333"; rCtx.fillRect(relX, relY, scale, scale);
+                    } else if (map[y][x] === 2) {
+                        let pulse = Math.sin(Date.now() * 0.01) * 2 + 5;
+                        rCtx.fillStyle = step === 1 ? "#ff0055" : "#00aaff";
+                        rCtx.beginPath(); rCtx.arc(relX + scale/2, relY + scale/2, pulse, 0, Math.PI*2); rCtx.fill();
+                    }
+                }
+            }
+            rCtx.restore();
+            rCtx.fillStyle = "#00ff00"; rCtx.beginPath(); rCtx.arc(50, 50, 4, 0, Math.PI * 2); rCtx.fill();
+            rCtx.strokeStyle = "#00ff00"; rCtx.lineWidth = 2; rCtx.beginPath(); rCtx.moveTo(50, 50); rCtx.lineTo(50, 38); rCtx.stroke();
+        }
+
+        function render3D() {
+            if(!lastCalledTime) { lastCalledTime = performance.now(); fps = 0; } 
+            else { let delta = (performance.now() - lastCalledTime)/1000; lastCalledTime = performance.now(); fps = Math.round(1/delta); document.getElementById('fps-val').innerText = fps + " FPS"; }
+
+            ctx.fillStyle = step === 1 ? "#020c02" : "#0d0202"; ctx.fillRect(0, 0, canvas.width, canvas.height / 2);
+            ctx.fillStyle = "#050505"; ctx.fillRect(0, canvas.height / 2, canvas.width, canvas.height / 2);
+
+            for (let i = 0; i < numRays; i++) {
+                let rayAngle = pa - fov / 2 + (i / numRays) * fov;
+                let distance = 0, hitWall = false, wallType = 0;
+                let eyeX = Math.cos(rayAngle), eyeY = Math.sin(rayAngle);
+                while (!hitWall && distance < 16) {
+                    distance += 0.05; let testX = Math.floor(px + eyeX * distance); let testY = Math.floor(py + eyeY * distance);
+                    if (testX < 0 || testX >= mapSize || testY < 0 || testY >= mapSize) { hitWall = true; distance = 16; } 
+                    else if (map[testY][testX] > 0) { hitWall = true; wallType = map[testY][testX]; }
+                }
+                let correctedDist = distance * Math.cos(rayAngle - pa);
+                let wallHeight = Math.min(canvas.height, canvas.height / correctedDist);
+                if (wallType === 2) ctx.strokeStyle = step === 1 ? `rgba(255, 0, 85, ${1 - distance/10})` : `rgba(0, 150, 255, ${1 - distance/10})`;
+                else ctx.strokeStyle = step === 1 ? `rgba(0, ${Math.floor(200 * (1 - distance/12))}, 0, 1)` : `rgba(${Math.floor(180 * (1 - distance/12))}, ${Math.floor(50 * (1 - distance/12))}, 0, 1)`;
+                ctx.beginPath(); ctx.moveTo(i, (canvas.height - wallHeight) / 2); ctx.lineTo(i, (canvas.height + wallHeight) / 2); ctx.stroke();
+            }
+            drawGtaRadar(); 
+            if (map[Math.floor(py)][Math.floor(px)] === 2) {
+                if (step === 1) startPortugalStage();
+                else if (step === 2) startFinalHackMode();
+            }
+        }
+
+        function movePlayer(dir) {
+            if (step === 3) return; let moveSpeed = 0.22, rotSpeed = 0.16;
+            if (dir === 'w') {
+                let nx = px + Math.cos(pa) * moveSpeed, ny = py + Math.sin(pa) * moveSpeed;
+                if (map[Math.floor(py)][Math.floor(nx)] !== 1) px = nx; if (map[Math.floor(ny)][Math.floor(px)] !== 1) py = ny; playBeep(140, 0.02);
+            }
+            if (dir === 's') {
+                let nx = px - Math.cos(pa) * moveSpeed, ny = py - Math.sin(pa) * moveSpeed;
+                if (map[Math.floor(py)][Math.floor(nx)] !== 1) px = nx; if (map[Math.floor(ny)][Math.floor(px)] !== 1) py = ny; playBeep(110, 0.02);
+            }
+            if (dir === 'a') {
+                let nx = px + Math.cos(pa - Math.PI/2) * moveSpeed, ny = py + Math.sin(pa - Math.PI/2) * moveSpeed;
+                if (map[Math.floor(py)][Math.floor(nx)] !== 1) px = nx; if (map[Math.floor(ny)][Math.floor(px)] !== 1) py = ny;
+            }
+            if (dir === 'd') {
+                let nx = px + Math.cos(pa + Math.PI/2) * moveSpeed, ny = py + Math.sin(pa + Math.PI/2) * moveSpeed;
+                if (map[Math.floor(py)][Math.floor(nx)] !== 1) px = nx; if (map[Math.floor(ny)][Math.floor(px)] !== 1) py = ny;
+            }
+            if (dir === 'left') pa -= rotSpeed; if (dir === 'right') pa += rotSpeed;
+            render3D();
+        }
+
+        function startPortugalStage() {
+            step = 2; hackedObjects += 1; salary += 75; 
+            document.getElementById('hacked-count').innerText = hackedObjects + " узлов";
+            document.getElementById('salary-val').innerText = salary;
+            px = 1.5; py = 1.5; pa = 0.0; 
+            map = [
+               ,
+               ,
+               ,
+               ,
+               ,
+               ,
+               ,
+               ,
+               ,
+               ,
+               ,
+               
+            ];
+            playBeep(523, 0.1); setTimeout(() => playBeep(659, 0.1), 100); setTimeout(() => playBeep(784, 0.2), 200);
+            document.getElementById('mission-title').innerText = "=== ЭТАП 2: МИНИ ХАКЕРСКИЙ ДОМ (ПОРТУГАЛИЯ) ===";
+            document.getElementById('loc-val').innerText = "Лиссабон (Португалия)";
+            document.getElementById('target-val').innerText = "Взломать Защищенный Сервер Киберпреступников";
+            
+            printLog("<br>✈️ Перелет завершен. Ты прибыл на секретную европейскую виллу CYBER SHIELD!", "#00ff00");
+            printLog("Штаб повысил твой оклад за успешный транзит: текущая ставка <span style='color: #0cf;'>$" + salary + "/сек</span>.", "#00ffff");
+            printLog("Пройди по внутренним коридорам базы и найди Синий Главный Сервер преступной группировки (мигающая точка на радаре), чтобы изолировать их сеть!", "#00ffff");
+            render3D();
+        }
+
+        function startFinalHackMode() {
+            step = 3; hackedObjects += 1; salary += 300; 
+            document.getElementById('hacked-count').innerText = hackedObjects + " узла(ов)";
+            document.getElementById('salary-val').innerText = salary;
+            canvas.style.display = "none"; radarCanvas.style.display = "none"; 
+            document.getElementById('mission-title').innerText = "=== ЭТАП 3: ФИНАЛЬНАЯ НЕЙТРАЛИЗАЦИЯ СЕТИ ===";
+            document.getElementById('target-val').innerText = "Полная блокировка угроз";
+            playBeep(880, 0.1); setTimeout(() => playBeep(440, 0.3), 120);
+            
+            printLog("<br>🚨 ТЕРМИНАЛ ДЕАКТИВАЦИИ ДОСТУПЕН! Ты подключен к ядру системы. Ставка повышена до <span style='color: #0cf;'>$" + salary + "/сек</span>!", "#00ffff");
+            printLog("Обнаружена активная хакерская атака на серверы крупного банка! Преступники пытаются украсть личные данные миллионов людей. Время запустить протоколы CYBER SHIELD!", "#ff0055");
+            printLog("Выбери тип защитного алгоритма:<br>1 - Развернуть глобальный Firewall и заблокировать внешние порты взломщиков<br>2 - Перехватить управление их ботнетом и полностью стереть их сервера", "#00ffff");
+            document.getElementById('user-input').disabled = false; document.getElementById('submit-btn').disabled = false;
+        }
+
+        function processHack() {
+            let input = document.getElementById('user-input').value.trim(); document.getElementById('user-input').value = "";
+            if (step !== 3 || !input) return;
+            if (input === "1") {
+                score += 750000; document.getElementById('score-val').innerText = score.toLocaleString(); hackedObjects += 30;
+                document.getElementById('hacked-count').innerText = hackedObjects + " узлов";
+                printLog(">> ОТЛИЧНО! Внешний Firewall заблокировал атаку. Серверы банка в безопасности. Угроза устранена!", "#00ff00");
+                endGame();
+            } else if (input === "2") {
+                score += 1500000; document.getElementById('score-val').innerText = score.toLocaleString(); hackedObjects += 95;
+                document.getElementById('hacked-count').innerText = hackedObjects + " узлов";
+                printLog(">> ПОЛНЫЙ РАЗГРОМ! Ботнет перехвачен, базы данных преступников уничтожены без возможности восстановления!", "#ffcc00");
+                endGame();
+            } else { printLog("Неверный код директивы! Введи 1 или 2.", "#f00"); }
+        }
+
+        function endGame() {
+            step = 4; salary = 0; document.getElementById('salary-val').innerText = salary;
+            printLog("<br>🎉 ОПЕРАЦИЯ 'ЕВРОПА' ЗАВЕРШЕНА! Кибер-безопасность региона восстановлена. Сумма предотвращенного ущерба: $" + score.toLocaleString(), "#ff0055");
+            document.getElementById('user-input').disabled = true; document.getElementById('submit-btn').disabled = true;
+        }
+
+        window.addEventListener('keydown', (e) => {
+            if (e.code === 'KeyW' || e.code === 'ArrowUp') movePlayer('w'); if (e.code === 'KeyS' || e.code === 'ArrowDown') movePlayer('s');
+            if (e.code === 'KeyA') movePlayer('a'); if (e.code === 'KeyD') movePlayer('d');
+            if (e.code === 'ArrowLeft') movePlayer('left'); if (e.code === 'ArrowRight') movePlayer('right');
+        });
+
+        setInterval(() => { if (step < 4) { score += salary; document.getElementById('score-val').innerText = score.toLocaleString(); } }, 1000);
+        setInterval(() => { if (step < 3) render3D(); }, 30);
+    </script>
+</body>
+</html>
