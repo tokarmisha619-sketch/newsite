@@ -3,105 +3,43 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width,initial-scale=1.0">
-    <title>🚨 MISSION PORTUGAL: PUBG MOUSE 3D</title>
+    <title>⚽ MISHA VIPERSKY №5: ДВОРОВЫЙ ФУТБОЛ</title>
     <style>
-        body { font-family: monospace; background: #0c0f12; color: #e0e5eb; margin: 0; padding: 10px; overflow: hidden; touch-action: none; }
-        .game-layout { display: grid; grid-template-columns: 1fr 300px; gap: 10px; max-width: 1200px; margin: 0 auto; height: 95vh; }
-        .screen-box { background: #161a1e; border: 2px solid #4a5568; border-radius: 8px; padding: 10px; display: flex; flex-direction: column; box-shadow: 0 4px 20px rgba(0,0,0,0.5); position: relative; }
-        
-        .canvas-container { position: relative; width: 100%; height: 350px; overflow: hidden; border: 1px solid #2d3748; border-radius: 4px; cursor: pointer; }
-        canvas { width: 100%; height: 100%; background: #000; }
-        
-        /* 🔫 СПРАЙТ ЭМИ-ОРУЖИЯ */
-        #cyber-weapon { position: absolute; bottom: 0; left: 50%; transform: translateX(-50%); width: 120px; height: 100px; background: linear-gradient(to top, #1a202c, #4a5568); border: 3px solid #00ffff; border-bottom: none; border-radius: 10px 10px 0 0; box-shadow: 0 0 15px #00ffff; pointer-events: none; transition: transform 0.1s; z-index: 5; }
-        #weapon-laser { position: absolute; bottom: 85px; left: 50%; transform: translateX(-50%); width: 14px; height: 14px; background: #00ffff; border-radius: 50%; box-shadow: 0 0 20px #00ffff; pointer-events: none; z-index: 6; }
-        
-        /* ПРИЦЕЛ ИЗ PUBG */
-        #crosshair { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 14px; height: 14px; pointer-events: none; z-index: 20; }
-        #crosshair::before, #crosshair::after { content: ''; position: absolute; background: #00ffff; box-shadow: 0 0 5px #00ffff; }
-        #crosshair::before { top: 6px; left: -3px; width: 20px; height: 2px; }
-        #crosshair::after { top: -3px; left: 6px; width: 2px; height: 20px; }
-
-        .spark { position: absolute; width: 6px; height: 6px; background: #00ffff; border-radius: 50%; box-shadow: 0 0 10px #00ffff; pointer-events: none; z-index: 10; opacity: 1; transition: all 0.2s ease-out; }
-        .weapon-fire { transform: translateX(-50%) translateY(15px) scale(0.96) !important; background: linear-gradient(to top, #2d3748, #00ffff) !important; box-shadow: 0 0 25px #00ffff !important; }
-        #explosion-flash { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: #fff; opacity: 0; pointer-events: none; z-index: 100; transition: opacity 0.1s ease-out; }
-
-        #radar-canvas { position: absolute; top: 20px; right: 20px; width: 100px; height: 100px; border: 2px solid #4a5568; border-radius: 50%; background: rgba(22,26,30,0.9); box-shadow: 0 0 10px rgba(0,0,0,0.5); z-index: 10; }
-        #terminal { flex-grow: 1; background: #0f1115; border: 1px solid #2d3748; padding: 10px; margin-top: 10px; overflow-y: auto; font-size: 0.85em; border-radius: 4px; height: 180px; box-shadow: inset 0 0 10px rgba(0,0,0,0.8); }
-        .input-area { display: flex; gap: 5px; margin-top: 5px; }
-        input { background: #0f1115; color: #fff; border: 1px solid #4a5568; padding: 8px; font-family: monospace; flex-grow: 1; outline: none; border-radius: 4px; }
-        button { background: #3182ce; color: #fff; border: none; padding: 8px 15px; font-family: monospace; font-weight: bold; cursor: pointer; border-radius: 4px; text-transform: uppercase; }
-        button:hover { background: #2b6cb0; box-shadow: 0 0 8px #3182ce; }
-        .sidebar { background: #161a1e; border: 2px solid #4a5568; border-radius: 8px; padding: 15px; font-size: 0.8em; box-shadow: 0 4px 20px rgba(0,0,0,0.5); }
-        
-        .shake-effect { animation: screenShake 0.4s ease-in-out infinite; }
-        @keyframes screenShake {
-            0% { transform: translate(2px, 1px); }
-            20% { transform: translate(-3px, 0px); }
-            40% { transform: translate(1px, -1px); }
-            60% { transform: translate(-2px, 2px); }
-            80% { transform: translate(2px, 1px); }
-            100% { transform: translate(0px, -1px); }
-        }
+        body { font-family: monospace; background: #1a202c; color: #fff; margin: 0; padding: 10px; display: flex; flex-direction: column; align-items: center; overflow: hidden; touch-action: none; }
+        .score-board { display: flex; gap: 30px; background: #2d3748; padding: 10px 20px; border: 2px solid #4a5568; border-radius: 8px; margin-bottom: 10px; box-shadow: 0 4px 10px rgba(0,0,0,0.3); font-size: 1.1em; }
+        #field-container { position: relative; width: 800px; height: 450px; background: #38a169; border: 5px solid #fff; border-radius: 4px; box-shadow: 0 6px 20px rgba(0,0,0,0.5); cursor: none; }
+        canvas { width: 100%; height: 100%; }
+        #goal-banner { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%) scale(0); background: rgba(0,0,0,0.85); color: #ecc94b; border: 3px solid #ecc94b; padding: 20px 40px; font-size: 3em; font-weight: bold; border-radius: 10px; text-shadow: 0 0 10px #ecc94b; transition: transform 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275); pointer-events: none; z-index: 100; text-align: center; }
+        .active-goal { transform: translate(-50%, -50%) scale(1) !important; }
     </style>
 </head>
 <body>
 
-    <div class="game-layout">
-        <div id="main-box" class="screen-box">
-            <div class="canvas-container" id="fire-zone">
-                <canvas id="3d-screen" width="320" height="240"></canvas>
-                <div id="crosshair"></div>
-                <div id="cyber-weapon"><div id="weapon-laser"></div></div>
-                <div id="explosion-flash"></div>
-            </div>
-            
-            <canvas id="radar-canvas" width="100" height="100"></canvas>
-            
-            <div id="terminal">
-                <div id="mission-title" style="color: #ecc94b; font-weight: bold; text-align: center;">=== ЭТАП 1: ДОМ В США ===</div>
-                <p id="instruction-text">[ДИРЕКТИВА]: Кликни ОДИН РАЗ по 3D-экрану, чтобы захватить мышь (как в PUBG). Оглядись по сторонам, найди светящуюся КРАСНУЮ ДВЕРЬ в стене дома и войди в неё.</p>
-                <p style="color: #a0aec0;">Управление: W,A,S,D — ходить, Движение мыши — обзор и прицеливание. Нажатие Левой Кнопки Мыши или Пробел — огонь!</p>
-                <hr style="border: 1px dashed #4a5568;">
-                <div id="story-log"></div>
-            </div>
-            
-            <div class="input-area">
-                <input type="text" id="user-input" placeholder="Доступ закрыт. Ожидайте терминал взлома..." disabled>
-                <button id="submit-btn" onclick="processHack()" disabled>ВЗРЫВ</button>
-            </div>
-        </div>
-
-        <div class="sidebar">
-            <h3 style="color: #3182ce; text-align: center; margin-top: 0;">📟 ШТАБ CYBER SHIELD</h3>
-            <hr style="border: 1px dashed #4a5568;">
-            <p>📍 ЛОКАЦИЯ: <span id="loc-val" style="color: #fff;">Твой дом (США)</span></p>
-            <p>🎯 ЦЕЛЬ: <span id="target-val" style="color: #ecc94b;">Выйти через Красную Дверь</span></p>
-            <p>🏅 РАНГ: <span id="rank-val" style="color: #9f7aea; font-weight: bold;">Стажер</span></p>
-            <p>🔋 ЗАРЯДЫ ЭМИ: <span id="ammo-val" style="color: #00ffff; font-weight: bold;">20 шт</span></p>
-            <p>💰 КОШЕЛЕК ОЧКОВ: \$<span id="score-val" style="color: #48bb78; font-weight: bold;">0</span></p>
-            <p>💵 ЗАРПЛАТА: <span style="color: #00bfff;">\$<span id="salary-val">0</span>/сек</span></p>
-            <p>💻 ВЗЛОМАНО СЕТЕЙ: <span id="hacked-count" style="color: #ed8936; font-weight: bold;">0 объектов</span></p>
-            <p>📊 ДВИЖОК: <span id="fps-val" style="color: #9f7aea; font-weight: bold;">0 FPS</span></p>
-            <hr style="border: 1px dashed #4a5568;">
-            <p style="font-size: 0.85em; color: #a0aec0; text-align: center;">Нажми ESC, чтобы освободить мышку</p>
-        </div>
+    <!-- ОБНОВЛЕННОЕ ТАБЛО СЧЕТА С НОВЫМ ИМЕНЕМ -->
+    <div class="score-board">
+        <div>👤 ФУТБОЛИСТ: <span style="color: #ecc94b; font-weight: bold;">Misha Vipersky</span></div>
+        <div>🏆 ЗАБИТО ГОЛОВ: <span id="goals-val" style="color: #48bb78; font-weight: bold;">0</span></div>
+        <div>🔥 НОМЕР: <span style="color: #63b3ed; font-weight: bold;">5</span></div>
     </div>
 
-    <script>
-        let score = 0;
-        let step = 1; 
-        let salary = 0;
-        let hackedObjects = 0;
-        let ammo = 20; 
-        let audioCtx = null;
-        let lastCalledTime, fps;
+    <!-- ФУТБОЛЬНОЕ ПОЛЕ -->
+    <div id="field-container">
+        <canvas id="football-field" width="800" height="450"></canvas>
+        <div id="goal-banner">ГООООЛ! ⚽🔥</div>
+    </div>
 
-        let px = 2.5, py = 2.5, pa = 0.0; 
-        let keys = { w: false, a: false, s: false, d: false };
+    <p style="color: #a0aec0; margin-top: 10px; font-size: 0.9em;">Управление: Двигай мышку, чтобы бегать за Misha Vipersky. Обведи защитников и пробей точно в ворота!</p>
+
+    <script>
+        const canvas = document.getElementById('football-field');
+        const ctx = canvas.getContext('2d');
+        const goalBanner = document.getElementById('goal-banner');
+
+        let goalCount = 0;
+        let audioCtx = null;
 
         function initAudio() { if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)(); }
-        function playBeep(freq, duration, type='sine') {
+        function playSound(freq, duration, type='sine') {
             try {
                 initAudio(); if (audioCtx.state === 'suspended') audioCtx.resume();
                 let osc = audioCtx.createOscillator(), gain = audioCtx.createGain();
@@ -111,278 +49,131 @@
             } catch(e) {}
         }
 
-        function printLog(text, color="#e2e8f0") {
-            let log = document.getElementById('story-log');
-            let p = document.createElement('p'); p.style.color = color; p.innerHTML = text;
-            log.appendChild(p); document.getElementById('terminal').scrollTop = document.getElementById('terminal').scrollHeight;
-        }
-
-        function updateRank() {
-            let rankElement = document.getElementById('rank-val');
-            if (hackedObjects === 0) rankElement.innerText = "Стажер 🧑‍💻";
-            else if (hackedObjects <= 10) rankElement.innerText = "Младший Агент 🕵️‍♂️";
-            else rankElement.innerText = "Спецагент CYBER SHIELD ⚡";
-        }
-
-        // ЗАХВАТ КУРСОРA (POINTER LOCK) ДЛЯ УПРАВЛЕНИЯ КАК В PUBG
-        const container = document.getElementById('fire-zone');
-        container.addEventListener('click', () => {
-            if (step < 4) {
-                container.requestPointerLock();
+        // КЛАСС МЯЧА
+        class Ball {
+            constructor(x, y) { this.reset(x, y); }
+            reset(x, y) {
+                this.x = x; this.y = y; this.vx = 0; this.vy = 0; this.radius = 10; this.friction = 0.98;
             }
-        });
+            update() {
+                this.x += this.vx; this.y += this.vy;
+                this.vx *= this.friction; this.vy *= this.friction;
 
-        document.addEventListener('pointerlockchange', () => {
-            if (document.pointerLockElement === container) {
-                document.addEventListener("mousemove", updateRotation, false);
-                container.addEventListener("click", fireWeapon, false); // Стрельба только по клику при активном захвате
-            } else {
-                document.removeEventListener("mousemove", updateRotation, false);
-                container.removeEventListener("click", fireWeapon, false);
-            }
-        });
+                if (this.y - this.radius < 0) { this.y = this.radius; this.vy = -this.vy * 0.6; playSound(300, 0.05); }
+                if (this.y + this.radius > canvas.height) { this.y = canvas.height - this.radius; this.vy = -this.vy * 0.6; playSound(300, 0.05); }
+                if (this.x - this.radius < 0) { this.x = this.radius; this.vx = -this.vx * 0.6; playSound(300, 0.05); }
 
-        function updateRotation(e) {
-            let sensitivity = 0.0025; 
-            pa += e.movementX * sensitivity;
-        }
-
-        function fireWeapon() {
-            if (step === 4 || step === 5) return;
-            if (ammo <= 0) {
-                playBeep(150, 0.1, 'sawtooth');
-                printLog("⚠️ ВНИМАНИЕ: Заряды ЭМИ на нуле! Срочно найди синюю батарею на дороге!", "#f56565");
-                return;
-            }
-            ammo -= 1;
-            document.getElementById('ammo-val').innerText = ammo + " шт";
-
-            let weapon = document.getElementById('cyber-weapon');
-            weapon.classList.add('weapon-fire');
-            playBeep(850, 0.12, 'sawtooth');
-
-            let zone = document.getElementById('fire-zone');
-            for(let i=0; i<8; i++) {
-                let spark = document.createElement('div');
-                spark.className = 'spark'; spark.style.left = '50%'; spark.style.bottom = '95px';
-                zone.appendChild(spark);
-                let angle = (Math.random() * Math.PI) - Math.PI; 
-                let speed = Math.random() * 60 + 30;
-                setTimeout(() => {
-                    spark.style.transform = `translate(${Math.cos(angle)*speed}px, ${Math.sin(angle)*speed}px) scale(0.1)`;
-                    spark.style.opacity = '0';
-                }, 10);
-                setTimeout(() => spark.remove(), 200);
-            }
-            setTimeout(() => weapon.classList.remove('weapon-fire'), 80);
-        }
-
-        const canvas = document.getElementById('3d-screen');
-        const ctx = canvas.getContext('2d');
-        const radarCanvas = document.getElementById('radar-canvas');
-        const rCtx = radarCanvas.getContext('2d');
-        const mapSize = 12;
-        
-        // КАРТЫ С ЖЁСТКИМИ СТЕНАМИ (Больше никакого чёрного экрана)
-        let mapUSA_House = [
-            [1,1,1,1,1,1,1,1,1,1,1,1],
-            [1,0,0,0,0,0,0,0,0,0,0,1],
-            [1,0,0,0,0,0,0,0,0,0,0,1],
-            [1,0,0,0,0,0,0,0,0,0,2,1], // 2 — Красная дверь твоего дома
-            [1,0,0,0,0,0,0,0,0,0,0,1],
-            [1,0,0,0,0,0,0,0,0,0,0,1],
-            [1,0,0,0,0,0,0,0,0,0,0,1],
-            [1,1,1,1,1,1,1,1,1,1,1,1],
-            [1,1,1,1,1,1,1,1,1,1,1,1],
-            [1,1,1,1,1,1,1,1,1,1,1,1],
-            [1,1,1,1,1,1,1,1,1,1,1,1],
-            [1,1,1,1,1,1,1,1,1,1,1,1]
-        ];
-
-        let mapUSA_Road = [
-            [1,1,1,1,1,1,1,1,1,1,1,1],
-            [1,0,0,3,1,1,1,1,1,1,1,1], // 3 — Желтый кейс
-            [1,0,1,0,1,1,1,1,1,1,1,1],
-            [1,0,1,0,0,4,1,1,1,1,1,1], // 4 — Синяя батарея
-            [1,0,1,1,1,0,1,1,1,1,1,1],
-            [1,0,0,0,1,0,0,3,1,1,1,1],
-            [1,1,1,0,1,1,1,0,1,1,1,1],
-            [1,1,1,0,0,0,1,0,0,0,2,1], // 2 — Оранжевый Аэропорт в тупике
-            [1,1,1,1,1,0,1,1,1,1,1,1],
-            [1,1,1,1,1,0,0,0,0,0,0,1],
-            [1,1,1,1,1,1,1,1,1,1,1,1],
-            [1,1,1,1,1,1,1,1,1,1,1,1]
-        ];
-
-        let mapPortugal = [
-            [1,1,1,1,1,1,1,1,1,1,1,1],
-            [1,0,0,0,0,0,1,1,1,1,1,1],
-            [1,0,1,1,1,0,1,1,1,1,1,1],
-            [1,3,1,1,1,0,0,0,4,1,1,1],
-            [1,0,1,1,1,1,1,1,0,1,1,1],
-            [1,0,0,0,0,0,0,1,0,1,1,1],
-            [1,1,1,1,1,1,0,1,0,0,3,1],
-            [1,1,1,1,1,1,0,1,1,1,0,1],
-            [1,1,1,1,1,1,0,0,0,1,2,1], // 2 — Синий Хакерский Дом
-            [1,1,1,1,1,1,1,1,0,0,0,1],
-            [1,1,1,1,1,1,1,1,1,1,1,1],
-            [1,1,1,1,1,1,1,1,1,1,1,1]
-        ];
-
-        let map = mapUSA_House; 
-        const fov = Math.PI / 3, numRays = 160; 
-
-        function drawGtaRadar() {
-            rCtx.clearRect(0, 0, radarCanvas.width, radarCanvas.height);
-            let scale = 8; rCtx.save(); rCtx.translate(50, 50); rCtx.rotate(-pa - Math.PI/2); 
-            for (let y = 0; y < mapSize; y++) {
-                for (let x = 0; x < mapSize; x++) {
-                    if (map[y][x] === 1) { rCtx.fillStyle = "#4a5568"; rCtx.fillRect((x - px) * scale, (y - py) * scale, scale, scale); } 
-                    else if (map[y][x] === 2) {
-                        rCtx.fillStyle = step === 1 ? "#e53e3e" : (step === 2 ? "#ed8936" : "#3182ce");
-                        rCtx.fillRect((x - px) * scale, (y - py) * scale, scale, scale);
-                    } else if (map[y][x] === 3) {
-                        rCtx.fillStyle = "#ecc94b"; rCtx.beginPath(); rCtx.arc((x - px) * scale + 4, (y - py) * scale + 4, 3, 0, Math.PI*2); rCtx.fill();
-                    } else if (map[y][x] === 4) {
-                        rCtx.fillStyle = "#00ffff"; rCtx.beginPath(); rCtx.arc((x - px) * scale + 4, (y - py) * scale + 4, 3, 0, Math.PI*2); rCtx.fill();
-                    }
+                if (this.x + this.radius >= canvas.width) {
+                    if (this.y > 150 && this.y < 300) { triggerGoal(); } 
+                    else { this.x = canvas.width - this.radius; this.vx = -this.vx * 0.6; playSound(300, 0.05); }
                 }
             }
-            rCtx.restore(); rCtx.fillStyle = "#48bb78"; rCtx.beginPath(); rCtx.arc(50, 50, 4, 0, Math.PI * 2); rCtx.fill();
-            rCtx.strokeStyle = "#48bb78"; rCtx.lineWidth = 2; rCtx.beginPath(); rCtx.moveTo(50, 50); rCtx.lineTo(50, 38); rCtx.stroke();
-        }
-
-        // РАСЧЕТ ДВИЖЕНИЯ КАК В PUBG (Стрейфы W,A,S,D зависят от обзора)
-        function updatePlayerMovement() {
-            if (step >= 4) return;
-            let moveSpeed = 0.08; 
-            let moveX = 0, moveY = 0;
-
-            if (keys.w) { moveX += Math.cos(pa); moveY += Math.sin(pa); }
-            if (keys.s) { moveX -= Math.cos(pa); moveY -= Math.sin(pa); }
-            if (keys.a) { moveX += Math.cos(pa - Math.PI/2); moveY += Math.sin(pa - Math.PI/2); } 
-            if (keys.d) { moveX += Math.cos(pa + Math.PI/2); moveY += Math.sin(pa + Math.PI/2); } 
-
-            if (moveX !== 0 || moveY !== 0) {
-                let len = Math.sqrt(moveX*moveX + moveY*moveY);
-                let nx = px + (moveX / len) * moveSpeed;
-                let ny = py + (moveY / len) * moveSpeed;
-
-                if (map[Math.floor(py)][Math.floor(nx)] !== 1) px = nx;
-                if (map[Math.floor(ny)][Math.floor(px)] !== 1) py = ny;
-                
-                if (Math.random() > 0.85) playBeep(80, 0.03, 'triangle');
+            draw() {
+                ctx.save(); ctx.beginPath(); ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2);
+                ctx.fillStyle = "#ffffff"; ctx.fill(); ctx.strokeStyle = "#000000"; ctx.lineWidth = 1.5; ctx.stroke();
+                ctx.strokeStyle = "#333"; ctx.lineWidth = 1;
+                ctx.beginPath(); ctx.moveTo(this.x - 6, this.y); ctx.lineTo(this.x + 6, this.y); ctx.stroke();
+                ctx.beginPath(); ctx.moveTo(this.x, this.y - 6); ctx.lineTo(this.x, this.y + 6); ctx.stroke();
+                ctx.restore();
             }
         }
 
-        function render3D() {
-            if(!lastCalledTime) { lastCalledTime = performance.now(); fps = 0; } 
-            else { let delta = (performance.now() - lastCalledTime)/1000; lastCalledTime = performance.now(); fps = Math.round(1/delta); document.getElementById('fps-val').innerText = fps + " FPS"; }
+        // КЛАСС ТВОЕГО НАПАДАЮЩЕГО (MISHA VIPERSKY)
+        class Player {
+            constructor() {
+                this.x = 150; this.y = 225; this.radius = 18;
+                this.targetX = 150; this.targetY = 225;
+            }
+            update() {
+                this.x += (this.targetX - this.x) * 0.15;
+                this.y += (this.targetY - this.y) * 0.15;
+                this.x = Math.max(this.radius, Math.min(canvas.width - this.radius, this.x));
+                this.y = Math.max(this.radius, Math.min(canvas.height - this.radius, this.y));
 
-            updatePlayerMovement(); 
-
-            // СВЕТЛЫЕ РЕАЛИСТИЧНЫЕ ЦВЕТА
-            ctx.fillStyle = "#4299e1"; ctx.fillRect(0, 0, canvas.width, canvas.height / 2); // Синее небо
-            ctx.fillStyle = "#2d3748"; ctx.fillRect(0, canvas.height / 2, canvas.width, canvas.height / 2); // Асфальт
-
-            for (let i = 0; i < numRays; i++) {
-                let rayAngle = pa - fov / 2 + (i / numRays) * fov;
-                let distance = 0, hitWall = false, wallType = 0;
-                let eyeX = Math.cos(rayAngle), eyeY = Math.sin(rayAngle);
-                while (!hitWall && distance < 16) {
-                    distance += 0.1; let testX = Math.floor(px + eyeX * distance); let testY = Math.floor(py + eyeY * distance);
-                    if (testX < 0 || testX >= mapSize || testY < 0 || testY >= mapSize) { hitWall = true; distance = 16; } 
-                    else if (map[testY][testX] > 0) { hitWall = true; wallType = map[testY][testX]; }
+                let dx = ball.x - this.x, dy = ball.y - this.y;
+                let dist = Math.sqrt(dx*dx + dy*dy);
+                if (dist < this.radius + ball.radius) {
+                    let angle = Math.atan2(dy, dx);
+                    ball.vx = Math.cos(angle) * 7.5 + (this.x - ball.x) * -0.2;
+                    ball.vy = Math.sin(angle) * 7.5 + (this.y - ball.y) * -0.2;
+                    playSound(450, 0.08, 'triangle');
                 }
-                let correctedDist = distance * Math.cos(rayAngle - pa);
-                let wallHeight = Math.min(canvas.height, canvas.height / correctedDist);
-                let xPixel = Math.floor(i * (canvas.width / numRays));
-                
-                if (wallType === 2) { ctx.strokeStyle = step === 1 ? "#e53e3e" : (step === 2 ? "#ed8936" : "#3182ce"); } 
-                else if (wallType === 3) { ctx.strokeStyle = "#ecc94b"; } 
-                else if (wallType === 4) { ctx.strokeStyle = "#00ffff"; } 
-                else { let wallColor = Math.floor(180 * (1 - distance/12)); ctx.strokeStyle = `rgb(${wallColor+20},${wallColor+20},${wallColor+25})`; }
-                ctx.lineWidth = Math.ceil(canvas.width / numRays);
-                ctx.beginPath(); ctx.moveTo(xPixel, (canvas.height - wallHeight) / 2); ctx.lineTo(xPixel, (canvas.height + wallHeight) / 2); ctx.stroke();
             }
-            drawGtaRadar(); 
-            
-            let tx = Math.floor(px), ty = Math.floor(py);
-            if (map[ty] && map[ty][tx] === 3) {
-                map[ty][tx] = 0; let bonus = Math.floor(Math.random() * 20000) + 5000; score += bonus;
-                document.getElementById('score-val').innerText = score.toLocaleString();
-                playBeep(880, 0.1); printLog(`💰 КЕЙС: Получено +$${bonus.toLocaleString()}`, "#ecc94b");
-            }
-            if (map[ty] && map[ty][tx] === 4) {
-                map[ty][tx] = 0; ammo += 10; document.getElementById('ammo-val').innerText = ammo + " шт";
-                playBeep(600, 0.1); printLog(`🔋 ЭНЕРГИЯ: Батарея подобрана! Заряды ЭМИ +10 выстрелов!`, "#00ffff");
-            }
-
-            if (map[ty] && map[ty][tx] === 2) {
-                if (step === 1) startRoadToAirport();
-                else if (step === 2) startPortugalCity();
-                else if (step === 3) startHackerWork();
+            draw() {
+                ctx.save(); ctx.beginPath(); ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2);
+                ctx.fillStyle = "#1e3a8a"; ctx.fill(); ctx.strokeStyle = "#ffffff"; ctx.lineWidth = 2; ctx.stroke();
+                ctx.fillStyle = "#ecc94b"; ctx.font = "bold 15px monospace"; ctx.textAlign = "center"; ctx.textBaseline = "middle";
+                ctx.fillText("5", this.x, this.y); ctx.restore();
             }
         }
 
-        function startRoadToAirport() {
-            step = 2; px = 1.5; py = 1.5; pa = 0.0; map = mapUSA_Road; playBeep(440, 0.1);
-            document.exitPointerLock(); 
-            document.getElementById('mission-title').innerText = "=== ЭТАП 2: ДОРОГА В АЭРОПОРТ ===";
-            document.getElementById('loc-val').innerText = "Улицы США"; document.getElementById('target-val').innerText = "Дойти до Оранжевого Аэропорта";
-            document.getElementById('instruction-text').innerText = "[ДИРЕКТИВА]: Кликни по 3D-экрану заново! Иди по дороге вперед до здания Аэропорта (Оранжевый куб).";
-            printLog(">> Выход на трассу. Направление мыши активировано.");
-            render3D();
+        // КЛАСС ЗАЩИТНИКОВ
+        class Defender {
+            constructor(startX, startY, speed) {
+                this.x = startX; this.y = startY; this.startX = startX; this.startY = startY;
+                this.radius = 16; this.speed = speed;
+            }
+            update() {
+                let dx = ball.x - this.x, dy = ball.y - this.y;
+                let dist = Math.sqrt(dx*dx + dy*dy);
+                if (dist > 5) { this.x += (dx / dist) * this.speed; this.y += (dy / dist) * this.speed; }
+
+                let bDx = ball.x - this.x, bDy = ball.y - this.y;
+                if (Math.sqrt(bDx*bDx + bDy*bDy) < this.radius + ball.radius) {
+                    let angle = Math.atan2(bDy, bDx);
+                    ball.vx = Math.cos(angle) * 4 - 3.5; ball.vy = Math.sin(angle) * 4;
+                    playSound(250, 0.06, 'sawtooth');
+                }
+            }
+            draw() {
+                ctx.save(); ctx.beginPath(); ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2);
+                ctx.fillStyle = "#e53e3e"; ctx.fill(); ctx.strokeStyle = "#ffffff"; ctx.lineWidth = 1.5; ctx.stroke(); ctx.restore();
+            }
         }
 
-        function startPortugalCity() {
-            step = 3; px = 1.5; py = 1.5; pa = 0.5; map = mapPortugal; playBeep(523, 0.1);
-            document.exitPointerLock();
-            document.getElementById('mission-title').innerText = "=== ЭТАП 3: ГОРОД ЛИССАБОН ===";
-            document.getElementById('loc-val').innerText = "Лиссабон (Португалия)"; document.getElementById('target-val').innerText = "Найти Синий Хакерский Дом";
-            document.getElementById('instruction-text').innerText = "[ДИРЕКТИВА]: Кликни по экрану! Исследуй улицы Португалии и доберись до Синего Хакерского Дома.";
-            printLog("<br>✈️ Успешное прибытие в Лиссабон. Выдвигайся по радару к штабу.");
-            render3D();
-        }
+        const ball = new Ball(400, 225);
+        const player = new Player();
+        const defenders = [
+            new Defender(550, 120, 1.6),
+            new Defender(600, 225, 2.0),
+            new Defender(550, 330, 1.8)
+        ];
 
-        function startHackerWork() {
-            step = 4; canvas.style.display = "none"; radarCanvas.style.display = "none"; 
-            document.getElementById('cyber-weapon').style.display = "none"; 
-            document.getElementById('crosshair').style.display = "none";
-            document.exitPointerLock(); 
-            
-            hackedObjects += 1; salary = 250; 
-            document.getElementById('hacked-count').innerText = hackedObjects + " объектов";
-            document.getElementById('salary-val').innerText = salary;
-            updateRank();
+        document.getElementById('field-container').addEventListener('mousemove', (e) => {
+            let rect = canvas.getBoundingClientRect();
+            player.targetX = (e.clientX - rect.left) * (canvas.width / rect.width);
+            player.targetY = (e.clientY - rect.top) * (canvas.height / rect.height);
+        });
 
-            document.getElementById('mission-title').innerText = "=== ЭТАП 4: ПОДРЫВ СЕТИ СКАМЕРОВ ===";
-            document.getElementById('target-val').innerText = "Уничтожение штаб-квартир мошенников";
-            document.getElementById('instruction-text').innerText = "[ДИРЕКТИВА]: Активирована пассивная ставка Cyber Shield. Запусти атаку на подрыв серверов преступников.";
-            
-            printLog("<br>🖥️ Ты внутри главного хакерского дома в Лиссабоне! Твой пассивный оклад запущен: <span style='color: #0cf;'>$250/сек</span>.", "#3182ce");
-            printLog("Выбери цель для удаленного взлома и физического подрыва здания мошенников:<br>1 - Уничтожить колл-центр фальшивых лотерей (+20 взломов, +$500K)<br>2 - Полностью взорвать главный серверный бункер скамеров банков (+70 взломов, +$1.5M)", "#ffff00");
-            
-            document.getElementById('user-input').disabled = false; document.getElementById('submit-btn').disabled = false;
-            document.getElementById('user-input').placeholder = "Введи 1 или 2 для подрыва...";
-        }
-
-        function processHack() {
-            let input = document.getElementById('user-input').value.trim(); document.getElementById('user-input').value = "";
-            if (step !== 4 || !input) return;
-            
-            let mainBox = document.getElementById('main-box');
-            let flash = document.getElementById('explosion-flash');
-            mainBox.classList.add('shake-effect');
-            flash.style.opacity = "1";
-            setTimeout(() => { flash.style.opacity = "0"; }, 180);
-
-            playBeep(120, 1.8, 'sawtooth');
-
+        function triggerGoal() {
+            goalCount += 1; document.getElementById('goals-val').innerText = goalCount;
+            playSound(600, 0.1); setTimeout(() => playSound(800, 0.15), 80); setTimeout(() => playSound(1000, 0.4), 160);
+            goalBanner.classList.add('active-goal');
             setTimeout(() => {
-                mainBox.classList.remove('shake-effect');
-                if (input === "1") {
-                    score += 500000; hackedObjects += 20;
-                    printLog(">> БУУУМ! Здание мошенников взорвано! Угроза ликвидирована!", "#48bb78");
-                    endGame();
-                } else if (input
+                goalBanner.classList.remove('active-goal'); ball.reset(400, 225);
+                defenders.forEach(d => { d.x = d.startX; d.y = d.startY; });
+            }, 1500);
+        }
+
+        function drawFieldMarkings() {
+            ctx.strokeStyle = "rgba(255,255,255,0.5)"; ctx.lineWidth = 3;
+            ctx.beginPath(); ctx.moveTo(canvas.width / 2, 0); ctx.lineTo(canvas.width / 2, canvas.height); ctx.stroke();
+            ctx.beginPath(); ctx.arc(canvas.width / 2, canvas.height / 2, 60, 0, Math.PI * 2); ctx.stroke();
+            ctx.fillStyle = "rgba(255,255,255,0.5)"; ctx.beginPath(); ctx.arc(canvas.width / 2, canvas.height / 2, 4, 0, Math.PI * 2); ctx.fill();
+            ctx.strokeRect(canvas.width - 100, 90, 100, 270);
+            ctx.strokeStyle = "#fff"; ctx.lineWidth = 4; ctx.strokeRect(canvas.width - 4, 150, 4, 150);
+        }
+
+        function gameLoop() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            drawFieldMarkings();
+            ball.update(); player.update();
+            if (goalBanner.className.indexOf('active-goal') === -1) { defenders.forEach(d => d.update()); }
+            ball.draw(); defenders.forEach(d => d.draw()); player.draw();
+            requestAnimationFrame(gameLoop);
+        }
+
+        gameLoop();
+    </script>
+</body>
+</html>
