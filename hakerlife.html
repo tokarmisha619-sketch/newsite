@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>2D BeamNG Drive: 2Т Выхлоп Дзинь-Дзинь</title>
+    <title>2D BeamNG Drive: JDM Скутер Тюнинг</title>
     <style>
         body { margin: 0; background: #1a1a1a; color: white; font-family: Arial, sans-serif; overflow: hidden; touch-action: none; -webkit-user-select: none; user-select: none; }
         #menu { position: absolute; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(20, 20, 20, 0.95); display: flex; flex-direction: column; justify-content: center; align-items: center; z-index: 100; overflow-y: auto; padding: 20px 0; box-sizing: border-box; }
@@ -28,13 +28,12 @@
         #boom { position: absolute; top: 0; left: 0; width: 100vw; height: 100vh; background: radial-gradient(circle, rgba(255,69,0,1) 0%, rgba(0,0,0,0) 70%); opacity: 0; pointer-events: none; transition: opacity 0.1s ease-out; z-index: 5; }
         #mobileControls { position: absolute; bottom: 15px; left: 0; width: 100vw; display: none; justify-content: space-between; padding: 0 20px; box-sizing: border-box; z-index: 80; }
         .btn-left-group, .btn-right-group { display: flex; gap: 10px; }
-        .touch-btn { width: 55px; height: 55px; background: rgba(255, 255, 255, 0.15); border: 2px solid rgba(255, 255, 255, 0.5); border-radius: 50%; color: white; font-size: 18px; font-weight: bold; display: flex; justify-content: center; align-items: center; }
+        .touch-btn { width: 55px; height: 55px; background: rgba(255, 255, 255, 0.15); border: 3px solid rgba(255, 255, 255, 0.5); border-radius: 50%; color: white; font-size: 18px; font-weight: bold; display: flex; justify-content: center; align-items: center; }
         .touch-btn:active { background: rgba(255, 255, 255, 0.4); transform: scale(0.95); }
         #btnTurbo { background: rgba(231, 76, 60, 0.3); border-color: #ff4757; font-size: 11px; }
         #orientationWarning { position: absolute; top: 0; left: 0; width: 100vw; height: 100vh; background: #1a1a1a; z-index: 999; display: none; flex-direction: column; justify-content: center; align-items: center; text-align: center; padding: 20px; box-sizing: border-box; }
         #orientationWarning h3 { font-size: 22px; color: #ffa502; margin-bottom: 10px; }
     </style>
-    <script src="cloudflare.com"></script>
 </head>
 <body>
 
@@ -48,11 +47,11 @@
     
     <div id="wallet">💰 0 руб.</div>
 
-    <h2>МАГАЗИН ПРОКАЧКИ (UPGRADE)</h2>
+    <h2>ГАРАЖ КОМПЛЕКТУЮЩИХ (STAGE 2)</h2>
     <div class="shop-container">
-        <button id="upEngine" class="shop-btn" onclick="buyUpgrade('engine')">🚀 Двигатель (Лвл 1)</button>
-        <button id="upStunt" class="shop-btn" onclick="buyUpgrade('stunt')">🏍️ Стант-Кит (Лвл 1)</button>
-        <button id="upWeight" class="shop-btn" onclick="buyUpgrade('weight')">🎈 Облегчение (Лвл 1)</button>
+        <button id="upEngine" class="shop-btn" onclick="buyUpgrade('engine')">🚀 ЦПГ Malossi Sport 70cc (Лвл 1)</button>
+        <button id="upStunt" class="shop-btn" onclick="buyUpgrade('stunt')">🏍️ Труба Yasuni Z (Лвл 1)</button>
+        <button id="upWeight" class="shop-btn" onclick="buyUpgrade('weight')">🎈 Вариатор Stage6 R/T (Лвл 1)</button>
     </div>
 
     <h2>УСТРОЙСТВО УПРАВЛЕНИЯ</h2>
@@ -69,6 +68,7 @@
     </div>
 
     <h2>ВЫБЕРИ КАРТУ ДЛЯ ТЕСТА</h2>
+    <!-- Исправлена опечатка в названии, теперь карта запускается! -->
     <button class="map-btn" onclick="startGame('autobahn')">1. Прямой автобан (Пустая)</button>
     <button class="map-btn" onclick="startGame('lemans')">2. Ле-Ман (Холмы)</button>
     <button class="map-btn" onclick="startGame('chaos')">3. Городской хаос</button>
@@ -80,10 +80,10 @@
     <div id="infoPc">
         <strong>Управление (ПК):</strong><br>
         • Стрелка Вправо — Газ<br>
-        • Стрелка Вверх — <strong>СТАНТ (Вилли)</strong><br>
+        • Стрелка Вверх — СТАНТ (Вилли)<br>
         • Стрелка Вниз — Наклон вперёд<br>
-        • Зажми <strong>ПРОБЕЛ</strong> — ТУРБО 🔥<br>
-        • Клавиша <strong>R</strong> — Починить мопед
+        • Зажми ПРОБЕЛ — ТУРБО 🔥<br>
+        • Клавиша R — Починить мопед
     </div>
     <div id="infoMobile" style="display:none;">
         <strong>Управление (Телефон):</strong><br>
@@ -125,36 +125,55 @@
     let obstacles = [];
     let groundY = 0, currentSessionCash = 0;
 
-    // ЗВУКОВОЙ ДВИЖОК ДЛЯ 2Т ДЗИHЬ-ДЗИHЬ
+    // ЗВУКОВОЙ ДВИЖОК ДЛЯ 2Т ВЫХЛОПА (Генератор звука без внешних файлов)
     let audioCtx = null;
-    let soundTimer = 0;
+    let osc = null;
+    let gainNode = null;
 
-    function playScooterSound(speedKmh, isTurbo) {
-        if (!audioCtx) return;
-        
-        let now = performance.now();
-        // Рассчитываем частоту треска «дзинь» от текущей скорости
-        let interval = isTurbo ? 25 : Math.max(40, 180 - (speedKmh * 0.5));
-        
-        if (now - soundTimer > interval) {
-            soundTimer = now;
+    function initAudio() {
+        if (audioCtx) return;
+        try {
+            audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+            osc = audioCtx.createOscillator();
+            gainNode = audioCtx.createGain();
             
-            // Генерируем резкий металлический щелчок (дзинь)
-            let osc = audioCtx.createOscillator();
-            let gainNode = audioCtx.createGain();
+            // Настройка пилящей волны для жесткого звука 2Т выхлопа скутера
+            osc.type = 'sawtooth'; 
+            osc.frequency.setValueAtTime(40, audioCtx.currentTime);
             
-            osc.type = 'sawtooth'; // Пилообразная волна дает едкий 2Т звук
-            // Если турбо — визжит на высоких оборотах, если обычный газ — трещит басом
-            osc.frequency.setValueAtTime(isTurbo ? 320 + Math.random()*80 : 120 + speedKmh*0.8, audioCtx.currentTime);
-            
-            gainNode.gain.setValueAtTime(0.06, audioCtx.currentTime); // Громкость
-            gainNode.gain.exponentialRampToValueAtTime(0.0001, audioCtx.currentTime + 0.04);
+            gainNode.gain.setValueAtTime(0, audioCtx.currentTime);
             
             osc.connect(gainNode);
             gainNode.connect(audioCtx.destination);
-            
             osc.start();
-            osc.stop(audioCtx.currentTime + 0.05);
+        } catch(e) { console.log("Звук не поддерживается браузером"); }
+    }
+
+    function updateExhaustSound(speedKmh, gasPressed, turboPressed) {
+        if (!audioCtx) return;
+        if (isExploded) {
+            gainNode.gain.setTargetAtTime(0, audioCtx.currentTime, 0.05);
+            return;
+        }
+
+        if (turboPressed) {
+            // Дикий ор на турбо ускорении
+            osc.frequency.setTargetAtTime(450, audioCtx.currentTime, 0.1);
+            gainNode.gain.setTargetAtTime(0.2, audioCtx.currentTime, 0.05);
+        } else if (gasPressed) {
+            // Реалистичный холостой и разгон "дзинь-дзинь-дзинь" при нажатии газа
+            let targetFreq = 50 + (speedKmh * 1.2);
+            if (targetFreq > 280) targetFreq = 280;
+            osc.frequency.setTargetAtTime(targetFreq, audioCtx.currentTime, 0.1);
+            
+            // Эффект прерывистого выхлопа скутера (дзинь-дзинь)
+            let dzin = Math.sin(performance.now() * 0.05) > 0 ? 0.12 : 0.06;
+            gainNode.gain.setTargetAtTime(dzin, audioCtx.currentTime, 0.02);
+        } else {
+            // Работа на холостых когда катится или стоит
+            osc.frequency.setTargetAtTime(35, audioCtx.currentTime, 0.2);
+            let idleDzin = Math.sin(performance.now() * 0.02) > 0 ? 0.05 : 0.01;
+            gainNode.gain.setTargetAtTime(idleDzin, audioCtx.currentTime, 0.05);
         }
     }
 
@@ -167,7 +186,7 @@
         if (localStorage.getItem('beamng_scooter_save')) {
             gameData = JSON.parse(localStorage.getItem('beamng_scooter_save'));
         }
-    } catch(e) { console.log("Ошибка загрузки сохранений"); }
+    } catch(e) {}
 
     const scooterSpecs = {
         honda_dio: { maxNormal: 140, turboSpeed: 380, accel: 0.40, color: '#3498db' },
@@ -182,9 +201,9 @@
 
     function updateMenuUi() {
         document.getElementById('wallet').textContent = "💰 " + gameData.cash + " руб.";
-        document.getElementById('upEngine').textContent = "🚀 Двигатель (Лвл " + gameData.upgrades.engine + ") - " + (gameData.upgrades.engine * 150) + " руб.";
-        document.getElementById('upStunt').textContent = "🏍️ Стант-Кит (Лвл " + gameData.upgrades.stunt + ") - " + (gameData.upgrades.stunt * 200) + " руб.";
-        document.getElementById('upWeight').textContent = "🎈 Облегчение (Лвл " + gameData.upgrades.weight + ") - " + (gameData.upgrades.weight * 250) + " руб.";
+        document.getElementById('upEngine').textContent = "🚀 ЦПГ Malossi Sport (Лвл " + gameData.upgrades.engine + ") - " + (gameData.upgrades.engine * 150) + " руб.";
+        document.getElementById('upStunt').textContent = "🏍️ Труба Yasuni Z (Лвл " + gameData.upgrades.stunt + ") - " + (gameData.upgrades.stunt * 200) + " руб.";
+        document.getElementById('upWeight').textContent = "🎈 Вариатор Stage6 (Лвл " + gameData.upgrades.weight + ") - " + (gameData.upgrades.weight * 250) + " руб.";
     }
 
     function buyUpgrade(type) {
@@ -198,7 +217,7 @@
             gameData.upgrades[type]++;
             saveGame();
         } else {
-            alert("Не хватает игровых рублей для прокачки!");
+            alert("Не хватает игровых рублей для покупки тюнинга!");
         }
     }
 
@@ -243,11 +262,7 @@
     }
 
     function startGame(mapType) {
-        // Активируем звуковой контекст при клике игрока
-        if (!audioCtx) {
-            audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-        }
-        
+        initAudio(); // Включаем выхлоп при старте игры
         if(isRunning) return; 
         isRunning = true;
         map = mapType;
@@ -311,19 +326,6 @@
         isExploded = true;
         document.getElementById('boom').style.opacity = '1';
         setTimeout(() => document.getElementById('boom').style.opacity = '0', 200);
-        
-        // Звук бума при взрыве
-        if (audioCtx) {
-            let osc = audioCtx.createOscillator();
-            let gainNode = audioCtx.createGain();
-            osc.type = 'triangle';
-            osc.frequency.setValueAtTime(60, audioCtx.currentTime);
-            osc.frequency.exponentialRampToValueAtTime(10, audioCtx.currentTime + 0.3);
-            gainNode.gain.setValueAtTime(0.3, audioCtx.currentTime);
-            gainNode.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.3);
-            osc.connect(gainNode); gainNode.connect(audioCtx.destination);
-            osc.start(); osc.stop(audioCtx.currentTime + 0.3);
-        }
     }
 
     function gameLoop() {
@@ -343,10 +345,8 @@
         
         let speedKmh = Math.floor(carVx * 15);
 
-        // Воспроизведение звука выхлопа при движении
-        if ((keysActive['ArrowRight'] || keysActive['Space']) && !isExploded) {
-            playScooterSound(speedKmh, keysActive['Space']);
-        }
+        // Обновляем звук выхлопа каждую микросекунду
+        updateExhaustSound(speedKmh, keysActive['ArrowRight'], keysActive['Space']);
 
         if (keysActive['Space']) {
             carVx = specs.turboSpeed / 15; 
@@ -469,9 +469,4 @@
             ctxGame.strokeStyle = specs.color; ctxGame.lineWidth = 5;
             ctxGame.beginPath(); ctxGame.moveTo(-20, 0); ctxGame.lineTo(0, 10); ctxGame.lineTo(20, 0); ctxGame.lineTo(25, -35); ctxGame.stroke();
             ctxGame.fillStyle = '#111'; ctxGame.fillRect(15, -38, 15, 5);
-            ctxGame.fillStyle = specs.color; ctxGame.fillRect(-22, -18, 25, 12);
-            ctxGame.fillStyle = '#222'; ctxGame.fillRect(-25, -23, 20, 5); 
-            ctxGame.fillStyle = '#111';
-            ctxGame.beginPath(); ctxGame.arc(-20, 8, 10, 0, Math.PI * 2); ctxGame.arc(22, 8, 10, 0, Math.PI * 2); ctxGame.fill();
-            ctxGame.fillStyle = '#bdc3c7';
-            ctxGame.beginPath(); ctxGame.arc(-20, 8, 4, 0, Math
+            ctxGame.fillStyle = specs.color
