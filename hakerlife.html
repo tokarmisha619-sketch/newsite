@@ -2,7 +2,7 @@
 <html lang="ru">
 <head>
     <meta charset="UTF-8">
-    <title>2D BeamNG Drive: Скорость, Турбо и FPS</title>
+    <title>2D BeamNG Drive: Полная Версия</title>
     <style>
         body {
             margin: 0;
@@ -147,6 +147,7 @@
             z-index: 5;
         }
     </style>
+    <!-- ПОЛНАЯ РАБОЧАЯ ССЫЛКА НА ДВИЖОК MATTER.JS -->
     <script src="cloudflare.com"></script>
 </head>
 <body>
@@ -197,9 +198,7 @@
     let carColorBack = '#bdc3c7';
     let carColorFront = '#95a5a6';
 
-    // Переменные для подсчета FPS
     let lastCalledTime;
-    let fps;
     let frameCount = 0;
     let fpsInterval = 0;
 
@@ -310,12 +309,10 @@
         car = spawnPlayerCar();
         setupEvents();
         
-        // Запуск счетчика кадров (FPS)
         lastCalledTime = performance.now();
         requestAnimationFrame(updateFps);
     }
 
-    // Функция измерения реального FPS
     function updateFps(now) {
         if (document.getElementById('dashboard').style.display === 'none') return;
         
@@ -323,7 +320,7 @@
         fpsInterval = now - lastCalledTime;
         
         if (fpsInterval >= 1000) {
-            fps = Math.round((frameCount * 1000) / fpsInterval);
+            let fps = Math.round((frameCount * 1000) / fpsInterval);
             document.getElementById('fpsVal').textContent = fps;
             frameCount = 0;
             lastCalledTime = now;
