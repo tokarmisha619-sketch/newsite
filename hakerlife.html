@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>2D BeamNG Drive: Полная Версия</title>
+    <title>2D BeamNG Drive: Реалистичные Повреждения</title>
     <style>
         body { margin: 0; background: #1a1a1a; color: white; font-family: Arial, sans-serif; overflow: hidden; touch-action: none; -webkit-user-select: none; user-select: none; }
         #menu { position: absolute; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(20, 20, 20, 0.95); display: flex; flex-direction: column; justify-content: center; align-items: center; z-index: 100; overflow-y: auto; padding: 20px 0; box-sizing: border-box; }
@@ -70,13 +70,13 @@
 <div id="info">
     <div id="infoPc">
         <strong>Управление (ПК):</strong><br>
-        • Стрелка Вправо — Обычный газ<br>
+        • Стрелка Вправо — Газ (До 300 км/ч)<br>
         • Зажми <strong>ПРОБЕЛ</strong> — МГНОВЕННО 411 км/ч 🔥<br>
         • Клавиша <strong>R</strong> — Починить машину
     </div>
     <div id="infoMobile" style="display:none;">
         <strong>Управление (Телефон):</strong><br>
-        • Используй экранные кнопки под пальцами<br>
+        • Кнопка «→» — Газ (До 300 км/ч)<br>
         • Кнопка ТУРБО — МГНОВЕННО 411 км/ч 🔥
     </div>
 </div>
@@ -103,11 +103,12 @@
 
 <script>
     let canvas, ctxGame;
-    let carX = 150, carY = 300, carVx = 0, carVy = 0, carAngle = 0;
+    let carX = 150, carY = 0, carVx = 0, carVy = 0, carAngle = 0;
     let map = 'autobahn', isExploded = false;
     let keysActive = {}, currentMode = 'pc', carColorBack = '#3498db', carColorFront = '#2980b9';
     let frameCount = 0, lastCalledTime = performance.now(), fps = 60;
     let obstacles = [];
+    let groundY = 0;
 
     function selectDeviceMode(mode) {
         currentMode = mode;
@@ -137,11 +138,11 @@
         if (type === 'autobahn') {
             obstacles.push({x: 1800, type: 'car', color: '#e67e22'}, {x: 3200, type: 'car', color: '#95a5a6'}, {x: 5000, type: 'wall'});
         } else if (type === 'lemans') {
-            obstacles.push({x: 1200, type: 'ramp', w: 250, h: 60}, {x: 2800, type: 'ramp', w: 300, h: 90}, {x: 5000, type: 'wall'});
+            obstacles.push({x: 1000, type: 'ramp', w: 300, h: 100}, {x: 2600, type: 'ramp', w: 350, h: 140}, {x: 5500, type: 'wall'});
         } else if (type === 'chaos') {
             for(let i=0; i<6; i++) obstacles.push({x: 1200 + i*500, type: 'car', color: i%2===0?'#9b59b6':'#1abc9c'});
             for(let i=0; i<5; i++) obstacles.push({x: 1500 + i*650, type: 'box'});
-            obstacles.push({x: 5000, type: 'wall'});
+            obstacles.push({x: 6000, type: 'wall'});
         }
     }
 
@@ -168,7 +169,8 @@
         document.body.appendChild(canvas);
         ctxGame = canvas.getContext('2d');
 
-        carX = 150; carY = window.innerHeight - 100;
+        groundY = window.innerHeight - 60;
+        carX = 150; carY = groundY - 16; 
         carVx = 0; carVy = 0; carAngle = 0; isExploded = false;
         
         spawnMapObstacles(mapType);
@@ -192,8 +194,14 @@
     }
 
     function restartCar() {
-        carX = 150; carY = window.innerHeight - 100; carVx = 0; carVy = 0; carAngle = 0; isExploded = false;
+        carX = 150; carY = groundY - 16; carVx = 0; carVy = 0; carAngle = 0; isExploded = false;
         document.getElementById('flightStatus').style.opacity = '0';
+    }
+
+    function triggerExplosionEffect() {
+        isExploded = true;
+        document.getElementById('boom').style.opacity = '1';
+        setTimeout(() => document.getElementById('boom').style.opacity = '0', 200);
     }
 
     function gameLoop() {
@@ -212,34 +220,61 @@
             document.getElementById('turboText').style.display = 'block';
         } else {
             document.getElementById('turboText').style.display = 'none';
-            if (keysActive['ArrowRight'] && !isExploded) carVx += 0.25;
-            if (keysActive['ArrowLeft'] && !isExploded) carVx -= 0.15;
+            if (keysActive['ArrowRight'] && !isExploded && speedKmh < 300) carVx += 0.55; 
+            if (keysActive['ArrowLeft'] && !isExploded) carVx -= 0.30;
             carVx *= 0.98; 
         }
 
         carX += carVx;
         carY += carVy;
 
+        let currentGround = groundY - 16;
+        let onRamp = false;
+
+        obstacles.forEach(obs => {
+            if (obs.type === 'ramp' && carX >= obs.x && carX <= obs.x + obs.w) {
+                let ratio = (carX - obs.x) / obs.w;
+                currentGround = (groundY - 16) - (obs.h * ratio);
+                onRamp = true;
+            }
+        });
+
         if (speedKmh >= 300 && !isExploded) {
             document.getElementById('flightStatus').style.opacity = '1';
-            carVy -= 0.4; carAngle -= 0.04;
+            carVy -= 0.35; 
+            carAngle -= 0.045; 
         } else {
             document.getElementById('flightStatus').style.opacity = '0';
-            if(carY < window.innerHeight - 100) carVy += 0.3; 
-            else { carY = window.innerHeight - 100; carVy = 0; carAngle *= 0.8; }
+            if (carY < currentGround) {
+                carVy += 0.4; // Гравитация в полете
+            } else {
+                // ИСПРАВЛЕНО: Если машина падает на дорогу или трамплин сверху на огромной скорости — она ломается!
+                if (carVy > 4 && !isExploded) {
+                    triggerExplosionEffect();
+                    carVy = 0;
+                } else if (onRamp && carVx > 5) {
+                    carVy = -carVx * 0.45; 
+                } else {
+                    carY = currentGround; 
+                    carVy = 0; 
+                    carAngle *= 0.8; 
+                }
+            }
         }
 
         document.getElementById('speedVal').textContent = speedKmh;
         if(speedKmh >= 300) document.getElementById('speedometer').style.color = '#ff4757';
         else document.getElementById('speedometer').style.color = 'white';
 
+        // Проверка столкновений с боковыми препятствиями
         obstacles.forEach(obs => {
-            if (carX + 60 >= obs.x && carX - 60 <= obs.x + 50 && carY >= window.innerHeight - 140) {
-                if (speedKmh >= 300 && !isExploded) {
-                    isExploded = true;
-                    document.getElementById('boom').style.opacity = '1';
-                    setTimeout(() => document.getElementById('boom').style.opacity = '0', 200);
-                }
+            let hit = false;
+            if (obs.type === 'wall' && carX + 40 >= obs.x && carX - 40 <= obs.x + 70 && carY >= groundY - 140) hit = true;
+            if (obs.type === 'box' && carX + 40 >= obs.x && carX - 40 <= obs.x + 50 && carY >= groundY - 110) hit = true;
+            if (obs.type === 'car' && carX + 40 >= obs.x && carX - 40 <= obs.x + 70 && carY >= groundY - 100) hit = true;
+
+            if (hit && !isExploded) {
+                triggerExplosionEffect();
             }
         });
 
@@ -250,15 +285,15 @@
         ctxGame.translate(-carX + 200, 0);
 
         ctxGame.fillStyle = '#333';
-        ctxGame.fillRect(0, window.innerHeight - 60, carX + window.innerWidth * 10, 60);
+        ctxGame.fillRect(0, groundY, carX + window.innerWidth * 15, 60);
         ctxGame.fillStyle = '#fff';
-        for(let i=0; i<100; i++) ctxGame.fillRect(i * 300, window.innerHeight - 62, 100, 4);
+        for(let i=0; i<150; i++) ctxGame.fillRect(i * 300, groundY + 2, 100, 4);
 
         obstacles.forEach(obs => {
-            if(obs.type === 'wall') { ctxGame.fillStyle = '#ff4757'; ctxGame.fillRect(obs.x, window.innerHeight - 200, 70, 140); }
-            else if(obs.type === 'box') { ctxGame.fillStyle = '#f1c40f'; ctxGame.fillRect(obs.x, window.innerHeight - 110, 50, 50); }
-            else if(obs.type === 'ramp') { ctxGame.fillStyle = '#ffa502'; ctxGame.beginPath(); ctxGame.moveTo(obs.x, window.innerHeight - 60); ctxGame.lineTo(obs.x + obs.w, window.innerHeight - 60 - obs.h); ctxGame.lineTo(obs.x + obs.w, window.innerHeight - 60); ctxGame.fill(); }
-            else if(obs.type === 'car') { ctxGame.fillStyle = obs.color; ctxGame.fillRect(obs.x, window.innerHeight - 100, 70, 40); ctxGame.fillStyle = '#111'; ctxGame.beginPath(); ctxGame.arc(obs.x+15, window.innerHeight-60, 12, 0, Math.PI*2); ctxGame.arc(obs.x+55, window.innerHeight-60, 12, 0, Math.PI*2); ctxGame.fill(); }
+            if(obs.type === 'wall') { ctxGame.fillStyle = '#ff4757'; ctxGame.fillRect(obs.x, groundY - 140, 70, 140); }
+            else if(obs.type === 'box') { ctxGame.fillStyle = '#f1c40f'; ctxGame.fillRect(obs.x, groundY - 50, 50, 50); }
+            else if(obs.type === 'ramp') { ctxGame.fillStyle = '#ffa502'; ctxGame.beginPath(); ctxGame.moveTo(obs.x, groundY); ctxGame.lineTo(obs.x + obs.w, groundY - obs.h); ctxGame.lineTo(obs.x + obs.w, groundY); ctxGame.fill(); }
+            else if(obs.type === 'car') { ctxGame.fillStyle = obs.color; ctxGame.fillRect(obs.x, groundY - 40, 70, 40); ctxGame.fillStyle = '#111'; ctxGame.beginPath(); ctxGame.arc(obs.x+15, groundY, 12, 0, Math.PI*2); ctxGame.arc(obs.x+55, groundY, 12, 0, Math.PI*2); ctxGame.fill(); }
         });
 
         ctxGame.save();
@@ -285,6 +320,7 @@
             ctxGame.fillStyle = '#95a5a6';
             ctxGame.beginPath(); ctxGame.arc(-20, 0, 8, 0, Math.PI * 2); ctxGame.arc(25, 0, 8, 0, Math.PI * 2); ctxGame.fill();
         } else {
+            // Осколки при крушении
             ctxGame.fillStyle = carColorBack; ctxGame.fillRect(-20, -50, 30, 15);
             ctxGame.fillStyle = carColorFront; ctxGame.fillRect(20, 10, 25, 10);
             ctxGame.fillStyle = '#111'; ctxGame.beginPath(); ctxGame.arc(-40, -10, 16, 0, Math.PI * 2); ctxGame.arc(50, -40, 16, 0, Math.PI * 2); ctxGame.fill();
