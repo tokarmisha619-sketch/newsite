@@ -3,17 +3,17 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>2D BeamNG Drive: Мопедский Тюнинг и Стант</title>
+    <title>2D BeamNG Drive: Исправленная Версия</title>
     <style>
         body { margin: 0; background: #1a1a1a; color: white; font-family: Arial, sans-serif; overflow: hidden; touch-action: none; -webkit-user-select: none; user-select: none; }
         #menu { position: absolute; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(20, 20, 20, 0.95); display: flex; flex-direction: column; justify-content: center; align-items: center; z-index: 100; overflow-y: auto; padding: 20px 0; box-sizing: border-box; }
-        h1 { font-size: 26px; margin: 0 0 10px 0; text-shadow: 0 0 10px #ff4757; text-align: center; }
+        h1 { font-size: 28px; margin: 0 0 10px 0; text-shadow: 0 0 10px #ff4757; text-align: center; }
         h2 { font-size: 18px; margin: 10px 0 5px 0; color: #bdc3c7; }
         #wallet { font-size: 22px; font-weight: bold; color: #2ecc71; background: rgba(0,0,0,0.5); padding: 5px 15px; border-radius: 20px; border: 2px solid #2ecc71; margin-bottom: 10px; }
-        .mode-container, .vehicle-container, .shop-container { display: flex; flex-wrap: wrap; justify-content: center; gap: 8px; margin-bottom: 5px; max-width: 750px; }
-        .mode-btn, .v-btn, .shop-btn { background: #222; color: #bdc3c7; border: 2px solid #444; padding: 8px 14px; font-size: 13px; font-weight: bold; border-radius: 8px; cursor: pointer; transition: 0.2s; }
+        .mode-container, .vehicle-container, .shop-container { display: flex; flex-wrap: wrap; justify-content: center; gap: 10px; margin-bottom: 5px; max-width: 650px; }
+        .mode-btn, .v-btn, .shop-btn { background: #222; color: #bdc3c7; border: 2px solid #444; padding: 8px 16px; font-size: 14px; font-weight: bold; border-radius: 8px; cursor: pointer; transition: 0.2s; }
         .mode-btn.active, .v-btn.active { background: #2ecc71; color: white; border-color: #2ecc71; }
-        .shop-btn { border-color: #f1c40f; color: #f1c40f; width: 230px; text-align: left; }
+        .shop-btn { border-color: #f1c40f; color: #f1c40f; }
         .shop-btn:hover { background: rgba(241, 196, 15, 0.1); }
         .map-btn { background: #2e86de; color: white; border: none; padding: 10px 25px; font-size: 16px; font-weight: bold; margin: 4px; border-radius: 8px; cursor: pointer; transition: 0.2s; width: 280px; }
         .map-btn:hover { background: #54a0ff; transform: scale(1.03); }
@@ -28,12 +28,12 @@
         #boom { position: absolute; top: 0; left: 0; width: 100vw; height: 100vh; background: radial-gradient(circle, rgba(255,69,0,1) 0%, rgba(0,0,0,0) 70%); opacity: 0; pointer-events: none; transition: opacity 0.1s ease-out; z-index: 5; }
         #mobileControls { position: absolute; bottom: 15px; left: 0; width: 100vw; display: none; justify-content: space-between; padding: 0 20px; box-sizing: border-box; z-index: 80; }
         .btn-left-group, .btn-right-group { display: flex; gap: 10px; }
-        .touch-btn { width: 55px; height: 55px; background: rgba(255, 255, 255, 0.15); border: 3px solid rgba(255, 255, 255, 0.5); border-radius: 50%; color: white; font-size: 18px; font-weight: bold; display: flex; justify-content: center; align-items: center; }
+        .touch-btn { width: 55px; height: 55px; background: rgba(255, 255, 255, 0.15); border: 2px solid rgba(255, 255, 255, 0.5); border-radius: 50%; color: white; font-size: 18px; font-weight: bold; display: flex; justify-content: center; align-items: center; }
         .touch-btn:active { background: rgba(255, 255, 255, 0.4); transform: scale(0.95); }
         #btnTurbo { background: rgba(231, 76, 60, 0.3); border-color: #ff4757; font-size: 11px; }
         #orientationWarning { position: absolute; top: 0; left: 0; width: 100vw; height: 100vh; background: #1a1a1a; z-index: 999; display: none; flex-direction: column; justify-content: center; align-items: center; text-align: center; padding: 20px; box-sizing: border-box; }
+        #orientationWarning h3 { font-size: 22px; color: #ffa502; margin-bottom: 10px; }
     </style>
-    <script src="cloudflare.com"></script>
 </head>
 <body>
 
@@ -43,18 +43,15 @@
 </div>
 
 <div id="menu">
-    <h1>2D BEAMNG: СТАНТ И КОМПОНЕНТЫ</h1>
+    <h1>2D BEAMNG DRIVE: СТАНТ И ТЮНИНГ</h1>
     
     <div id="wallet">💰 0 руб.</div>
 
-    <h2>ГАРАЖ / МОПЕДСКИЕ КОМПОНЕНТЫ</h2>
+    <h2>МАГАЗИН ПРОКАЧКИ (UPGRADE)</h2>
     <div class="shop-container">
-        <button id="upCpg" class="shop-btn" onclick="buyUpgrade('cpg')">📦 ЦПГ Malossi 70cc (Лвл 1)<br>Цена: 150 р.</button>
-        <button id="upPipe" class="shop-btn" onclick="buyUpgrade('pipe')">💨 Труба Solo C16 (Лвл 1)<br>Цена: 180 р.</button>
-        <button id="upCarb" class="shop-btn" onclick="buyUpgrade('carb')">⛽ Карб Dellorto 21 (Лвл 1)<br>Цена: 200 р.</button>
-        <button id="upTrans" class="shop-btn" onclick="buyUpgrade('trans')">⚙️ Варик Multivar (Лвл 1)<br>Цена: 150 р.</button>
-        <button id="upRul" class="shop-btn" onclick="buyUpgrade('rul')">🏍️ Руль и Вынос STR8 (Лвл 1)<br>Цена: 220 р.</button>
-        <button id="upBrake" class="shop-btn" onclick="buyUpgrade('brake')">🛑 Тормоза Stage6 (Лвл 1)<br>Цена: 170 р.</button>
+        <button id="upEngine" class="shop-btn" onclick="buyUpgrade('engine')">🚀 Двигатель (Лвл 1)</button>
+        <button id="upStunt" class="shop-btn" onclick="buyUpgrade('stunt')">🏍️ Стант-Кит (Лвл 1)</button>
+        <button id="upWeight" class="shop-btn" onclick="buyUpgrade('weight')">🎈 Облегчение (Лвл 1)</button>
     </div>
 
     <h2>УСТРОЙСТВО УПРАВЛЕНИЯ</h2>
@@ -81,16 +78,16 @@
 <div id="info">
     <div id="infoPc">
         <strong>Управление (ПК):</strong><br>
-        • Стрелка Вправо — Газ мопеда<br>
+        • Стрелка Вправо — Газ<br>
         • Стрелка Вверх — <strong>СТАНТ (Вилли)</strong><br>
-        • Стрелка Вниз — Тормоз контуром Stage6 (вперед)<br>
-        • Зажми <strong>ПРОБЕЛ</strong> — ТУРБО ВЫХЛОП 🔥<br>
+        • Стрелка Вниз — Наклон вперёд<br>
+        • Зажми <strong>ПРОБЕЛ</strong> — ТУРБО 🔥<br>
         • Клавиша <strong>R</strong> — Починить мопед
     </div>
     <div id="infoMobile" style="display:none;">
         <strong>Управление (Телефон):</strong><br>
-        • Кнопка «→» — Ручка газа на полную<br>
-        • Кнопка «↑» — Трюк вилли (на заднее)<br>
+        • Кнопка «→» — Ручка газа<br>
+        • Кнопка «↑» — СТАНТ / ВИЛЛИ<br>
         • Кнопка ТУРБО — МАКСИМАЛЬНЫЙ РАЗГОН 🔥
     </div>
 </div>
@@ -121,21 +118,23 @@
 <script>
     let canvas, ctxGame;
     let carX = 150, carY = 0, carVx = 0, carVy = 0, carAngle = 0;
-    let map = 'autobahn', isExploded = false;
+    let map = 'autobahn', isExploded = false, isRunning = false;
     let keysActive = {}, currentMode = 'pc', chosenVehicle = 'honda_dio';
     let frameCount = 0, lastCalledTime = performance.now(), fps = 60;
     let obstacles = [];
     let groundY = 0, currentSessionCash = 0;
 
-    // СИСТЕМА СОХРАНЕНИЯ ПРОГРЕССА (Загрузка реальных компонентов)
     let gameData = {
         cash: 0,
-        upgrades: { cpg: 1, pipe: 1, carb: 1, trans: 1, rul: 1, brake: 1 }
+        upgrades: { engine: 1, stunt: 1, weight: 1 }
     };
     
-    if (localStorage.getItem('beamng_scooter_comp_save')) {
-        try { gameData = JSON.parse(localStorage.getItem('beamng_scooter_comp_save')); } catch(e) {}
-    }
+    // Загрузка сохранений безопасным способом
+    try {
+        if (localStorage.getItem('beamng_scooter_save')) {
+            gameData = JSON.parse(localStorage.getItem('beamng_scooter_save'));
+        }
+    } catch(e) { console.log("Ошибка загрузки сохранений"); }
 
     const scooterSpecs = {
         honda_dio: { maxNormal: 140, turboSpeed: 380, accel: 0.40, color: '#3498db' },
@@ -144,30 +143,29 @@
     };
 
     function saveGame() {
-        localStorage.setItem('beamng_scooter_comp_save', JSON.stringify(gameData));
+        localStorage.setItem('beamng_scooter_save', JSON.stringify(gameData));
         updateMenuUi();
     }
 
     function updateMenuUi() {
         document.getElementById('wallet').textContent = "💰 " + gameData.cash + " руб.";
-        document.getElementById('upCpg').innerHTML = "📦 ЦПГ Malossi 70cc (Лвл " + gameData.upgrades.cpg + ")<br>Цена: " + (gameData.upgrades.cpg * 150) + " р.";
-        document.getElementById('upPipe').innerHTML = "💨 Труба Solo C16 (Лвл " + gameData.upgrades.pipe + ")<br>Цена: " + (gameData.upgrades.pipe * 180) + " р.";
-        document.getElementById('upCarb').innerHTML = "⛽ Карб Dellorto 21 (Лвл " + gameData.upgrades.carb + ")<br>Цена: " + (gameData.upgrades.carb * 200) + " р.";
-        document.getElementById('upTrans').innerHTML = "⚙️ Варик Multivar (Лвл " + gameData.upgrades.trans + ")<br>Цена: " + (gameData.upgrades.trans * 150) + " р.";
-        document.getElementById('upRul').innerHTML = "  Руль и Вынос STR8 (Лвл " + gameData.upgrades.rul + ")<br>Цена: " + (gameData.upgrades.rul * 220) + " р.";
-        document.getElementById('upBrake').innerHTML = "🛑 Тормоза Stage6 (Лвл " + gameData.upgrades.brake + ")<br>Цена: " + (gameData.upgrades.brake * 170) + " р.";
+        document.getElementById('upEngine').textContent = "🚀 Двигатель (Лвл " + gameData.upgrades.engine + ") - " + (gameData.upgrades.engine * 150) + " руб.";
+        document.getElementById('upStunt').textContent = "🏍️ Стант-Кит (Лвл " + gameData.upgrades.stunt + ") - " + (gameData.upgrades.stunt * 200) + " руб.";
+        document.getElementById('upWeight').textContent = "🎈 Облегчение (Лвл " + gameData.upgrades.weight + ") - " + (gameData.upgrades.weight * 250) + " руб.";
     }
 
     function buyUpgrade(type) {
-        let costs = { cpg: 150, pipe: 180, carb: 200, trans: 150, rul: 220, brake: 170 };
-        let cost = gameData.upgrades[type] * costs[type];
+        let cost = 0;
+        if(type === 'engine') cost = gameData.upgrades.engine * 150;
+        if(type === 'stunt') cost = gameData.upgrades.stunt * 200;
+        if(type === 'weight') cost = gameData.upgrades.weight * 250;
 
         if (gameData.cash >= cost) {
             gameData.cash -= cost;
             gameData.upgrades[type]++;
             saveGame();
         } else {
-            alert("Не хватает игровых рублей на покупку этой запчасти!");
+            alert("Не хватает игровых рублей для прокачки!");
         }
     }
 
@@ -193,6 +191,7 @@
         document.getElementById('vDio').className = 'v-btn';
         document.getElementById('vJog').className = 'v-btn';
         document.getElementById('vTact').className = 'v-btn';
+
         if (type === 'honda_dio') document.getElementById('vDio').className = 'v-btn active';
         if (type === 'yamaha_jog') document.getElementById('vJog').className = 'v-btn active';
         if (type === 'honda_tact') document.getElementById('vTact').className = 'v-btn active';
@@ -201,6 +200,7 @@
     function spawnMapObstacles(type) {
         obstacles = [];
         if (type === 'autobahn') {
+            // Без препятствий
         } else if (type === 'lemans') {
             obstacles.push({x: 1000, type: 'ramp', w: 300, h: 100}, {x: 2600, type: 'ramp', w: 350, h: 140}, {x: 5500, type: 'wall'});
         } else if (type === 'chaos') {
@@ -211,7 +211,10 @@
     }
 
     function startGame(mapType) {
+        if(isRunning) return; // Защита от повторного запуска игрового цикла
+        isRunning = true;
         map = mapType;
+        
         document.getElementById('menu').style.display = 'none';
         document.getElementById('info').style.display = 'block';
         document.getElementById('backToMenu').style.display = 'block';
@@ -248,6 +251,7 @@
 
         const attachTouch = (id, key) => {
             const btn = document.getElementById(id);
+            if(!btn) return;
             btn.addEventListener('touchstart', (e) => { e.preventDefault(); keysActive[key] = true; });
             btn.addEventListener('touchend', (e) => { e.preventDefault(); keysActive[key] = false; });
         };
@@ -256,7 +260,9 @@
         attachTouch('btnTurbo', 'Space');
         attachTouch('btnUp', 'ArrowUp');     
         attachTouch('btnDown', 'ArrowDown'); 
-        document.getElementById('btnRepair').addEventListener('touchstart', (e) => { e.preventDefault(); restartCar(); });
+        
+        const repBtn = document.getElementById('btnRepair');
+        if(repBtn) repBtn.addEventListener('touchstart', (e) => { e.preventDefault(); restartCar(); });
     }
 
     function restartCar() {
@@ -281,15 +287,11 @@
 
         const specs = scooterSpecs[chosenVehicle];
         
-        // ВЛИЯНИЕ МОПЕДСКИХ ЗАПЧАСТЕЙ НА КОД И ФИЗИКУ
-        let maxSpeedBonus = (gameData.upgrades.cpg - 1) * 15 + (gameData.upgrades.pipe - 1) * 15; 
-        let upgradedMaxNormal = specs.maxNormal + maxSpeedBonus; 
-        
-        let accelBonus = (gameData.upgrades.carb - 1) * 0.05 + (gameData.upgrades.trans - 1) * 0.05;
-        let upgradedAccel = specs.accel + accelBonus;
-
-        let stuntPower = 0.05 + (gameData.upgrades.rul - 1) * 0.015; // Руль облегчает вилли
-        let brakePower = 0.05 + (gameData.upgrades.brake - 1) * 0.015; // Контур Stage6 прижимает перед
+        let upgradedMaxNormal = specs.maxNormal + (gameData.upgrades.engine - 1) * 25; 
+        let upgradedAccel = specs.accel + (gameData.upgrades.engine - 1) * 0.08;
+        let stuntPower = 0.05 + (gameData.upgrades.stunt - 1) * 0.015;                
+        let weightReduction = 0.45 - (gameData.upgrades.weight - 1) * 0.04;           
+        if(weightReduction < 0.2) weightReduction = 0.2;
 
         let speedKmh = Math.floor(carVx * 15);
 
@@ -297,7 +299,7 @@
             carVx = specs.turboSpeed / 15; 
             speedKmh = specs.turboSpeed;
             document.getElementById('turboText').style.display = 'block';
-            document.getElementById('turboText').textContent = "ВЫХЛОП ТУРБО: " + specs.turboSpeed + " КМ/Ч";
+            document.getElementById('turboText').textContent = "ТУРБО: " + specs.turboSpeed + " КМ/Ч";
         } else {
             document.getElementById('turboText').style.display = 'none';
             if (keysActive['ArrowRight'] && !isExploded && speedKmh < upgradedMaxNormal) {
@@ -310,13 +312,12 @@
         carX += carVx;
         carY += carVy;
 
-        // ЗАРАБОТОК РУБЛЕЙ
         if (!isExploded && carVx > 2) {
             let cashReward = Math.floor(carVx * 0.1);
-            if (carY < groundY - 30) cashReward += 3; // Бонус за стант-полет
+            if (carY < groundY - 30) cashReward += 2; 
             currentSessionCash += cashReward;
             gameData.cash += cashReward;
-            localStorage.setItem('beamng_scooter_comp_save', JSON.stringify(gameData));
+            try { localStorage.setItem('beamng_scooter_save', JSON.stringify(gameData)); } catch(e){}
             document.getElementById('cashCounter').textContent = "+" + currentSessionCash + " руб.";
         }
 
@@ -331,15 +332,14 @@
             }
         });
 
-        // ПРИМЕНЕНИЕ РУЛЯ И ТОРМОЗОВ НА НАКЛОН УГЛА СКУТЕРА
         if (!isExploded) {
             if (keysActive['ArrowUp']) carAngle -= stuntPower; 
-            if (keysActive['ArrowDown']) carAngle += brakePower; 
+            if (keysActive['ArrowDown']) carAngle += stuntPower; 
         }
 
         if (speedKmh >= 300 && !isExploded) {
             document.getElementById('flightStatus').style.opacity = '1';
-            carVy -= 0.45; 
+            carVy -= (0.45 + (gameData.upgrades.weight - 1) * 0.05); 
             if (!keysActive['ArrowUp'] && !keysActive['ArrowDown']) carAngle -= 0.035; 
         } else {
             document.getElementById('flightStatus').style.opacity = '0';
@@ -352,7 +352,7 @@
                     carVy = 0;
                 } else {
                     if (onRamp && carVx > 5) {
-                        carVy = -carVx * 0.55; 
+                        carVy = -carVx * (0.55 + (gameData.upgrades.weight - 1) * 0.05); 
                     } else {
                         carY = currentGround; 
                         carVy = 0; 
@@ -412,4 +412,15 @@
             }
         } else {
             ctxGame.fillStyle = specs.color; ctxGame.fillRect(-15, -20, 15, 10);
-            ctxGame.fillStyle = '#111'; ctxGame.beginPath(); ctxGame.arc(-30, 5, 10, 0, Math.PI * 2); ctxGame.arc(40, -2
+            ctxGame.fillStyle = '#111'; ctxGame.beginPath(); ctxGame.arc(-30, 5, 10, 0, Math.PI * 2); ctxGame.arc(40, -25, 10, 0, Math.PI * 2); ctxGame.fill();
+        }
+        ctxGame.restore();
+        ctxGame.restore();
+        requestAnimationFrame(gameLoop);
+    }
+
+    // Инициализация интерфейса магазина строго при загрузке скрипта
+    updateMenuUi();
+</script>
+</body>
+</html>
