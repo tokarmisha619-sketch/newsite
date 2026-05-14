@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>2D BeamNG Drive: Исправленная Версия</title>
+    <title>2D BeamNG Drive: Идеальный Стант-Контроль</title>
     <style>
         body { margin: 0; background: #1a1a1a; color: white; font-family: Arial, sans-serif; overflow: hidden; touch-action: none; -webkit-user-select: none; user-select: none; }
         #menu { position: absolute; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(20, 20, 20, 0.95); display: flex; flex-direction: column; justify-content: center; align-items: center; z-index: 100; overflow-y: auto; padding: 20px 0; box-sizing: border-box; }
@@ -17,7 +17,7 @@
         .shop-btn:hover { background: rgba(241, 196, 15, 0.1); }
         .map-btn { background: #2e86de; color: white; border: none; padding: 10px 25px; font-size: 16px; font-weight: bold; margin: 4px; border-radius: 8px; cursor: pointer; transition: 0.2s; width: 280px; }
         .map-btn:hover { background: #54a0ff; transform: scale(1.03); }
-        #info { position: absolute; top: 10px; left: 10px; font-size: 13px; background: rgba(0,0,0,0.7); padding: 12px; border-radius: 5px; pointer-events: none; line-height: 1.5; z-index: 10; display: none; max-width: 280px; }
+        #info { position: absolute; top: 10px; left: 10px; font-size: 14px; background: rgba(0,0,0,0.7); padding: 12px; border-radius: 5px; pointer-events: none; line-height: 1.5; z-index: 10; display: none; max-width: 280px; }
         #backToMenu { position: absolute; top: 10px; right: 10px; background: #ff4757; color: white; border: none; padding: 8px 15px; font-size: 14px; border-radius: 5px; cursor: pointer; z-index: 10; display: none; }
         #dashboard { position: absolute; bottom: 20px; right: 20px; background: rgba(0,0,0,0.8); padding: 12px; border-radius: 10px; border: 2px solid #333; z-index: 10; display: none; min-width: 165px; }
         #speedometer { font-size: 28px; font-weight: bold; text-align: right; }
@@ -34,6 +34,7 @@
         #orientationWarning { position: absolute; top: 0; left: 0; width: 100vw; height: 100vh; background: #1a1a1a; z-index: 999; display: none; flex-direction: column; justify-content: center; align-items: center; text-align: center; padding: 20px; box-sizing: border-box; }
         #orientationWarning h3 { font-size: 22px; color: #ffa502; margin-bottom: 10px; }
     </style>
+    <script src="cloudflare.com"></script>
 </head>
 <body>
 
@@ -129,7 +130,6 @@
         upgrades: { engine: 1, stunt: 1, weight: 1 }
     };
     
-    // Загрузка сохранений безопасным способом
     try {
         if (localStorage.getItem('beamng_scooter_save')) {
             gameData = JSON.parse(localStorage.getItem('beamng_scooter_save'));
@@ -200,7 +200,6 @@
     function spawnMapObstacles(type) {
         obstacles = [];
         if (type === 'autobahn') {
-            // Без препятствий
         } else if (type === 'lemans') {
             obstacles.push({x: 1000, type: 'ramp', w: 300, h: 100}, {x: 2600, type: 'ramp', w: 350, h: 140}, {x: 5500, type: 'wall'});
         } else if (type === 'chaos') {
@@ -211,7 +210,7 @@
     }
 
     function startGame(mapType) {
-        if(isRunning) return; // Защита от повторного запуска игрового цикла
+        if(isRunning) return; 
         isRunning = true;
         map = mapType;
         
@@ -289,10 +288,8 @@
         
         let upgradedMaxNormal = specs.maxNormal + (gameData.upgrades.engine - 1) * 25; 
         let upgradedAccel = specs.accel + (gameData.upgrades.engine - 1) * 0.08;
-        let stuntPower = 0.05 + (gameData.upgrades.stunt - 1) * 0.015;                
-        let weightReduction = 0.45 - (gameData.upgrades.weight - 1) * 0.04;           
-        if(weightReduction < 0.2) weightReduction = 0.2;
-
+        let stuntPower = 0.015 + (gameData.upgrades.stunt - 1) * 0.005; // Снижена резкость для плавного подъема
+        
         let speedKmh = Math.floor(carVx * 15);
 
         if (keysActive['Space']) {
@@ -332,22 +329,44 @@
             }
         });
 
+        // ИСПРАВЛЕННАЯ СИСТЕМА УПРАВЛЕНИЯ СТАНТОМ (ИДЕАЛЬНЫЙ БАЛАНС)
         if (!isExploded) {
-            if (keysActive['ArrowUp']) carAngle -= stuntPower; 
-            if (keysActive['ArrowDown']) carAngle += stuntPower; 
+            let isAirborne = carY < currentGround - 5;
+
+            if (isAirborne) {
+                // Свободный наклон в воздухе без ограничений для трюков
+                if (keysActive['ArrowUp']) carAngle -= 0.04;
+                if (keysActive['ArrowDown']) carAngle += 0.04;
+            } else {
+                // На земле: плавный подъем на заднее колесо
+                if (keysActive['ArrowUp'] && carVx > 1) {
+                    carAngle -= stuntPower;
+                    // Ограничиваем максимальный угол вилли, чтобы мопед не крутился бесконечно и не падал на спину сам по себе
+                    if (carAngle < -0.85) carAngle = -0.85; 
+                } else if (keysActive['ArrowDown']) {
+                    carAngle += 0.04;
+                    if (carAngle > 0) carAngle = 0;
+                } else {
+                    // ГРАВИТАЦИЯ ДЛЯ СТАНТА: Если отпустить кнопку подъема, мопед плавно возвращается на 2 колеса!
+                    if (carAngle < 0) {
+                        carAngle += 0.025;
+                        if (carAngle > 0) carAngle = 0;
+                    }
+                }
+            }
         }
 
         if (speedKmh >= 300 && !isExploded) {
             document.getElementById('flightStatus').style.opacity = '1';
             carVy -= (0.45 + (gameData.upgrades.weight - 1) * 0.05); 
-            if (!keysActive['ArrowUp'] && !keysActive['ArrowDown']) carAngle -= 0.035; 
         } else {
             document.getElementById('flightStatus').style.opacity = '0';
             if (carY < currentGround) {
                 carVy += 0.4; 
             } else {
                 let normalizedAngle = Math.abs(carAngle % (Math.PI * 2));
-                if (carVy > 6 && (normalizedAngle > 1.3 && normalizedAngle < 4.9) && !isExploded) {
+                // Взрыв только при жестком падении на крышу/голову пилота
+                if (carVy > 6 && (normalizedAngle > 1.4 && normalizedAngle < 4.8) && !isExploded) {
                     triggerExplosionEffect();
                     carVy = 0;
                 } else {
@@ -419,7 +438,6 @@
         requestAnimationFrame(gameLoop);
     }
 
-    // Инициализация интерфейса магазина строго при загрузке скрипта
     updateMenuUi();
 </script>
 </body>
