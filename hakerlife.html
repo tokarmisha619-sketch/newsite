@@ -1,392 +1,425 @@
 <!DOCTYPE html>
-<html>
+<html lang="ru">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width,initial-scale=1.0,user-scalable=no">
-    <title>⚽ MISHA VIPERSKY №5: MOBILE STRIKER</title>
+    <title>2D BeamNG Drive: Скорость, Турбо и FPS</title>
     <style>
-        body { font-family: monospace; background: #1a202c; color: #fff; margin: 0; padding: 10px; display: flex; flex-direction: column; align-items: center; overflow: hidden; touch-action: none; -webkit-user-select: none; user-select: none; }
-        .menu-bar { display: flex; gap: 15px; margin-bottom: 10px; z-index: 10; }
-        .mode-btn { background: #4a5568; color: #fff; border: 2px solid #718096; padding: 8px 16px; border-radius: 6px; cursor: pointer; font-family: monospace; font-weight: bold; transition: all 0.2s; font-size: 0.9em; }
-        .mode-btn.active { background: #3182ce; border-color: #63b3ed; box-shadow: 0 0 10px rgba(99,179,237,0.6); }
-        .score-board { display: flex; gap: 30px; background: #2d3748; padding: 10px 20px; border: 2px solid #4a5568; border-radius: 8px; margin-bottom: 10px; box-shadow: 0 4px 10px rgba(0,0,0,0.3); font-size: 1.1em; z-index: 10; }
-        #field-container { position: relative; width: 800px; height: 450px; background: #38a169; border: 5px solid #fff; border-radius: 4px; box-shadow: 0 6px 20px rgba(0,0,0,0.5); }
-        canvas { width: 100%; height: 100%; display: block; }
-        #goal-banner { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%) scale(0); background: rgba(0,0,0,0.85); color: #ecc94b; border: 3px solid #ecc94b; padding: 20px 40px; font-size: 3em; font-weight: bold; border-radius: 10px; text-shadow: 0 0 10px #ecc94b; transition: transform 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275); pointer-events: none; z-index: 100; text-align: center; }
-        .active-goal { transform: translate(-50%, -50%) scale(1) !important; }
-        
-        /* Мобильный джойстик (слева) */
-        #joystick-zone { position: fixed; bottom: 30px; left: 30px; width: 110px; height: 110px; background: rgba(255,255,255,0.15); border: 3px solid rgba(255,255,255,0.4); border-radius: 50%; z-index: 1000; display: flex; align-items: center; justify-content: center; }
-        #joystick-stick { width: 45px; height: 45px; background: rgba(255,255,255,0.85); border-radius: 50%; box-shadow: 0 4px 10px rgba(0,0,0,0.4); pointer-events: none; }
-
-        /* Кнопка удара (справа) */
-        #kick-btn { position: fixed; bottom: 35px; right: 35px; width: 85px; height: 85px; background: #e53e3e; border: 4px solid #fff; border-radius: 50%; z-index: 1000; display: flex; align-items: center; justify-content: center; font-family: monospace; font-weight: bold; font-size: 1.1em; color: #fff; box-shadow: 0 6px 12px rgba(0,0,0,0.4); text-shadow: 1px 1px 2px #000; cursor: pointer; transition: transform 0.05s; }
-        #kick-btn:active { transform: scale(0.9); background: #c53030; }
+        body {
+            margin: 0;
+            background: #1a1a1a;
+            color: white;
+            font-family: Arial, sans-serif;
+            overflow: hidden;
+        }
+        #menu {
+            position: absolute;
+            top: 0; left: 0; width: 100vw; height: 100vh;
+            background: rgba(20, 20, 20, 0.95);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            z-index: 100;
+        }
+        h1 {
+            font-size: 38px;
+            margin-bottom: 20px;
+            text-shadow: 0 0 10px #ff4757;
+        }
+        h2 {
+            font-size: 24px;
+            margin-top: 20px;
+            margin-bottom: 15px;
+            color: #bdc3c7;
+        }
+        .map-btn {
+            background: #2e86de;
+            color: white;
+            border: none;
+            padding: 12px 30px;
+            font-size: 20px;
+            font-weight: bold;
+            margin: 8px;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: 0.2s;
+            width: 320px;
+        }
+        .map-btn:hover {
+            background: #54a0ff;
+            transform: scale(1.05);
+        }
+        .color-container {
+            display: flex;
+            gap: 15px;
+        }
+        .color-btn {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            border: 3px solid white;
+            cursor: pointer;
+            transition: 0.2s;
+        }
+        .color-btn:hover, .color-btn.active {
+            transform: scale(1.2);
+            border-color: #ff4757;
+        }
+        #info {
+            position: absolute;
+            top: 10px;
+            left: 10px;
+            font-size: 16px;
+            background: rgba(0,0,0,0.7);
+            padding: 12px;
+            border-radius: 5px;
+            pointer-events: none;
+            line-height: 1.5;
+            z-index: 10;
+            display: none;
+        }
+        #backToMenu {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            background: #ff4757;
+            color: white;
+            border: none;
+            padding: 8px 15px;
+            font-size: 14px;
+            border-radius: 5px;
+            cursor: pointer;
+            z-index: 10;
+            display: none;
+        }
+        #dashboard {
+            position: absolute;
+            bottom: 20px;
+            right: 20px;
+            background: rgba(0,0,0,0.8);
+            padding: 15px;
+            border-radius: 10px;
+            border: 2px solid #333;
+            z-index: 10;
+            display: none;
+            min-width: 160px;
+        }
+        #speedometer {
+            font-size: 32px;
+            font-weight: bold;
+            text-align: right;
+        }
+        #fpsCounter {
+            font-size: 16px;
+            color: #2ecc71;
+            margin-top: 5px;
+            text-align: right;
+            font-family: monospace;
+        }
+        #turboText {
+            font-size: 14px;
+            color: #54a0ff;
+            margin-top: 5px;
+            display: none;
+            text-align: right;
+            font-weight: bold;
+        }
+        #flightStatus {
+            position: absolute;
+            top: 30%; left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 80px;
+            font-weight: bold;
+            color: #ff3838;
+            text-shadow: 0 0 20px #ff0000;
+            opacity: 0;
+            transition: opacity 0.1s ease-in-out;
+            pointer-events: none;
+            z-index: 10;
+        }
+        #boom {
+            position: absolute;
+            top: 0; left: 0; width: 100vw; height: 100vh;
+            background: radial-gradient(circle, rgba(255,69,0,1) 0%, rgba(0,0,0,0) 70%);
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.1s ease-out;
+            z-index: 5;
+        }
     </style>
+    <script src="cloudflare.com"></script>
 </head>
 <body>
 
-    <!-- ВЫБОР РЕЖИМА ИГРЫ -->
-    <div class="menu-bar">
-        <button id="btn-match" class="mode-btn active" onclick="setGameMode('match')">🏆 МАТЧ 5х5</button>
-        <button id="btn-training" class="mode-btn" onclick="setGameMode('training')">🎯 ТРЕНИРОВКА</button>
+<div id="menu">
+    <h1>ВЫБЕРИ КАРТУ ДЛЯ ТЕСТА</h1>
+    <button class="map-btn" onclick="startGame('autobahn')">1. Прямой автобан</button>
+    <button class="map-btn" onclick="startGame('lemans')">2. Ле-Ман (Холмы)</button>
+    <button class="map-btn" onclick="startGame('chaos')">3. Городской хаос</button>
+
+    <h2>ВЫБЕРИ ЦВЕТ МАШИНЫ</h2>
+    <div class="color-container">
+        <div class="color-btn active" style="background: #bdc3c7;" onclick="selectColor('#bdc3c7', '#95a5a6', this)"></div>
+        <div class="color-btn" style="background: #e74c3c;" onclick="selectColor('#e74c3c', '#c0392b', this)"></div>
+        <div class="color-btn" style="background: #2ecc71;" onclick="selectColor('#2ecc71', '#27ae60', this)"></div>
+        <div class="color-btn" style="background: #2c3e50;" onclick="selectColor('#2c3e50', '#1a252f', this)"></div>
     </div>
+</div>
 
-    <!-- ТАБЛО СЧЕТА -->
-    <div class="score-board">
-        <div>👤 МЫ: <span id="my-score" style="color: #48bb78; font-weight: bold;">0</span></div>
-        <div>🆚 СЧЕТ</div>
-        <div>🤖 ОНИ: <span id="enemy-score" style="color: #e53e3e; font-weight: bold;">0</span></div>
-    </div>
+<button id="backToMenu" onclick="location.reload()">В меню</button>
 
-    <!-- ИГРОВОЕ ПОЛЕ -->
-    <div id="field-container">
-        <canvas id="football-field" width="800" height="450"></canvas>
-        <div id="goal-banner">ГООООЛ! ⚽🔥</div>
-    </div>
+<div id="info">
+    <strong>Управление:</strong><br>
+    • Стрелка Вправо — Газ<br>
+    • Зажми <strong>ПРОБЕЛ</strong> — ТУРБО-УСКОРЕНИЕ 🔥<br>
+    • Набери 300 км/ч для взлета!<br>
+    • Клавиша <strong>R</strong> — Починить машину
+</div>
 
-    <!-- ИНТЕРФЕЙС ДЛЯ СМАРТФОНОВ -->
-    <div id="joystick-zone">
-        <div id="joystick-stick"></div>
-    </div>
-    <div id="kick-btn">УДАР</div>
+<div id="dashboard">
+    <div id="speedometer"><span id="speedVal">0</span> км/ч</div>
+    <div id="turboText">ТУРБО АКТИВНО</div>
+    <div id="fpsCounter">FPS: <span id="fpsVal">60</span></div>
+</div>
 
-    <p style="color: #a0aec0; margin-top: 10px; font-size: 0.85em; text-align: center; padding: 0 10px;">
-        На телефоне: бегай джойстиком слева, бей кнопкой справа. На ПК: для удара жми Пробел (Space)!
-    </p>
+<div id="flightStatus">ВЗЛЕТ!</div>
+<div id="boom"></div>
 
-    <script>
-        const canvas = document.getElementById('football-field');
-        const ctx = canvas.getContext('2d');
-        const goalBanner = document.getElementById('goal-banner');
-        const stick = document.getElementById('joystick-stick');
-        const joystickZone = document.getElementById('joystick-zone');
-        const kickBtn = document.getElementById('kick-btn');
+<script>
+    const { Engine, Render, Runner, Bodies, Composite, Constraint, Body, Events, Vector } = Matter;
 
-        let currentGameMode = 'match'; 
-        let myGoals = 0;
-        let enemyGoals = 0;
-        let isLock = false; 
-        let audioCtx = null;
+    let engine, render, runner;
+    let carParts = [], carConstraints = [], mainBodies = [];
+    let isExploded = false, chargedForExplosion = false;
+    let car = null;
+    const keys = {};
 
-        let isTouching = false;
-        let joyX = 0;
-        let joyY = 0;
+    let carColorBack = '#bdc3c7';
+    let carColorFront = '#95a5a6';
 
-        function initAudio() { if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)(); }
-        function playSound(freq, duration, type='sine') {
-            try {
-                initAudio(); if (audioCtx.state === 'suspended') audioCtx.resume();
-                let osc = audioCtx.createOscillator(), gain = audioCtx.createGain();
-                osc.type = type; osc.frequency.setValueAtTime(freq, audioCtx.currentTime);
-                gain.gain.setValueAtTime(0.03, audioCtx.currentTime); gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + duration);
-                osc.connect(gain); gain.connect(audioCtx.destination); osc.start(); osc.stop(audioCtx.currentTime + duration);
-            } catch(e) {}
-        }
+    // Переменные для подсчета FPS
+    let lastCalledTime;
+    let fps;
+    let frameCount = 0;
+    let fpsInterval = 0;
 
-        function setGameMode(mode) {
-            currentGameMode = mode;
-            myGoals = 0; enemyGoals = 0;
-            document.getElementById('my-score').innerText = 0;
-            document.getElementById('enemy-score').innerText = 0;
-            document.getElementById('btn-match').classList.toggle('active', mode === 'match');
-            document.getElementById('btn-training').classList.toggle('active', mode === 'training');
-            ball.reset(400, 225); player.reset();
-            teammates.forEach(t => t.reset()); enemies.forEach(e => e.reset());
-        }
+    function selectColor(colorBack, colorFront, element) {
+        carColorBack = colorBack;
+        carColorFront = colorFront;
+        document.querySelectorAll('.color-btn').forEach(btn => btn.classList.remove('active'));
+        element.classList.add('active');
+    }
 
-        class Ball {
-            constructor(x, y) { this.reset(x, y); }
-            reset(x, y) { this.x = x; this.y = y; this.vx = 0; this.vy = 0; this.radius = 10; this.friction = 0.98; }
-            update() {
-                if (isLock) return;
-                this.x += this.vx; this.y += this.vy;
-                this.vx *= this.friction; this.vy *= this.friction;
-
-                const cornerSize = 45;
-                if (this.x < cornerSize && this.y < cornerSize) { this.vx += 0.4; this.vy += 0.4; }
-                if (this.x > canvas.width - cornerSize && this.y < cornerSize) { this.vx -= 0.4; this.vy += 0.4; }
-                if (this.x < cornerSize && this.y > canvas.height - cornerSize) { this.vx += 0.4; this.vy -= 0.4; }
-                if (this.x > canvas.width - cornerSize && this.y > canvas.height - cornerSize) { this.vx -= 0.4; this.vy -= 0.4; }
-
-                if (this.y - this.radius < 0) { this.y = this.radius; this.vy = -this.vy * 0.75; playSound(300, 0.05); }
-                if (this.y + this.radius > canvas.height) { this.y = canvas.height - this.radius; this.vy = -this.vy * 0.75; playSound(300, 0.05); }
-
-                if (this.x - this.radius <= 0) {
-                    if (this.y > 150 && this.y < 300) { triggerGoal(false); } 
-                    else { this.x = this.radius; this.vx = -this.vx * 0.75; playSound(300, 0.05); }
-                }
-                if (this.x + this.radius >= canvas.width) {
-                    if (this.y > 150 && this.y < 300) { triggerGoal(true); } 
-                    else { this.x = canvas.width - this.radius; this.vx = -this.vx * 0.75; playSound(300, 0.05); }
-                }
+    function initPhysics() {
+        engine = Engine.create();
+        render = Render.create({
+            element: document.body,
+            engine: engine,
+            options: {
+                width: window.innerWidth,
+                height: window.innerHeight,
+                wireframes: false,
+                background: '#222'
             }
-            draw() {
-                ctx.save(); ctx.beginPath(); ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2);
-                ctx.fillStyle = "#ffffff"; ctx.fill(); ctx.strokeStyle = "#000000"; ctx.lineWidth = 1.5; ctx.stroke();
-                ctx.restore();
-            }
-        }
-
-        class Player {
-            constructor() { this.x = 150; this.y = 225; this.radius = 18; this.targetX = 150; this.targetY = 225; this.moveVx = 0; this.moveVy = 0; }
-            update() {
-                let oldX = this.x;
-                let oldY = this.y;
-
-                if (isTouching) {
-                    this.x += joyX * 4.5;
-                    this.y += joyY * 4.5;
-                    this.targetX = this.x;
-                    this.targetY = this.y;
-                } else {
-                    let mDx = this.targetX - this.x;
-                    let mDy = this.targetY - this.y;
-                    if (Math.sqrt(mDx*mDx + mDy*mDy) > 2) {
-                        this.x += mDx * 0.15;
-                        this.y += mDy * 0.15;
-                    }
-                }
-
-                this.x = Math.max(this.radius, Math.min(canvas.width - this.radius, this.x));
-                this.y = Math.max(this.radius, Math.min(canvas.height - this.radius, this.y));
-
-                this.moveVx = this.x - oldX;
-                this.moveVy = this.y - oldY;
-
-                if (isLock) return;
-                let dx = ball.x - this.x, dy = ball.y - this.y;
-                let dist = Math.sqrt(dx*dx + dy*dy);
-                
-                if (dist < this.radius + ball.radius + 4) {
-                    let angle = Math.atan2(dy, dx);
-                    let playerSpeed = Math.sqrt(this.moveVx * this.moveVx + this.moveVy * this.moveVy);
-                    
-                    if (playerSpeed < 0.25) {
-                        ball.x = this.x + Math.cos(angle) * (this.radius + ball.radius);
-                        ball.y = this.y + Math.sin(angle) * (this.radius + ball.radius);
-                        ball.vx = 0; ball.vy = 0;
-                    } else {
-                        ball.x = this.x + Math.cos(angle) * (this.radius + ball.radius - 1);
-                        ball.y = this.y + Math.sin(angle) * (this.radius + ball.radius - 1);
-                        ball.vx = this.moveVx * 1.05;
-                        ball.vy = this.moveVy * 1.05;
-                    }
-                }
-            }
-            
-            // ФУНКЦИЯ КНОПКИ БУЦАНИЯ
-            kick() {
-                if (isLock) return;
-                let dx = ball.x - this.x, dy = ball.y - this.y;
-                let dist = Math.sqrt(dx*dx + dy*dy);
-                
-                // Буцать можно, если мяч находится близко к тебе (в радиусе контроля)
-                if (dist < this.radius + ball.radius + 15) {
-                    let angle = Math.atan2(dy, dx);
-                    // Мощный удар в направлении от игрока к мячу
-                    ball.vx = Math.cos(angle) * 14.0; 
-                    ball.vy = Math.sin(angle) * 14.0;
-                    playSound(550, 0.12, 'triangle');
-                }
-            }
-            
-            draw() {
-                ctx.save(); ctx.beginPath(); ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2);
-                ctx.fillStyle = "#1e3a8a"; ctx.fill(); ctx.strokeStyle = "#ecc94b"; ctx.lineWidth = 3; ctx.stroke();
-                ctx.fillStyle = "#ecc94b"; ctx.font = "bold 15px monospace"; ctx.textAlign = "center"; ctx.textBaseline = "middle";
-                ctx.fillText("5", this.x, this.y); ctx.restore();
-            }
-            reset() { this.x = 150; this.y = 225; this.targetX = 150; this.targetY = 225; this.moveVx = 0; this.moveVy = 0; }
-        }
-
-        class AIBot {
-            constructor(startX, startY, isTeammate, number, speed, role) {
-                this.startX = startX; this.startY = startY; this.x = startX; this.y = startY;
-                this.radius = 16; this.isTeammate = isTeammate; this.number = number; this.speed = speed; this.role = role;
-            }
-            update(hasBallFocus, allPlayers) {
-                if (isLock) return;
-                let targetX = this.startX, targetY = this.startY;
-
-                if (this.role === 'gk') {
-                    let inZone = this.isTeammate ? ball.x < 200 : ball.x > 580;
-                    targetX = this.startX; targetY = inZone ? ball.y : 225;
-                    if (targetY < 150) targetY = 150; if (targetY > 300) targetY = 300;
-                } else if (hasBallFocus) {
-                    targetX = ball.x; targetY = ball.y;
-                } else {
-                    let ballOffset = (ball.x - 400) * 0.3;
-                    targetX = this.startX + ballOffset;
-                    targetY = this.startY + (ball.y - this.startY) * 0.2;
-                }
-
-                allPlayers.forEach(p => {
-                    if (p === this) return;
-                    let pDx = this.x - p.x, pDy = this.y - p.y;
-                    let pDist = Math.sqrt(pDx*pDx + pDy*pDy);
-                    if (pDist < 75) { targetX += (pDx / pDist) * 35; targetY += (pDy / pDist) * 35; }
-                });
-
-                let dx = targetX - this.x, dy = targetY - this.y;
-                let dist = Math.sqrt(dx*dx + dy*dy);
-                if (dist > 5) { this.x += (dx / dist) * this.speed; this.y += (dy / dist) * this.speed; }
-
-                let bDx = ball.x - this.x, bDy = ball.y - this.y;
-                if (Math.sqrt(bDx*bDx + bDy*bDy) < this.radius + ball.radius) {
-                    let angle = Math.atan2(bDy, bDx);
-                    let power = 6.5 + Math.random() * 2.5;
-                    if (this.isTeammate) {
-                        ball.vx = Math.abs(Math.cos(angle)) * power; ball.vy = Math.sin(angle) * (power * 0.4);
-                        playSound(350, 0.06, 'sine');
-                    } else {
-                        ball.vx = -Math.abs(Math.cos(angle)) * power; ball.vy = Math.sin(angle) * (power * 0.4);
-                        playSound(250, 0.06, 'sawtooth');
-                    }
-                }
-            }
-            draw() {
-                ctx.save(); ctx.beginPath(); ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2);
-                ctx.fillStyle = this.isTeammate ? "#2b6cb0" : "#e53e3e"; ctx.fill(); 
-                ctx.strokeStyle = "#ffffff"; ctx.lineWidth = 1.5; ctx.stroke();
-                ctx.fillStyle = "#ffffff"; ctx.font = "bold 12px monospace"; ctx.textAlign = "center"; ctx.textBaseline = "middle";
-                ctx.fillText(this.number, this.x, this.y); ctx.restore();
-            }
-            reset() { this.x = this.startX; this.y = this.startY; }
-        }
-
-        const ball = new Ball(400, 225);
-        const player = new Player();
-
-        const teammates = [
-            new AIBot(50, 225, true, "1", 1.6, 'gk'),
-            new AIBot(220, 225, true, "2", 2.2, 'def'),
-            new AIBot(380, 110, true, "4", 2.3, 'att'),
-            new AIBot(380, 340, true, "7", 2.3, 'att')
-        ];
-
-        const enemies = [
-            new AIBot(750, 225, false, "1", 1.6, 'gk'), 
-            new AIBot(580, 130, false, "3", 2.2, 'def'),
-            new AIBot(580, 320, false, "9", 2.2, 'def'),
-            new AIBot(460, 110, false, "10", 2.3, 'att'),
-            new AIBot(460, 340, false, "11", 2.3, 'att')
-        ];
-
-        // ОБРАБОТКА ДЖОЙСТИКА
-        function handleJoystick(e) {
-            e.preventDefault();
-            if (!e.touches || e.touches.length === 0) return;
-            const touch = e.touches[0];
-            const rect = joystickZone.getBoundingClientRect();
-            const centerX = rect.left + rect.width / 2;
-            const centerY = rect.top + rect.height / 2;
-            
-            let deltaX = touch.clientX - centerX;
-            let deltaY = touch.clientY - centerY;
-            let distance = Math.sqrt(deltaX * deltaX + deltaY * deltaY);
-            const maxDistance = 45;
-
-            if (distance > maxDistance) {
-                deltaX = (deltaX / distance) * maxDistance;
-                deltaY = (deltaY / distance) * maxDistance;
-            }
-
-            stick.style.transform = `translate(${deltaX}px, ${deltaY}px)`;
-            joyX = deltaX / maxDistance;
-            joyY = deltaY / maxDistance;
-            isTouching = true;
-        }
-
-        joystickZone.addEventListener('touchstart', handleJoystick);
-        joystickZone.addEventListener('touchmove', handleJoystick);
-        joystickZone.addEventListener('touchend', () => {
-            stick.style.transform = 'translate(0px, 0px)';
-            joyX = 0; joyY = 0; isTouching = false;
         });
+        Render.run(render);
+        runner = Runner.create();
+        Runner.run(runner, engine);
+    }
 
-        // СЛУШАТЕЛЬ НАЖАТИЯ НА КНОПКУ УДАРА (Для смартфонов)
-        kickBtn.addEventListener('touchstart', (e) => {
-            e.preventDefault();
-            player.kick();
-        });
+    function buildMap(mapType) {
+        const ground = Bodies.rectangle(window.innerWidth * 3, window.innerHeight - 20, window.innerWidth * 15, 40, { isStatic: true, render: { fillStyle: '#444' } });
+        Composite.add(engine.world, ground);
 
-        // СЛУШАТЕЛЬ ДЛЯ ПК (Пробел выполняет удар)
+        if (mapType === 'autobahn') {
+            const finalWall = Bodies.rectangle(window.innerWidth * 5.5, window.innerHeight - 150, 70, 300, { isStatic: true, render: { fillStyle: '#ff4757' } });
+            Composite.add(engine.world, finalWall);
+            spawnObstacleCar(1800, '#e67e22');
+            spawnObstacleCar(3200, '#3498db');
+        } 
+        else if (mapType === 'lemans') {
+            const ramp1 = Bodies.rectangle(1200, window.innerHeight - 55, 250, 70, { isStatic: true, angle: -0.3, render: { fillStyle: '#ffa502' } });
+            const ramp2 = Bodies.rectangle(2800, window.innerHeight - 75, 300, 100, { isStatic: true, angle: -0.45, render: { fillStyle: '#ffa502' } });
+            Composite.add(engine.world, [ramp1, ramp2]);
+        } 
+        else if (mapType === 'chaos') {
+            for (let i = 0; i < 6; i++) {
+                spawnObstacleCar(1200 + i * 500, i % 2 === 0 ? '#9b59b6' : '#1abc9c');
+            }
+            for (let i = 0; i < 5; i++) {
+                let box = Bodies.rectangle(1500 + i * 650, window.innerHeight - 80, 50, 80, { render: { fillStyle: '#f1c40f' } });
+                Composite.add(engine.world, box);
+            }
+        }
+    }
+
+    function spawnObstacleCar(x, color) {
+        let y = window.innerHeight - 80;
+        let bBack = Bodies.rectangle(x, y, 60, 25, { render: { fillStyle: color } });
+        let bFront = Bodies.rectangle(x + 40, y + 2, 40, 20, { render: { fillStyle: color } });
+        let wA = Bodies.circle(x - 15, y + 20, 15, { render: { fillStyle: '#111' } });
+        let wB = Bodies.circle(x + 35, y + 20, 15, { render: { fillStyle: '#111' } });
+        let c1 = Constraint.create({ bodyA: bBack, bodyB: bFront, stiffness: 0.3, render: { visible: false } });
+        let c2 = Constraint.create({ bodyA: bBack, bodyB: wA, stiffness: 0.5, render: { visible: false } });
+        let c3 = Constraint.create({ bodyA: bFront, bodyB: wB, stiffness: 0.5, render: { visible: false } });
+        Composite.add(engine.world, [bBack, bFront, wA, wB, c1, c2, c3]);
+    }
+
+    function spawnPlayerCar() {
+        carParts.forEach(part => Composite.remove(engine.world, part));
+        carConstraints.forEach(c => Composite.remove(engine.world, c));
+        
+        carParts = []; carConstraints = []; mainBodies = [];
+        isExploded = false; chargedForExplosion = false;
+        document.getElementById('speedometer').style.color = 'white';
+        document.getElementById('flightStatus').style.opacity = '0';
+        document.getElementById('turboText').style.display = 'none';
+
+        const carX = 150;
+        const carY = window.innerHeight - 100;
+
+        const bodyBack = Bodies.rectangle(carX, carY, 90, 20, { group: -1, render: { fillStyle: carColorBack } });
+        const bodyFront = Bodies.rectangle(carX + 70, carY + 2, 60, 16, { group: -1, render: { fillStyle: carColorFront } });
+        const exhaust = Bodies.rectangle(carX - 50, carY, 10, 8, { isSensor: true, group: -1, render: { fillStyle: 'rgba(0,0,0,0)' } });
+
+        const wheelA = Bodies.circle(carX - 25, carY + 15, 18, { friction: 0.9, density: 0.03, render: { fillStyle: '#111' } });
+        const wheelB = Bodies.circle(carX + 55, carY + 15, 18, { friction: 0.9, density: 0.03, render: { fillStyle: '#111' } });
+
+        const spring1 = Constraint.create({ bodyA: bodyBack, bodyB: bodyFront, pointA: { x: 45, y: -5 }, pointB: { x: -30, y: -5 }, stiffness: 0.2, render: { strokeStyle: '#fff' } });
+        const spring2 = Constraint.create({ bodyA: bodyBack, bodyB: bodyFront, pointA: { x: 45, y: 5 }, pointB: { x: -30, y: 5 }, stiffness: 0.2, render: { strokeStyle: '#fff' } });
+        const axelA = Constraint.create({ bodyA: bodyBack, bodyB: wheelA, stiffness: 0.4, render: { strokeStyle: '#555' } });
+        const axelB = Constraint.create({ bodyA: bodyFront, bodyB: wheelB, stiffness: 0.4, render: { strokeStyle: '#555' } });
+        const exhaustConnect = Constraint.create({ bodyA: bodyBack, bodyB: exhaust, pointA: { x: -45, y: 5 }, pointB: { x: 0, y: 0 }, stiffness: 1, render: { visible: false } });
+
+        mainBodies = [bodyBack, bodyFront, wheelA, wheelB, exhaust];
+        carParts = [...mainBodies];
+        carConstraints = [spring1, spring2, axelA, axelB, exhaustConnect];
+
+        Composite.add(engine.world, [...carParts, ...carConstraints]);
+        return { wheelA, wheelB, bodyFront, bodyBack, exhaust };
+    }
+
+    function startGame(mapType) {
+        document.getElementById('menu').style.display = 'none';
+        document.getElementById('info').style.display = 'block';
+        document.getElementById('backToMenu').style.display = 'block';
+        document.getElementById('dashboard').style.display = 'block';
+
+        initPhysics();
+        buildMap(mapType);
+        car = spawnPlayerCar();
+        setupEvents();
+        
+        // Запуск счетчика кадров (FPS)
+        lastCalledTime = performance.now();
+        requestAnimationFrame(updateFps);
+    }
+
+    // Функция измерения реального FPS
+    function updateFps(now) {
+        if (document.getElementById('dashboard').style.display === 'none') return;
+        
+        frameCount++;
+        fpsInterval = now - lastCalledTime;
+        
+        if (fpsInterval >= 1000) {
+            fps = Math.round((frameCount * 1000) / fpsInterval);
+            document.getElementById('fpsVal').textContent = fps;
+            frameCount = 0;
+            lastCalledTime = now;
+        }
+        requestAnimationFrame(updateFps);
+    }
+
+    function setupEvents() {
         window.addEventListener('keydown', (e) => {
-            if (e.code === 'Space') {
-                e.preventDefault();
-                player.kick();
+            if (e.code === 'Space') e.preventDefault();
+            keys[e.code] = true;
+            if (e.code === 'KeyR') car = spawnPlayerCar();
+        });
+        window.addEventListener('keyup', (e) => keys[e.code] = false);
+
+        Events.on(engine, 'beforeUpdate', () => {
+            if (isExploded || !car) return;
+
+            const speedKmh = Math.floor(Vector.magnitude(car.bodyFront.velocity) * 35); 
+            document.getElementById('speedVal').textContent = speedKmh;
+
+            if (speedKmh >= 300) {
+                chargedForExplosion = true;
+                document.getElementById('speedometer').style.color = '#ff4757';
             }
-        });
 
-        document.getElementById('field-container').addEventListener('mousemove', (e) => {
-            if (isTouching) return;
-            let rect = canvas.getBoundingClientRect();
-            player.targetX = (e.clientX - rect.left) * (canvas.width / rect.width);
-            player.targetY = (e.clientY - rect.top) * (canvas.height / rect.height);
-        });
+            if (keys['ArrowRight']) {
+                Body.setAngularVelocity(car.wheelA, 0.95);
+                Body.setAngularVelocity(car.wheelB, 0.95);
+                Body.applyForce(car.bodyBack, car.bodyBack.position, { x: 0.08, y: 0 });
+            }
 
-        function triggerGoal(isMyGoal) {
-            if (isLock) return;
-            isLock = true;
-            if (isMyGoal) {
-                myGoals += 1; document.getElementById('my-score').innerText = myGoals;
-                goalBanner.innerText = "ГООООЛ! ⚽🔥"; goalBanner.style.color = "#ecc94b";
+            if (keys['Space']) {
+                document.getElementById('turboText').style.display = 'block';
+                car.exhaust.render.fillStyle = '#00a8ff';
+                Body.applyForce(car.bodyBack, car.bodyBack.position, { x: 0.28, y: 0 });
+                Body.setAngularVelocity(car.wheelA, 1.5);
+                Body.setAngularVelocity(car.wheelB, 1.5);
             } else {
-                enemyGoals += 1; document.getElementById('enemy-score').innerText = enemyGoals;
-                goalBanner.innerText = "ПРОПУСТИЛИ! 😢"; goalBanner.style.color = "#e53e3e";
+                document.getElementById('turboText').style.display = 'none';
+                if (car && car.exhaust) car.exhaust.render.fillStyle = 'rgba(0,0,0,0)';
             }
-            goalBanner.classList.add('active-goal');
-            playSound(500, 0.1, 'square'); setTimeout(() => playSound(650, 0.3, 'square'), 120);
-            setTimeout(() => {
-                goalBanner.classList.remove('active-goal');
-                ball.reset(400, 225); player.reset();
-                teammates.forEach(t => t.reset()); enemies.forEach(e => e.reset());
-                isLock = false;
-            }, 1500);
-        }
 
-        function drawFieldLines() {
-            ctx.strokeStyle = "rgba(255,255,255,0.4)"; ctx.lineWidth = 3;
-            ctx.strokeRect(0, 0, canvas.width, canvas.height);
-            ctx.beginPath(); ctx.moveTo(canvas.width / 2, 0); ctx.lineTo(canvas.width / 2, canvas.height); ctx.stroke();
-            ctx.beginPath(); ctx.arc(canvas.width / 2, canvas.height / 2, 60, 0, Math.PI * 2); ctx.stroke();
-            ctx.strokeRect(canvas.width - 40, 150, 40, 150); ctx.strokeRect(0, 150, 40, 150); 
-        }
+            if (speedKmh >= 300) {
+                document.getElementById('flightStatus').style.opacity = '1';
+                Body.applyForce(car.bodyFront, car.bodyFront.position, { x: 0, y: -0.18 });
+                Body.applyForce(car.bodyBack, car.bodyBack.position, { x: 0, y: 0.06 });
+            } else {
+                document.getElementById('flightStatus').style.opacity = '0';
+            }
+            
+            if (keys['ArrowLeft']) {
+                Body.setAngularVelocity(car.wheelA, -0.2);
+                Body.setAngularVelocity(car.wheelB, -0.2);
+            }
 
-        function gameLoop() {
-            ctx.clearRect(0, 0, canvas.width, canvas.height);
-            drawFieldLines();
-
-            ball.update(); ball.draw();
-            player.update(); player.draw();
-
-            let activeTeammates = (currentGameMode === 'match') ? teammates : [];
-            let activeEnemies = (currentGameMode === 'match') ? enemies : [enemies];
-
-            let allList = [player, ...activeTeammates, ...activeEnemies];
-
-            let closestTeammate = null, minTDist = Infinity;
-            let closestEnemy = null, minEDist = Infinity;
-
-            activeTeammates.forEach(t => {
-                if (t.role === 'gk') return;
-                let d = Math.sqrt((ball.x-t.x)**2 + (ball.y-t.y)**2);
-                if (d < minTDist) { minTDist = d; closestTeammate = t; }
+            Render.lookAt(render, {
+                min: { x: car.bodyBack.position.x - 300, y: car.bodyBack.position.y - 450 },
+                max: { x: car.bodyBack.position.x + 700, y: car.bodyBack.position.y + 150 }
             });
-            activeEnemies.forEach(e => {
-                if (e.role === 'gk') return;
-                let d = Math.sqrt((ball.x-e.x)**2 + (ball.y-e.y)**2);
-                if (d < minEDist) { minEDist = d; closestEnemy = e; }
+        });
+
+        Events.on(engine, 'collisionStart', (event) => {
+            if (chargedForExplosion && !isExploded) {
+                const pairs = event.pairs;
+                for (let i = 0; i < pairs.length; i++) {
+                    if (mainBodies.includes(pairs[i].bodyA) || mainBodies.includes(pairs[i].bodyB)) {
+                        triggerExplosion();
+                        break;
+                    }
+                }
+            }
+        });
+    }
+
+    function triggerExplosion() {
+        isExploded = true;
+        chargedForExplosion = false;
+        document.getElementById('flightStatus').style.opacity = '0';
+        document.getElementById('turboText').style.display = 'none';
+
+        const boomOverlay = document.getElementById('boom');
+        boomOverlay.style.opacity = '1';
+        setTimeout(() => boomOverlay.style.opacity = '0', 300);
+
+        carConstraints.forEach(c => Composite.remove(engine.world, c));
+        mainBodies.forEach(body => {
+            const forceMagnitude = 0.5 * body.mass;
+            Body.applyForce(body, body.position, {
+                x: (Math.random() - 0.4) * forceMagnitude,
+                y: (Math.random() - 0.9) * forceMagnitude
             });
+            Body.setAngularVelocity(body, (Math.random() - 0.5) * 0.9);
+        });
+    }
+</script>
 
-            activeTeammates.forEach(t => { t.update(t === closestTeammate, allList); t.draw(); });
-            activeEnemies.forEach(e => { e.update(e === closestEnemy, allList); e.draw(); });
-
-            requestAnimationFrame(gameLoop);
-        }
-
-        gameLoop();
-    </script>
 </body>
 </html>
