@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>2D Scooter Stunt: 2.5D Night City</title>
+    <title>2D Scooter Stunt: Hyper-Realistic 2T Smoke</title>
     <style>
         body { margin: 0; background: #0b0b1a; color: white; font-family: 'Arial', sans-serif; overflow: hidden; touch-action: none; -webkit-user-select: none; user-select: none; }
         #menu { position: absolute; top: 0; left: 0; width: 100vw; height: 100vh; background: #111122; display: flex; flex-direction: column; justify-content: center; align-items: center; z-index: 100; overflow-y: auto; padding: 20px 0; box-sizing: border-box; }
@@ -16,23 +16,21 @@
         .btn-shop { border-color: #f1c40f; color: #f1c40f; }
         .btn-map { background: #ff4757; color: white; border: none; padding: 12px 35px; font-size: 16px; font-weight: bold; margin: 10px; border-radius: 6px; cursor: pointer; width: 280px; box-shadow: 0 0 15px rgba(255, 71, 87, 0.4); }
         #backToMenu { position: absolute; top: 10px; right: 10px; background: #ff4757; color: white; border: none; padding: 8px 14px; font-size: 14px; border-radius: 4px; cursor: pointer; z-index: 110; display: none; }
-        #dashboard { position: absolute; bottom: 15px; right: 15px; background: rgba(11, 11, 26, 0.9); padding: 10px 15px; border-radius: 8px; border: 2px solid #3d3d6b; z-index: 10; display: none; min-width: 160px; }
+        #dashboard { position: absolute; bottom: 15px; right: 15px; background: rgba(11, 11, 26, 0.9); padding: 10px 15px; border-radius: 8px; border: 2px solid #333; z-index: 10; display: none; min-width: 160px; }
         #speedometer { font-size: 26px; font-weight: bold; text-align: right; font-family: monospace; color: #fff; }
         #cashCounter { font-size: 15px; color: #2ecc71; font-weight: bold; text-align: right; margin-top: 2px; }
         #soundIndicator { font-size: 12px; color: #f1c40f; text-align: right; margin-top: 2px; font-weight: bold; }
         #fpsCounter { font-size: 11px; color: #888; margin-top: 4px; text-align: right; font-family: monospace; }
-        #turboText { font-size: 11px; color: #ff4757; margin-top: 2px; text-align: right; font-weight: bold; animation: blink 0.3s infinite alternate; }
+        #turboText { font-size: 11px; color: #ff4757; margin-top: 2px; text-align: right; font-weight: bold; }
         #mobileControls { position: absolute; bottom: 15px; left: 0; width: 100vw; display: none; justify-content: space-between; padding: 0 20px; box-sizing: border-box; z-index: 80; }
         .control-group { display: flex; gap: 8px; }
         .touch-btn { width: 55px; height: 55px; background: rgba(255, 255, 255, 0.15); border: 2px solid rgba(255, 255, 255, 0.5); border-radius: 50%; color: white; font-size: 20px; font-weight: bold; display: flex; justify-content: center; align-items: center; cursor: pointer; }
-        @keyframes blink { from { opacity: 0.3; } to { opacity: 1; } }
     </style>
 </head>
 <body>
 
 <div id="menu">
     <h1>2.5D SCOOTER STUNT SIMULATOR</h1>
-    
     <div id="wallet">💰 0 руб.</div>
 
     <h2>Оригинальные запчасти (Магазин)</h2>
@@ -93,6 +91,7 @@
     let frames = 0, lastTick = performance.now(), currentFps = 60;
     let exhaustParticles = [];
     let earnedCash = 0, engineSoundTick = 0, sirenTimer = 0, moneyTimer = 0;
+    let sAngleVelocity = 0;
 
     let saveState = {
         cash: 0,
@@ -169,7 +168,7 @@
         ctx = canvas.getContext('2d');
 
         distanceTravelled = 0; currentSpeed = 0;
-        stuntAngle = 0; stuntVelocity = 0; earnedCash = 0;
+        stuntAngle = 0; stuntVelocity = 0; sAngleVelocity = 0; earnedCash = 0;
         exhaustParticles = [];
 
         bindInputEvents();
@@ -199,7 +198,7 @@
     }
 
     function hardReset() {
-        currentSpeed = 0; stuntAngle = 0; stuntVelocity = 0;
+        currentSpeed = 0; stuntAngle = 0; stuntVelocity = 0; sAngleVelocity = 0;
         exhaustParticles = [];
     }
 
@@ -216,7 +215,7 @@
         
         let maxAllowedNormal = stats.baseMax + ((saveState.upgrades.cylinder - 1) * 15);
         let currentAcceleration = stats.baseAccel + ((saveState.upgrades.carburetor - 1) * 0.08);
-        let dynamicStuntPower = 0.003 + (saveState.upgrades.stunt - 1) * 0.001;
+        let dynamicStuntPower = 0.0025 + (saveState.upgrades.stunt - 1) * 0.0008;
 
         if (inputs['Space']) {
             if (currentSpeed < stats.nitroMax) currentSpeed += 4;
@@ -231,196 +230,174 @@
                 if (engineSoundTick % 4 === 0) document.getElementById('soundIndicator').textContent = "ЗВУК: ДЗИНЬ!";
                 else if (engineSoundTick % 4 === 2) document.getElementById('soundIndicator').textContent = "ЗВУК: ДРИНЬ!";
             } else {
-                currentSpeed *= 0.97; // Инерция замедления
+                currentSpeed *= 0.97; 
                 document.getElementById('soundIndicator').textContent = "ЗВУК: ххххх...";
             }
         }
 
-        distanceTravelled += currentSpeed * 0.05;
+        distanceTravelled += currentSpeed * 0.1;
 
-        // Генерация 2.5D сизого дыма из выхлопной Stage6
-        if (currentSpeed > 5 && Math.random() < 0.4) {
-            exhaustParticles.push({
-                x: canvas.width / 2 + 10,
-                y: canvas.height - 120 + (stuntAngle * 80),
-                size: 8,
-                opacity: 0.7,
-                vx: -2 + Math.random() * 4,
-                vy: -Math.random() * 2,
-                growth: 0.8 + (currentSpeed * 0.05)
-            });
+        // МОДИФИЦИРОВАННЫЙ ГИПЕР-РЕАЛИСТИЧНЫЙ ВЫХЛОП 2Т МОТОРА
+        if (currentSpeed > 5) {
+            let smokeDensity = inputs['Space'] ? 6 : (inputs['ArrowRight'] ? 3 : 1);
+            for (let i = 0; i < smokeDensity; i++) {
+                // Точка вылета строго из глушителя сзади колеса
+                let exhaustX = canvas.width / 2 - 25 - (Math.sin(stuntAngle) * 20);
+                let exhaustY = canvas.height - 85 - (Math.cos(stuntAngle) * 5) - (Math.sin(stuntAngle) * 35);
+
+                exhaustParticles.push({
+                    x: exhaustX,
+                    y: exhaustY,
+                    size: 2 + Math.random() * 3, // Старт с маленького облачка
+                    // Реалистичный сизый (синевато-серый маслянистый) цвет
+                    r: 155 + Math.floor(Math.random() * 20),
+                    g: 175 + Math.floor(Math.random() * 25),
+                    b: 210 + Math.floor(Math.random() * 30),
+                    opacity: 0.65,
+                    // Физика завихрений дыма ветром
+                    vx: -4 + Math.random() * 8 - (currentSpeed * 0.05),
+                    vy: -1 - Math.random() * 5 - (stuntAngle * 8),
+                    growth: 0.8 + (saveState.upgrades.exhaust * 0.2) // Расширение клубов
+                });
+            }
         }
 
         exhaustParticles.forEach((p, idx) => {
             p.x += p.vx;
             p.y += p.vy;
             p.size += p.growth;
-            p.opacity -= 0.02;
-            if (p.opacity <= 0) exhaustParticles.splice(idx, 1);
+            p.opacity -= 0.012; // Реалистичное долгое рассеивание
+            if (p.opacity <= 0 || p.size > 140) exhaustParticles.splice(idx, 1);
         });
 
-        // Начисление рублей за стант на скорости
         if (currentSpeed > 10) {
             moneyTimer++;
-            if (moneyTimer % 12 === 0) {
+            if (moneyTimer % 10 === 0) {
                 let addCash = 50;
-                if (stuntAngle > 0.2) addCash += 100; // Жирный бонус за вилли!
-                earnedCash += addCash;
-                saveState.cash += addCash;
+                if (stuntAngle > 0.2) addCash += 100; 
+                earnedCash += addCash; saveState.cash += addCash;
                 try { localStorage.setItem('scooter_25d_save', JSON.stringify(saveState)); } catch(e){}
                 document.getElementById('cashCounter').textContent = "+" + earnedCash + " руб.";
             }
         }
 
-        // РЕАЛИСТИЧНЫЙ 2.5D СТАНТ КОНТРОЛЬ (ПОДЪЕМ ЭКРАНА)
+        // Физика станта (баланс)
         if (inputs['ArrowUp'] && currentSpeed > 5) {
-            stuntVelocity += dynamicStuntPower;
-            if (stuntVelocity > 0.03) stuntVelocity = 0.03;
+            sAngleVelocity -= dynamicStuntPower;
+            if (sAngleVelocity < -0.04) sAngleVelocity = -0.04;
         } else if (inputs['ArrowDown']) {
-            stuntVelocity -= 0.008;
+            sAngleVelocity += 0.005;
         } else {
-            // Плавное падение передка под весом
-            if (stuntAngle > 0) {
-                stuntVelocity -= 0.0015;
-            }
+            if (stuntAngle > 0) sAngleVelocity += 0.0015; 
+            else sAngleVelocity = 0;
         }
-
-        stuntVelocity *= 0.88; // Гашение рывков
-        stuntAngle += stuntVelocity;
-
-        // Фиксация идеального угла станта
-        if (stuntAngle > 0.65) { stuntAngle = 0.65; stuntVelocity = 0; }
-        if (stuntAngle < 0) { stuntAngle = 0; stuntVelocity = 0; }
+        
+        sAngleVelocity *= 0.85; 
+        stuntAngle += sAngleVelocity;
+        
+        if (stuntAngle > 0.78) { stuntAngle = 0.78; sAngleVelocity = 0; }
+        if (stuntAngle < 0) { stuntAngle = 0; sAngleVelocity = 0; }
 
         document.getElementById('speedVal').textContent = Math.floor(currentSpeed);
         document.getElementById('speedometer').style.color = (currentSpeed >= 250) ? '#ff4757' : 'white';
 
-        // ОТРИСОВКА 2.5D КАДРА В ЭКРАН
-        ctx.fillStyle = '#070714'; // Ночное небо
+        ctx.fillStyle = '#070714'; 
         ctx.fillRect(0, 0, canvas.width, canvas.height);
 
         let horizonY = canvas.height * 0.45;
 
-        // 1. Отрисовка Ночного Города (Небоскребы)
+        // Небоскребы
         ctx.fillStyle = '#111124';
         for (let i = 0; i < 15; i++) {
             let bWidth = 90 + (i % 3) * 40;
             let bHeight = 150 + (i % 2) * 100;
             let bX = (i * 110 - (distanceTravelled * 0.1)) % (canvas.width + 200) - 100;
             ctx.fillRect(bX, horizonY - bHeight, bWidth, bHeight);
-            
-            // Неоновые светящиеся окна в домах
             ctx.fillStyle = (i % 2 === 0) ? 'rgba(241, 196, 15, 0.4)' : 'rgba(52, 152, 219, 0.4)';
             ctx.fillRect(bX + 15, horizonY - bHeight + 20, 10, 15);
             ctx.fillRect(bX + 45, horizonY - bHeight + 50, 10, 15);
             ctx.fillStyle = '#111124';
         }
 
-        // 2. Отрисовка 2.5D Дороги уходящей вдаль
+        // Дорога
         let roadWidthStart = canvas.width * 0.08;
         let roadWidthEnd = canvas.width * 0.75;
-        let linesOffset = (distanceTravelled) % 80;
+        let linesOffset = (distanceTravelled) % 60;
 
         for (let y = horizonY; y < canvas.height; y += 4) {
             let percent = (y - horizonY) / (canvas.height - horizonY);
             let currentRoadW = roadWidthStart + percent * (roadWidthEnd - roadWidthStart);
             let leftX = (canvas.width / 2) - currentRoadW / 2;
 
-            // Асфальт и обочина
-            ctx.fillStyle = '#1a1a2e';
-            ctx.fillRect(leftX, y, currentRoadW, 4);
-            ctx.fillStyle = '#141423'; // Трава/земля по бокам
-            ctx.fillRect(0, y, leftX, 4);
-            ctx.fillRect(leftX + currentRoadW, y, canvas.width - (leftX + currentRoadW), 4);
+            ctx.fillStyle = '#1a1a2e'; ctx.fillRect(leftX, y, currentRoadW, 4);
+            ctx.fillStyle = '#141423'; ctx.fillRect(0, y, leftX, 4); ctx.fillRect(leftX + currentRoadW, y, canvas.width - (leftX + currentRoadW), 4);
 
-            // Отрисовка прерывистой разметки по центру в перспективе
-            let lineLength = 25 * percent;
-            if (Math.floor((y + linesOffset) / 40) % 2 === 0) {
+            if (Math.floor((y - linesOffset + 120) / 30) % 2 === 0) {
                 ctx.fillStyle = '#fff';
                 ctx.fillRect(canvas.width / 2 - (2 * percent), y, 4 * percent, 4);
             }
         }
 
-        // 3. 2.5D Частицы сизого дыма накладываются поверх трассы
+        // РИСОВАНИЕ РЕАЛИСТИЧНЫХ КЛУБОВ ДЫМА ПЕРЕД МОПЕДОМ
         exhaustParticles.forEach(p => {
-            ctx.fillStyle = 'rgba(150, 170, 200, ' + p.opacity + ')';
+            ctx.fillStyle = 'rgba(' + p.r + ',' + p.g + ',' + p.b + ',' + p.opacity + ')';
             ctx.beginPath(); ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2); ctx.fill();
         });
 
-        // 4. Отрисовка Копов (ДПС) в зеркале заднего вида / На Хвосте сзади
-        let copScale = 0.5 + (Math.sin(sirenTimer * 0.05) * 0.03); // Колыхание от погони
+        // Мусора
+        let copScale = 0.5 + (Math.sin(sirenTimer * 0.05) * 0.02);
         ctx.save();
-        ctx.translate(canvas.width / 2 - 120, canvas.height - 180 + (stuntAngle * 40));
+        ctx.translate(canvas.width / 2 - 180, canvas.height - 150);
         ctx.scale(copScale, copScale);
-        
-        // Машина ДПС сзади
         ctx.fillStyle = '#fff'; ctx.fillRect(0, 0, 70, 25);
         ctx.fillStyle = '#2e86de'; ctx.fillRect(15, 0, 40, 25);
         ctx.fillStyle = '#111'; ctx.fillRect(8, 25, 12, 6); ctx.fillRect(50, 25, 12, 6);
-        // Люстра
         let fColor = (Math.floor(sirenTimer / 4) % 2 === 0) ? '#ff3838' : '#2e86de';
         ctx.fillStyle = fColor; ctx.fillRect(25, -6, 20, 6);
-        ctx.fillStyle = fColor === '#ff3838' ? 'rgba(255,56,56,0.15)' : 'rgba(46,134,222,0.15)';
-        ctx.beginPath(); ctx.arc(35, -3, 50, 0, Math.PI*2); ctx.fill();
+        ctx.fillStyle = fColor === '#ff3838' ? 'rgba(255,56,56,0.12)' : 'rgba(46,134,222,0.12)';
+        ctx.beginPath(); ctx.arc(35, -3, 40, 0, Math.PI*2); ctx.fill();
         ctx.restore();
 
-        // 5. Отрисовка Скутера и Человечка из-за спины (Вид от 3-го лица)
+        // Скутер
         ctx.save();
-        // При станте (вилли) руль и передок мопеда поднимаются вверх, перекрывая горизонт
-        ctx.translate(canvas.width / 2, canvas.height - 110);
+        ctx.translate(canvas.width / 2, canvas.height - 85);
         ctx.scale(1.4, 1.4);
+        ctx.rotate(-stuntAngle); 
 
-        // Заднее колесо (всегда на асфальте)
-        ctx.fillStyle = '#111'; ctx.beginPath(); ctx.arc(0, 25, 14, 0, Math.PI*2); ctx.fill();
-        ctx.fillStyle = '#7f8c8d'; ctx.beginPath(); ctx.arc(0, 25, 6, 0, Math.PI*2); ctx.fill();
+        ctx.fillStyle = '#111'; ctx.beginPath(); ctx.arc(0, 0, 14, 0, Math.PI * 2); ctx.fill();
+        ctx.fillStyle = '#7f8c8d'; ctx.beginPath(); ctx.arc(0, 0, 6, 0, Math.PI * 2); ctx.fill();
+        ctx.fillStyle = '#333'; ctx.fillRect(-15, -12, 25, 12);
+        ctx.strokeStyle = '#f39c12'; ctx.lineWidth = 4;
+        ctx.beginPath(); ctx.moveTo(-20, -6); ctx.lineTo(-5, -20); ctx.stroke();
 
-        // Рама мопеда, которая поднимается при станте
-        ctx.save();
-        ctx.rotate(-stuntAngle); // Наклон кузова скутера при вилли!
-
-        // Двигатель вариатор и выхлоп Yasuni
-        ctx.fillStyle = '#333'; ctx.fillRect(-15, 10, 25, 12);
-        ctx.strokeStyle = '#f39c12'; ctx.lineWidth = 4; // Глушитель
-        ctx.beginPath(); ctx.moveTo(-20, 15); ctx.lineTo(-5, 0); ctx.stroke();
-
-        // Сиденье и пластик скутера (Кастомный цвет)
-        ctx.fillStyle = stats.baseColor;
-        ctx.fillRect(-16, -10, 32, 18);
-        ctx.fillStyle = '#222'; ctx.fillRect(-18, -15, 24, 6); // Седло
-
-        // Передний пластик и вилка руля Stage6
+        ctx.fillStyle = stats.baseColor; ctx.fillRect(-16, -32, 32, 18);
+        ctx.fillStyle = '#222'; ctx.fillRect(-18, -37, 24, 6); 
         ctx.strokeStyle = stats.baseColor; ctx.lineWidth = 6;
-        ctx.beginPath(); ctx.moveTo(10, 0); ctx.lineTo(22, -35); ctx.stroke();
-        
-        // Руль Stage6
-        ctx.fillStyle = '#111'; ctx.fillRect(14, -37, 16, 4);
+        ctx.beginPath(); ctx.moveTo(10, -22); ctx.lineTo(22, -57); ctx.stroke();
+        ctx.fillStyle = '#111'; ctx.fillRect(14, -59, 16, 4);
+        ctx.fillStyle = '#111'; ctx.beginPath(); ctx.arc(26, -27, 14, 0, Math.PI * 2); ctx.fill();
+        ctx.fillStyle = '#7f8c8d'; ctx.beginPath(); ctx.arc(26, -27, 6, 0, Math.PI * 2); ctx.fill();
 
-        // Переднее колесо (Поднимается в воздух при вилли!)
-        ctx.fillStyle = '#111'; ctx.beginPath(); ctx.arc(26, -5, 14, 0, Math.PI*2); ctx.fill();
-        ctx.fillStyle = '#7f8c8d'; ctx.beginPath(); ctx.arc(26, -5, 6, 0, Math.PI*2); ctx.fill();
-
-        // 6. Отрисовка Человечка (Райдера) в шортах, футболке и тапках со спины
+        // Райдер
         ctx.save();
-        ctx.translate(-2, -14);
-        
-        ctx.fillStyle = '#fff'; ctx.fillRect(-10, -26, 20, 26); // Белая футболка
-        ctx.fillStyle = '#34495e'; ctx.fillRect(-10, 0, 20, 10); // Синие шорты
-
-        // Ноги по бокам скутера
+        ctx.translate(-2, -36); 
+        ctx.fillStyle = '#fff'; ctx.fillRect(-10, -26, 20, 26); 
+        ctx.fillStyle = '#34495e'; ctx.fillRect(-10, 0, 20, 10); 
         ctx.strokeStyle = '#f39c12'; ctx.lineWidth = 5;
         ctx.beginPath(); ctx.moveTo(-6, 8); ctx.lineTo(-8, 28); ctx.stroke();
         ctx.beginPath(); ctx.moveTo(6, 8); ctx.lineTo(8, 28); ctx.stroke();
-        ctx.fillStyle = '#e74c3c'; ctx.fillRect(-11, 26, 6, 4); ctx.fillRect(5, 26, 6, 4); // Тапки
+        ctx.fillStyle = '#e74c3c'; ctx.fillRect(-11, 26, 6, 4); ctx.fillRect(5, 26, 6, 4); 
+        ctx.fillStyle = '#f39c12'; ctx.beginPath(); ctx.arc(0, -32, 7, 0, Math.PI * 2); ctx.fill(); 
+        ctx.fillStyle = '#e74c3c'; ctx.beginPath(); ctx.arc(0, -34, 10, 0, Math.PI * 2); ctx.fill(); 
+        ctx.fillStyle = '#111'; ctx.beginPath(); ctx.moveTo(4, -43); ctx.lineTo(16, -35); ctx.lineTo(6, -30); ctx.closePath(); ctx.fill();
+        ctx.fillStyle = '#111'; ctx.fillRect(-4, -36, 8, 4); 
+        ctx.restore();
 
-        // Голова в ярком шлеме с козырьком
-        ctx.fillStyle = '#f39c12'; ctx.beginPath(); ctx.arc(0, -32, 7, 0, Math.PI*2); ctx.fill();
-        ctx.fillStyle = '#e74c3c'; ctx.beginPath(); ctx.arc(0, -34, 10, 0, Math.PI*2); ctx.fill(); // Шлем питбайка
-        ctx.fillStyle = '#111'; ctx.fillRect(-4, -43, 8, 4); // Козырек кроссовый
+        if (inputs['Space']) {
+            ctx.fillStyle = '#ff4757'; ctx.beginPath(); ctx.moveTo(-22, -6); ctx.lineTo(-45, -2); ctx.lineTo(-22, -14); ctx.fill();
+        }
 
-        ctx.restore(); // Конец райдера
-        ctx.restore(); // Конец рамы мопеда
-        ctx.restore(); // Конец общего масштаба скутера
-
+        ctx.restore(); 
         requestAnimationFrame(engineFrame);
     }
 
