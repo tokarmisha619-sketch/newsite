@@ -11,13 +11,13 @@
         h2 { font-size: 16px; margin: 12px 0 6px 0; color: #ccc; text-transform: uppercase; letter-spacing: 1px; }
         #wallet { font-size: 20px; font-weight: bold; color: #2ecc71; background: rgba(0,0,0,0.4); padding: 6px 20px; border-radius: 20px; border: 2px solid #2ecc71; margin-bottom: 10px; }
         .block-container { display: flex; flex-wrap: wrap; justify-content: center; gap: 8px; margin-bottom: 5px; max-width: 600px; }
-        .btn-ui { background: #222; color: #bbb; border: 2px solid #333; padding: 8px 16px; font-size: 13px; font-weight: bold; border-radius: 6px; cursor: pointer; transition: 0.1s; }
+        .btn-ui { background: #222; color: #bbb; border: 2px solid #333; padding: 8px 16px; font-size: 13px; font-weight: bold; border-radius: 6px; cursor: pointer; transition: 0.1s; -webkit-tap-highlight-color: transparent; }
         .btn-ui.active { background: #2ecc71; color: white; border-color: #2ecc71; box-shadow: 0 0 8px rgba(46, 204, 113, 0.4); }
         .btn-shop { border-color: #f1c40f; color: #f1c40f; }
         .btn-shop:hover { background: rgba(241, 196, 15, 0.1); }
-        .btn-map { background: #2e86de; color: white; border: none; padding: 12px 25px; font-size: 15px; font-weight: bold; margin: 4px; border-radius: 6px; cursor: pointer; width: 260px; }
+        .btn-map { background: #2e86de; color: white; border: none; padding: 12px 25px; font-size: 15px; font-weight: bold; margin: 4px; border-radius: 6px; cursor: pointer; width: 260px; -webkit-tap-highlight-color: transparent; }
         .btn-map:hover { background: #54a0ff; }
-        #backToMenu { position: absolute; top: 10px; right: 10px; background: #ff4757; color: white; border: none; padding: 8px 14px; font-size: 14px; border-radius: 4px; cursor: pointer; z-index: 10; display: none; }
+        #backToMenu { position: absolute; top: 10px; right: 10px; background: #ff4757; color: white; border: none; padding: 8px 14px; font-size: 13px; border-radius: 4px; cursor: pointer; z-index: 10; display: none; -webkit-tap-highlight-color: transparent; }
         #dashboard { position: absolute; bottom: 15px; right: 15px; background: rgba(0,0,0,0.85); padding: 10px 15px; border-radius: 8px; border: 2px solid #333; z-index: 10; display: none; min-width: 150px; }
         #speedometer { font-size: 26px; font-weight: bold; text-align: right; font-family: monospace; }
         #cashCounter { font-size: 15px; color: #2ecc71; font-weight: bold; text-align: right; margin-top: 2px; }
@@ -25,13 +25,13 @@
         #turboText { font-size: 11px; color: #ff4757; margin-top: 2px; text-align: right; font-weight: bold; }
         #mobileControls { position: absolute; bottom: 15px; left: 0; width: 100vw; display: none; justify-content: space-between; padding: 0 20px; box-sizing: border-box; z-index: 80; }
         .control-group { display: flex; gap: 8px; }
-        .touch-btn { width: 55px; height: 55px; background: rgba(255, 255, 255, 0.12); border: 2px solid rgba(255, 255, 255, 0.4); border-radius: 50%; color: white; font-size: 20px; font-weight: bold; display: flex; justify-content: center; align-items: center; }
+        .touch-btn { width: 55px; height: 55px; background: rgba(255, 255, 255, 0.12); border: 2px solid rgba(255, 255, 255, 0.4); border-radius: 50%; color: white; font-size: 20px; font-weight: bold; display: flex; justify-content: center; align-items: center; -webkit-tap-highlight-color: transparent; }
         .touch-btn:active { background: rgba(255, 255, 255, 0.35); }
         #btnTurbo { background: rgba(231, 76, 60, 0.25); border-color: #ff4757; font-size: 11px; }
         #orientationWarning { position: absolute; top: 0; left: 0; width: 100vw; height: 100vh; background: #111; z-index: 999; display: none; flex-direction: column; justify-content: center; align-items: center; text-align: center; padding: 20px; box-sizing: border-box; }
         #orientationWarning h3 { font-size: 20px; color: #ffa502; margin-bottom: 5px; }
     </style>
-    <script src="cloudflare.com"></script>
+    <!-- Прямое подключение Matter-заглушки не требуется, используем Canvas API напрямую для надежности автономности сайта -->
 </head>
 <body>
 
@@ -62,16 +62,16 @@
 
     <h2>Выбери свой скутер</h2>
     <div class="block-container">
-        <button id="vDio" class="btn-ui active" onclick="setScooter('honda_dio')">🛵 Honda Dio</button>
+        <button id="vDio" class="btn-ui active" onclick="setScooter('honda_dio')">... Honda Dio</button>
         <button id="vJog" class="btn-ui" onclick="setScooter('yamaha_jog')">🔥 Yamaha Jog</button>
-        <button id="vTact" class="btn-ui" onclick="setScooter('honda_tact')">🛵 Honda Tact</button>
+        <button id="vTact" class="btn-ui" onclick="setScooter('honda_tact')">... Honda Tact</button>
     </div>
 
     <h2>Выбери трассу гонки</h2>
     <div class="block-container">
-        <button class="btn-map" onclick="launchGame('autobahn')">1. Бесконечный автобан (Погоня)</button>
+        <button class="btn-map" onclick="launchGame('autobahn')">1. Бесконечный автобан (Полиция!)</button>
         <button class="btn-map" onclick="launchGame('lemans')">2. Трасса Ле-Ман (Трамплины)</button>
-        <button class="btn-map" onclick="launchGame('chaos')">3. Городской хаос (Препятствия)</button>
+        <button class="btn-map" onclick="launchGame('chaos')">3. Городской хаос (Копы и Препятствия)</button>
     </div>
 </div>
 
@@ -97,15 +97,16 @@
     </div>
 </div>
 
+<div id="boom" style="position: absolute; top:0; left:0; width:100vw; height:100vh; background:radial-gradient(circle, rgba(0,100,255,0.3) 0%, rgba(0,0,0,0) 70%); opacity:0; pointer-events:none; z-index:5;"></div>
+
 <script>
     let canvas, ctx;
     let sX = 150, sY = 0, sVx = 0, sVy = 0, sAngle = 0;
-    let copX = -200, copY = 0, copVx = 0, copVy = 0; // Координаты полиции
     let selectedMap = 'autobahn', isLoopStarted = false;
     let inputs = {}, controlMode = 'pc', currentModel = 'honda_dio';
     let frames = 0, lastTick = performance.now(), currentFps = 60;
-    let elements = [], exhaustParticles = [];
-    let trackY = 0, earnedCash = 0, copFlashTimer = 0;
+    let elements = [], exhaustParticles = [], cops = [];
+    let trackY = 0, earnedCash = 0, flashTimer = 0;
 
     let saveState = {
         cash: 0,
@@ -113,8 +114,8 @@
     };
     
     try {
-        if (localStorage.getItem('beamng_scooter_v3')) {
-            saveState = JSON.parse(localStorage.getItem('beamng_scooter_v3'));
+        if (localStorage.getItem('beamng_scooter_v4')) {
+            saveState = JSON.parse(localStorage.getItem('beamng_scooter_v4'));
         }
     } catch(e) {}
 
@@ -125,7 +126,7 @@
     };
 
     function save() {
-        localStorage.setItem('beamng_scooter_v3', JSON.stringify(saveState));
+        localStorage.setItem('beamng_scooter_v4', JSON.stringify(saveState));
         refreshUi();
     }
 
@@ -176,12 +177,20 @@
 
     function generateEnvironment(type) {
         elements = [];
-        if (type === 'lemans') {
+        cops = [];
+        if (type === 'autobahn') {
+            // Спавним преследующих копов сзади и спереди
+            cops.push({ x: -300, vx: 4, type: 'police' });
+            cops.push({ x: 2500, vx: 1.5, type: 'police' });
+        } else if (type === 'lemans') {
             elements.push({x: 1000, type: 'ramp', w: 300, h: 100}, {x: 2600, type: 'ramp', w: 350, h: 140}, {x: 5500, type: 'wall'});
         } else if (type === 'chaos') {
-            for(let i=0; i<6; i++) elements.push({x: 1200 + i*500, type: 'car', color: i%2===0?'#9b59b6':'#1abc9c'});
-            for(let i=0; i<5; i++) elements.push({x: 1500 + i*650, type: 'box'});
-            elements.push({x: 6000, type: 'wall'});
+            for(let i=0; i<4; i++) elements.push({x: 1400 + i*800, type: 'car', color: i%2===0?'#9b59b6':'#1abc9c'});
+            for(let i=0; i<4; i++) elements.push({x: 1800 + i*750, type: 'box'});
+            elements.push({x: 5000, type: 'wall'});
+            // Полиция перекрывает дорогу и гонится сзади
+            cops.push({ x: -400, vx: 4.2, type: 'police' });
+            cops.push({ x: 3200, vx: 0, type: 'police' });
         }
     }
 
@@ -207,9 +216,6 @@
         trackY = window.innerHeight - 60;
         sX = 150; sY = trackY - 16;
         sVx = 0; sVy = 0; sAngle = 0; earnedCash = 0;
-        
-        // Позиция копов на старте погони сзади
-        copX = sX - 350; copY = trackY - 20; copVx = 0; copVy = 0;
         exhaustParticles = [];
 
         bindInputEvents();
@@ -247,7 +253,6 @@
 
     function hardReset() {
         sX = 150; sY = trackY - 16; sVx = 0; sVy = 0; sAngle = 0;
-        copX = sX - 350; copY = trackY - 20; copVx = 0; copVy = 0;
         exhaustParticles = [];
     }
 
@@ -259,8 +264,9 @@
             frames = 0; lastTick = currentTime;
         }
 
+        flashTimer += 0.2; // Для анимации мигалок полиции
+
         const stats = profileSpecs[currentModel];
-        
         let maxAllowedNormal = stats.baseMax + ((saveState.upgrades.cylinder - 1) * 6) + ((saveState.upgrades.variator - 1) * 5);
         let currentAcceleration = stats.baseAccel + ((saveState.upgrades.carburetor - 1) * 0.02) + ((saveState.upgrades.cylinder - 1) * 0.02);
         let dynamicStuntPower = 0.015 + (saveState.upgrades.stunt - 1) * 0.005;
@@ -286,21 +292,14 @@
         sX += sVx;
         sY += sVy;
 
-        // ИИ ЛОГИКА ДВИЖЕНИЯ ПОЛИЦИИ (МУСОРОВ)
-        // Копы пытаются догнать игрока и подстроиться под его скорость
-        let distanceToPlayer = sX - copX;
-        if (distanceToPlayer > 0) {
-            copVx += 0.15; // Постоянный разгон вдогонку
-            if (copVx > sVx + 2) copVx = sVx + 2; // Ограничение на обгон копов
-        } else {
-            copVx = sVx; // Сбрасывают скорость, если обогнали
-        }
-        copX += copVx;
-        copY += copVy;
-
-        // Гравитация для полиции
-        if (copY < trackY - 20) copVy += 0.45;
-        else { copY = trackY - 20; copVy = 0; }
+        // Физика ИИ Полицейских машин
+        cops.forEach(cop => {
+            if (cop.x < sX) {
+                cop.x += cop.vx + (sVx * 0.15); // Копы ускоряются, чтобы не отставать от Нитро
+            } else {
+                cop.x += cop.vx - (sVx * 0.1);
+            }
+        });
 
         if (sVx > 0.5) {
             if (Math.random() < 0.3) {
@@ -320,7 +319,7 @@
             let addCash = Math.floor(sVx * 0.15);
             if (sY < trackY - 30) addCash += 2; 
             earnedCash += addCash; saveState.cash += addCash;
-            try { localStorage.setItem('beamng_scooter_v3', JSON.stringify(saveState)); } catch(e){}
+            try { localStorage.setItem('beamng_scooter_v4', JSON.stringify(saveState)); } catch(e){}
             document.getElementById('cashCounter').textContent = "+" + earnedCash + " руб.";
         }
 
@@ -353,11 +352,13 @@
         document.getElementById('speedVal').textContent = displaySpeed;
         document.getElementById('speedometer').style.color = (displaySpeed >= 120) ? '#ff4757' : 'white';
 
+        // Бессмертие: Полное отсутствие проверок на урон и аварии
+
         ctx.fillStyle = '#1e1e1e';
         ctx.fillRect(0, 0, canvas.width, canvas.height);
 
         ctx.save();
-        ctx.translate(-sX + 200, 0); // Камера следит за игроком
+        ctx.translate(-sX + 200, 0);
 
         ctx.fillStyle = '#2c3e50';
         ctx.fillRect(0, trackY, sX + window.innerWidth * 15, 60);
@@ -369,6 +370,7 @@
             ctx.beginPath(); ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2); ctx.fill();
         });
 
+        // Отрисовка препятствий
         elements.forEach(obs => {
             if(obs.type === 'wall') { ctx.fillStyle = '#ff4757'; ctx.fillRect(obs.x, trackY - 140, 70, 140); }
             else if(obs.type === 'box') { ctx.fillStyle = '#f1c40f'; ctx.fillRect(obs.x, trackY - 50, 50, 50); }
@@ -376,35 +378,31 @@
             else if(obs.type === 'car') { ctx.fillStyle = obs.color; ctx.fillRect(obs.x, trackY - 40, 70, 40); ctx.fillStyle = '#111'; ctx.beginPath(); ctx.arc(obs.x+15, trackY, 12, 0, Math.PI*2); ctx.arc(obs.x+55, trackY, 12, 0, Math.PI*2); ctx.fill(); }
         });
 
-        // ОТРИСОВКА ПОЛИЦЕЙСКОЙ МАШИНЫ (МУСОРОВ)
-        ctx.save();
-        ctx.translate(copX, copY);
-        // Корпус патрульного авто
-        ctx.fillStyle = '#fff'; ctx.fillRect(-45, -20, 90, 30);
-        ctx.fillStyle = '#111'; ctx.fillRect(-45, -20, 35, 30); // Черно-белый окрас кузова
-        ctx.fillStyle = '#2c3e50'; ctx.fillRect(10, -32, 25, 12); // Лобовое и кабина копов
-        
-        // Текстура надписи POLICE на борту
-        ctx.fillStyle = '#fff'; ctx.font = '10px Arial'; ctx.fillText("POLICE", -35, 0);
+        // ОТРИСОВКА МАШИН ПОЛИЦИИ С МИГАЛКАМИ
+        cops.forEach(cop => {
+            ctx.fillStyle = '#2e86de'; // Синий кузов полиции
+            ctx.fillRect(cop.x, trackY - 45, 95, 45);
+            ctx.fillStyle = '#fff'; // Белая дверь
+            ctx.fillRect(cop.x + 25, trackY - 45, 40, 30);
+            
+            // Стекла копов
+            ctx.fillStyle = '#111';
+            ctx.fillRect(cop.x + 10, trackY - 40, 12, 15);
+            ctx.fillRect(cop.x + 68, trackY - 40, 18, 15);
 
-        // Колеса полиции
-        ctx.fillStyle = '#111'; ctx.beginPath(); ctx.arc(-25, 12, 14, 0, Math.PI*2); ctx.arc(25, 12, 14, 0, Math.PI*2); ctx.fill();
-        ctx.fillStyle = '#7f8c8d'; ctx.beginPath(); ctx.arc(-25, 12, 6, 0, Math.PI*2); ctx.arc(25, 12, 6, 0, Math.PI*2); ctx.fill();
+            // Колеса полиции
+            ctx.fillStyle = '#000';
+            ctx.beginPath(); ctx.arc(cop.x + 20, trackY, 15, 0, Math.PI * 2); ctx.arc(cop.x + 75, trackY, 15, 0, Math.PI * 2); ctx.fill();
+            ctx.fillStyle = '#bdc3c7';
+            ctx.beginPath(); ctx.arc(cop.x + 20, trackY, 6, 0, Math.PI * 2); ctx.arc(cop.x + 75, trackY, 6, 0, Math.PI * 2); ctx.fill();
 
-        // МИГАЛКА С КРАСНО-СИНИМИ ОГНЯМИ
-        copFlashTimer++;
-        if (Math.floor(copFlashTimer / 5) % 2 === 0) {
-            ctx.fillStyle = '#ff3838'; // Красный огонь мигалки
-            ctx.fillRect(0, -38, 8, 6);
-            ctx.fillStyle = 'rgba(255,0,0,0.2)'; ctx.beginPath(); ctx.arc(4, -35, 35, 0, Math.PI*2); ctx.fill(); // Свечение копов
-        } else {
-            ctx.fillStyle = '#2e86de'; // Синий огонь мигалки
-            ctx.fillRect(8, -38, 8, 6);
-            ctx.fillStyle = 'rgba(0,0,255,0.2)'; ctx.beginPath(); ctx.arc(12, -35, 35, 0, Math.PI*2); ctx.fill();
-        }
-        ctx.restore();
+            // Анимированная Красно-Синяя Мигалка (Стробоскопы)
+            let flashColor = Math.floor(flashTimer) % 2 === 0 ? '#ff3838' : '#00a8ff';
+            ctx.fillStyle = flashColor;
+            ctx.fillRect(cop.x + 40, trackY - 53, 15, 8);
+        });
 
-        // ОТРИСОВКА СКУТЕРА С ЧЕЛОВЕЧКОМ
+        // Отрисовка мопеда
         ctx.save();
         ctx.translate(sX, sY);
         ctx.rotate(sAngle);
@@ -419,6 +417,7 @@
         ctx.fillStyle = '#bdc3c7';
         ctx.beginPath(); ctx.arc(-20, 8, 4, 0, Math.PI * 2); ctx.arc(22, 8, 4, 0, Math.PI * 2); ctx.fill();
 
+        // Отрисовка человечка (Райдера) в шортах, футболке и тапках
         ctx.save();
         ctx.translate(-5, -25); 
         
@@ -428,6 +427,7 @@
         ctx.fillStyle = '#e74c3c'; ctx.fillRect(12, 23, 6, 4); 
 
         ctx.fillStyle = '#fff'; ctx.fillRect(-5, -22, 12, 22); 
+
         ctx.strokeStyle = '#f39c12'; ctx.lineWidth = 4;
         ctx.beginPath(); ctx.moveTo(4, -18); ctx.lineTo(22, -13); ctx.stroke();
 
@@ -435,12 +435,11 @@
         ctx.fillStyle = '#e74c3c'; ctx.beginPath(); ctx.arc(2, -29, 8, 0, Math.PI * 2); ctx.fill(); 
         
         ctx.fillStyle = '#111';
-        ctx.beginPath();
-        ctx.moveTo(4, -34); ctx.lineTo(16, -35); ctx.lineTo(6, -30);
+        ctx.beginPath(); ctx.moveTo(4, -34); ctx.lineTo(16, -35); ctx.lineTo(6, -30);
         ctx.closePath(); ctx.fill();
         
         ctx.fillStyle = '#111'; ctx.fillRect(4, -31, 5, 4); 
         ctx.restore();
 
         if (inputs['Space']) {
-            ctx.fillStyle = '#ff4757'; ctx.beginPath(); ctx.moveTo(-45, -10); ctx.lineTo(-70, -5); ctx.lineTo(-45
+            ctx.fillStyle = '#ff4757'; ctx.beginPath(); ctx
