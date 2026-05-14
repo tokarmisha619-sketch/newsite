@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>2D BeamNG Drive: Идеальный Стант-Контроль</title>
+    <title>2D BeamNG Drive: 2Т Выхлоп Дзинь-Дзинь</title>
     <style>
         body { margin: 0; background: #1a1a1a; color: white; font-family: Arial, sans-serif; overflow: hidden; touch-action: none; -webkit-user-select: none; user-select: none; }
         #menu { position: absolute; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(20, 20, 20, 0.95); display: flex; flex-direction: column; justify-content: center; align-items: center; z-index: 100; overflow-y: auto; padding: 20px 0; box-sizing: border-box; }
@@ -125,6 +125,39 @@
     let obstacles = [];
     let groundY = 0, currentSessionCash = 0;
 
+    // ЗВУКОВОЙ ДВИЖОК ДЛЯ 2Т ДЗИHЬ-ДЗИHЬ
+    let audioCtx = null;
+    let soundTimer = 0;
+
+    function playScooterSound(speedKmh, isTurbo) {
+        if (!audioCtx) return;
+        
+        let now = performance.now();
+        // Рассчитываем частоту треска «дзинь» от текущей скорости
+        let interval = isTurbo ? 25 : Math.max(40, 180 - (speedKmh * 0.5));
+        
+        if (now - soundTimer > interval) {
+            soundTimer = now;
+            
+            // Генерируем резкий металлический щелчок (дзинь)
+            let osc = audioCtx.createOscillator();
+            let gainNode = audioCtx.createGain();
+            
+            osc.type = 'sawtooth'; // Пилообразная волна дает едкий 2Т звук
+            // Если турбо — визжит на высоких оборотах, если обычный газ — трещит басом
+            osc.frequency.setValueAtTime(isTurbo ? 320 + Math.random()*80 : 120 + speedKmh*0.8, audioCtx.currentTime);
+            
+            gainNode.gain.setValueAtTime(0.06, audioCtx.currentTime); // Громкость
+            gainNode.gain.exponentialRampToValueAtTime(0.0001, audioCtx.currentTime + 0.04);
+            
+            osc.connect(gainNode);
+            gainNode.connect(audioCtx.destination);
+            
+            osc.start();
+            osc.stop(audioCtx.currentTime + 0.05);
+        }
+    }
+
     let gameData = {
         cash: 0,
         upgrades: { engine: 1, stunt: 1, weight: 1 }
@@ -210,6 +243,11 @@
     }
 
     function startGame(mapType) {
+        // Активируем звуковой контекст при клике игрока
+        if (!audioCtx) {
+            audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+        }
+        
         if(isRunning) return; 
         isRunning = true;
         map = mapType;
@@ -273,6 +311,19 @@
         isExploded = true;
         document.getElementById('boom').style.opacity = '1';
         setTimeout(() => document.getElementById('boom').style.opacity = '0', 200);
+        
+        // Звук бума при взрыве
+        if (audioCtx) {
+            let osc = audioCtx.createOscillator();
+            let gainNode = audioCtx.createGain();
+            osc.type = 'triangle';
+            osc.frequency.setValueAtTime(60, audioCtx.currentTime);
+            osc.frequency.exponentialRampToValueAtTime(10, audioCtx.currentTime + 0.3);
+            gainNode.gain.setValueAtTime(0.3, audioCtx.currentTime);
+            gainNode.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.3);
+            osc.connect(gainNode); gainNode.connect(audioCtx.destination);
+            osc.start(); osc.stop(audioCtx.currentTime + 0.3);
+        }
     }
 
     function gameLoop() {
@@ -288,9 +339,14 @@
         
         let upgradedMaxNormal = specs.maxNormal + (gameData.upgrades.engine - 1) * 25; 
         let upgradedAccel = specs.accel + (gameData.upgrades.engine - 1) * 0.08;
-        let stuntPower = 0.015 + (gameData.upgrades.stunt - 1) * 0.005; // Снижена резкость для плавного подъема
+        let stuntPower = 0.015 + (gameData.upgrades.stunt - 1) * 0.005; 
         
         let speedKmh = Math.floor(carVx * 15);
+
+        // Воспроизведение звука выхлопа при движении
+        if ((keysActive['ArrowRight'] || keysActive['Space']) && !isExploded) {
+            playScooterSound(speedKmh, keysActive['Space']);
+        }
 
         if (keysActive['Space']) {
             carVx = specs.turboSpeed / 15; 
@@ -329,27 +385,22 @@
             }
         });
 
-        // ИСПРАВЛЕННАЯ СИСТЕМА УПРАВЛЕНИЯ СТАНТОМ (ИДЕАЛЬНЫЙ БАЛАНС)
         if (!isExploded) {
             let isAirborne = carY < currentGround - 5;
 
             if (isAirborne) {
-                // Свободный наклон в воздухе без ограничений для трюков
                 if (keysActive['ArrowUp']) carAngle -= 0.04;
                 if (keysActive['ArrowDown']) carAngle += 0.04;
             } else {
-                // На земле: плавный подъем на заднее колесо
                 if (keysActive['ArrowUp'] && carVx > 1) {
                     carAngle -= stuntPower;
-                    // Ограничиваем максимальный угол вилли, чтобы мопед не крутился бесконечно и не падал на спину сам по себе
                     if (carAngle < -0.85) carAngle = -0.85; 
                 } else if (keysActive['ArrowDown']) {
                     carAngle += 0.04;
                     if (carAngle > 0) carAngle = 0;
                 } else {
-                    // ГРАВИТАЦИЯ ДЛЯ СТАНТА: Если отпустить кнопку подъема, мопед плавно возвращается на 2 колеса!
                     if (carAngle < 0) {
-                        carAngle += 0.025;
+                        carAngle += 0.007; 
                         if (carAngle > 0) carAngle = 0;
                     }
                 }
@@ -365,7 +416,6 @@
                 carVy += 0.4; 
             } else {
                 let normalizedAngle = Math.abs(carAngle % (Math.PI * 2));
-                // Взрыв только при жестком падении на крышу/голову пилота
                 if (carVy > 6 && (normalizedAngle > 1.4 && normalizedAngle < 4.8) && !isExploded) {
                     triggerExplosionEffect();
                     carVy = 0;
@@ -424,21 +474,4 @@
             ctxGame.fillStyle = '#111';
             ctxGame.beginPath(); ctxGame.arc(-20, 8, 10, 0, Math.PI * 2); ctxGame.arc(22, 8, 10, 0, Math.PI * 2); ctxGame.fill();
             ctxGame.fillStyle = '#bdc3c7';
-            ctxGame.beginPath(); ctxGame.arc(-20, 8, 4, 0, Math.PI * 2); ctxGame.arc(22, 8, 4, 0, Math.PI * 2); ctxGame.fill();
-
-            if(keysActive['Space']) {
-                ctxGame.fillStyle = '#ff4757'; ctxGame.beginPath(); ctxGame.moveTo(-45, -10); ctxGame.lineTo(-70, -5); ctxGame.lineTo(-45, 0); ctxGame.fill();
-            }
-        } else {
-            ctxGame.fillStyle = specs.color; ctxGame.fillRect(-15, -20, 15, 10);
-            ctxGame.fillStyle = '#111'; ctxGame.beginPath(); ctxGame.arc(-30, 5, 10, 0, Math.PI * 2); ctxGame.arc(40, -25, 10, 0, Math.PI * 2); ctxGame.fill();
-        }
-        ctxGame.restore();
-        ctxGame.restore();
-        requestAnimationFrame(gameLoop);
-    }
-
-    updateMenuUi();
-</script>
-</body>
-</html>
+            ctxGame.beginPath(); ctxGame.arc(-20, 8, 4, 0, Math
