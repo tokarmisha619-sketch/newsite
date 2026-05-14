@@ -1,248 +1,205 @@
 <!DOCTYPE html>
-<html lang="uk">
+<html lang="ru">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>2D BeamNG Drive: Скутер Симулятор</title>
+    <title>2D Scooter Stunt: Погоня от Копов</title>
     <style>
-        body { margin: 0; background: #1a1a1a; color: white; font-family: Arial, sans-serif; overflow: hidden; touch-action: none; -webkit-user-select: none; user-select: none; }
-        #menu { position: absolute; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(20, 20, 20, 0.95); display: flex; flex-direction: column; justify-content: center; align-items: center; z-index: 100; overflow-y: auto; padding: 20px 0; box-sizing: border-box; }
-        h1 { font-size: 28px; margin: 0 0 10px 0; text-shadow: 0 0 10px #ff4757; text-align: center; }
-        h2 { font-size: 18px; margin: 10px 0 5px 0; color: #bdc3c7; }
-        #wallet { font-size: 22px; font-weight: bold; color: #2ecc71; background: rgba(0,0,0,0.5); padding: 5px 15px; border-radius: 20px; border: 2px solid #2ecc71; margin-bottom: 10px; }
-        .mode-container, .vehicle-container, .shop-container { display: flex; flex-wrap: wrap; justify-content: center; gap: 10px; margin-bottom: 5px; max-width: 650px; }
-        .mode-btn, .v-btn, .shop-btn { background: #222; color: #bdc3c7; border: 2px solid #444; padding: 8px 16px; font-size: 14px; font-weight: bold; border-radius: 8px; cursor: pointer; transition: 0.2s; }
-        .mode-btn.active, .v-btn.active { background: #2ecc71; color: white; border-color: #2ecc71; }
-        .shop-btn { border-color: #f1c40f; color: #f1c40f; }
-        .shop-btn:hover { background: rgba(241, 196, 15, 0.1); }
-        .map-btn { background: #2e86de; color: white; border: none; padding: 10px 25px; font-size: 16px; font-weight: bold; margin: 4px; border-radius: 8px; cursor: pointer; transition: 0.2s; width: 280px; }
-        .map-btn:hover { background: #54a0ff; transform: scale(1.03); }
-        #info { position: absolute; top: 10px; left: 10px; font-size: 13px; background: rgba(0,0,0,0.7); padding: 12px; border-radius: 5px; pointer-events: none; line-height: 1.5; z-index: 10; display: none; max-width: 280px; }
-        #backToMenu { position: absolute; top: 10px; right: 10px; background: #ff4757; color: white; border: none; padding: 8px 15px; font-size: 14px; border-radius: 5px; cursor: pointer; z-index: 110; display: none; }
-        #dashboard { position: absolute; bottom: 20px; right: 20px; background: rgba(0,0,0,0.8); padding: 12px; border-radius: 10px; border: 2px solid #333; z-index: 10; display: none; min-width: 165px; }
-        #speedometer { font-size: 28px; font-weight: bold; text-align: right; }
-        #cashCounter { font-size: 16px; color: #2ecc71; font-weight: bold; text-align: right; margin-top: 2px; }
-        #fpsCounter { font-size: 12px; color: #888; margin-top: 5px; text-align: right; font-family: monospace; }
-        #turboText { font-size: 12px; color: #ff4757; margin-top: 4px; text-align: right; font-weight: bold; text-shadow: 0 0 5px #ff0000; }
-        #flightStatus { position: absolute; top: 30%; left: 50%; transform: translate(-50%, -50%); font-size: 70px; font-weight: bold; color: #ff3838; text-shadow: 0 0 20px #ff0000; opacity: 0; pointer-events: none; z-index: 10; }
-        #boom { position: absolute; top: 0; left: 0; width: 100vw; height: 100vh; background: radial-gradient(circle, rgba(255,69,0,1) 0%, rgba(0,0,0,0) 70%); opacity: 0; pointer-events: none; transition: opacity 0.1s ease-out; z-index: 5; }
+        body { margin: 0; background: #111; color: white; font-family: 'Arial', sans-serif; overflow: hidden; touch-action: none; -webkit-user-select: none; user-select: none; }
+        #menu { position: absolute; top: 0; left: 0; width: 100vw; height: 100vh; background: #1a1a1a; display: flex; flex-direction: column; justify-content: center; align-items: center; z-index: 100; overflow-y: auto; padding: 20px 0; box-sizing: border-box; }
+        h1 { font-size: 26px; margin: 0 0 10px 0; text-shadow: 0 0 8px #ff4757; color: #ff4757; text-align: center; }
+        h2 { font-size: 16px; margin: 12px 0 6px 0; color: #ccc; text-transform: uppercase; letter-spacing: 1px; }
+        #wallet { font-size: 20px; font-weight: bold; color: #2ecc71; background: rgba(0,0,0,0.4); padding: 6px 20px; border-radius: 20px; border: 2px solid #2ecc71; margin-bottom: 10px; }
+        .block-container { display: flex; flex-wrap: wrap; justify-content: center; gap: 8px; margin-bottom: 5px; max-width: 600px; }
+        .btn-ui { background: #222; color: #bbb; border: 2px solid #333; padding: 8px 16px; font-size: 13px; font-weight: bold; border-radius: 6px; cursor: pointer; transition: 0.1s; }
+        .btn-ui.active { background: #2ecc71; color: white; border-color: #2ecc71; box-shadow: 0 0 8px rgba(46, 204, 113, 0.4); }
+        .btn-shop { border-color: #f1c40f; color: #f1c40f; }
+        .btn-shop:hover { background: rgba(241, 196, 15, 0.1); }
+        .btn-map { background: #2e86de; color: white; border: none; padding: 12px 25px; font-size: 15px; font-weight: bold; margin: 4px; border-radius: 6px; cursor: pointer; width: 260px; }
+        .btn-map:hover { background: #54a0ff; }
+        #backToMenu { position: absolute; top: 10px; right: 10px; background: #ff4757; color: white; border: none; padding: 8px 14px; font-size: 14px; border-radius: 4px; cursor: pointer; z-index: 10; display: none; }
+        #dashboard { position: absolute; bottom: 15px; right: 15px; background: rgba(0,0,0,0.85); padding: 10px 15px; border-radius: 8px; border: 2px solid #333; z-index: 10; display: none; min-width: 150px; }
+        #speedometer { font-size: 26px; font-weight: bold; text-align: right; font-family: monospace; }
+        #cashCounter { font-size: 15px; color: #2ecc71; font-weight: bold; text-align: right; margin-top: 2px; }
+        #fpsCounter { font-size: 11px; color: #777; margin-top: 4px; text-align: right; font-family: monospace; }
+        #turboText { font-size: 11px; color: #ff4757; margin-top: 2px; text-align: right; font-weight: bold; }
         #mobileControls { position: absolute; bottom: 15px; left: 0; width: 100vw; display: none; justify-content: space-between; padding: 0 20px; box-sizing: border-box; z-index: 80; }
-        .btn-left-group, .btn-right-group { display: flex; gap: 10px; }
-        .touch-btn { width: 55px; height: 55px; background: rgba(255, 255, 255, 0.15); border: 2px solid rgba(255, 255, 255, 0.5); border-radius: 50%; color: white; font-size: 18px; font-weight: bold; display: flex; justify-content: center; align-items: center; }
-        .touch-btn:active { background: rgba(255, 255, 255, 0.4); transform: scale(0.95); }
-        #btnTurbo { background: rgba(231, 76, 60, 0.3); border-color: #ff4757; font-size: 11px; }
-        #orientationWarning { position: absolute; top: 0; left: 0; width: 100vw; height: 100vh; background: #1a1a1a; z-index: 999; display: none; flex-direction: column; justify-content: center; align-items: center; text-align: center; padding: 20px; box-sizing: border-box; }
+        .control-group { display: flex; gap: 8px; }
+        .touch-btn { width: 55px; height: 55px; background: rgba(255, 255, 255, 0.12); border: 2px solid rgba(255, 255, 255, 0.4); border-radius: 50%; color: white; font-size: 20px; font-weight: bold; display: flex; justify-content: center; align-items: center; }
+        .touch-btn:active { background: rgba(255, 255, 255, 0.35); }
+        #btnTurbo { background: rgba(231, 76, 60, 0.25); border-color: #ff4757; font-size: 11px; }
+        #orientationWarning { position: absolute; top: 0; left: 0; width: 100vw; height: 100vh; background: #111; z-index: 999; display: none; flex-direction: column; justify-content: center; align-items: center; text-align: center; padding: 20px; box-sizing: border-box; }
+        #orientationWarning h3 { font-size: 20px; color: #ffa502; margin-bottom: 5px; }
     </style>
+    <script src="cloudflare.com"></script>
 </head>
 <body>
 
 <div id="orientationWarning">
-    <h3>Будь ласка, переверніть пристрій!</h3>
-    <p>Переверніть телефон горизонтально для гри.</p>
+    <h3>Переверните устройство!</h3>
+    <p>Для игры на смартфоне поверните его горизонтально.</p>
 </div>
 
 <div id="menu">
-    <h1>2D BEAMNG DRIVE: СТАНТ ТА ТЮНІНГ</h1>
+    <h1>2D SCOOTER STUNT: COP PURSUIT</h1>
     
-    <div id="wallet">💰 0 грн.</div>
+    <div id="wallet">💰 0 руб.</div>
 
-    <h2>МАГАЗИН ТЮНІНГУ (UPGRADE)</h2>
-    <div class="shop-container">
-        <button id="upEngine" class="shop-btn" onclick="buyUpgrade('engine')">🚀 Двигун (Рівень 1)</button>
-        <button id="upStunt" class="shop-btn" onclick="buyUpgrade('stunt')">🏍️ Стант-Кіт (Рівень 1)</button>
-        <button id="upWeight" class="shop-btn" onclick="buyUpgrade('weight')">🎈 Полегшення (Рівень 1)</button>
+    <h2>Оригинальные запчасти (Магазин)</h2>
+    <div class="block-container">
+        <button id="upCylinder" class="btn-ui btn-shop" onclick="buyComponent('cylinder', 150)">🔥 ЦПГ Malossi MHR 70cc</button>
+        <button id="upExhaust" class="btn-ui btn-shop" onclick="buyComponent('exhaust', 180)">🎺 Резонатор Yasuni R</button>
+        <button id="upCarb" class="btn-ui btn-shop" onclick="buyComponent('carburetor', 120)">⛽ Карб Dell'Orto 19mm</button>
+        <button id="upVariator" class="btn-ui btn-shop" onclick="buyComponent('variator', 130)">⚙️ Вариатор Malossi Multivar</button>
+        <button id="upStunt" class="btn-ui btn-shop" onclick="buyComponent('stunt', 200)">🏍️ Бугель & Руль Stage6</button>
     </div>
 
-    <h2>ПРИСТРІЙ КЕРУВАННЯ</h2>
-    <div class="mode-container">
-        <button id="modePc" class="mode-btn active" onclick="selectDeviceMode('pc')">🖥️ Комп'ютер (ПК)</button>
-        <button id="modeMobile" class="mode-btn" onclick="selectDeviceMode('mobile')">📱 Телефон</button>
+    <h2>Устройство ввода</h2>
+    <div class="block-container">
+        <button id="modePc" class="btn-ui active" onclick="setDevice('pc')">🖥️ Компьютер (ПК)</button>
+        <button id="modeMobile" class="btn-ui" onclick="setDevice('mobile')">📱 Смартфон (Сенсор)</button>
     </div>
 
-    <h2>ВИБЕРИ СВІЙ МОПЕД</h2>
-    <div class="vehicle-container">
-        <button id="vDio" class="v-btn active" onclick="selectVehicle('honda_dio')">🛵 Honda Dio</button>
-        <button id="vJog" class="v-btn" onclick="selectVehicle('yamaha_jog')">🔥 Yamaha Jog</button>
-        <button id="vTact" class="v-btn" onclick="selectVehicle('honda_tact')">🛵 Honda Tact</button>
+    <h2>Выбери свой скутер</h2>
+    <div class="block-container">
+        <button id="vDio" class="btn-ui active" onclick="setScooter('honda_dio')">🛵 Honda Dio</button>
+        <button id="vJog" class="btn-ui" onclick="setScooter('yamaha_jog')">🔥 Yamaha Jog</button>
+        <button id="vTact" class="btn-ui" onclick="setScooter('honda_tact')">🛵 Honda Tact</button>
     </div>
 
-    <h2>ВИБЕРИ КАРТУ ДЛЯ ТЕСТУ</h2>
-    <button class="map-btn" onclick="startGame('autobahn')">1. Прямий автобан (Пуста)</button>
-    <button class="map-btn" onclick="startGame('lemans')">2. Ле-Ман (Трампліни)</button>
-    <button class="map-btn" onclick="startGame('chaos')">3. Міський хаос</button>
+    <h2>Выбери трассу гонки</h2>
+    <div class="block-container">
+        <button class="btn-map" onclick="launchGame('autobahn')">1. Бесконечный автобан (Погоня)</button>
+        <button class="btn-map" onclick="launchGame('lemans')">2. Трасса Ле-Ман (Трамплины)</button>
+        <button class="btn-map" onclick="launchGame('chaos')">3. Городской хаос (Препятствия)</button>
+    </div>
 </div>
 
 <button id="backToMenu" onclick="location.reload()">В меню</button>
 
-<div id="info">
-    <div id="infoPc">
-        <strong>Керування (ПК):</strong><br>
-        • Стрілка Вправо — Газ<br>
-        • Стрілка Вгору — <strong>СТАНТ (Віллі)</strong><br>
-        • Стрілка Вниз — Нахил вперед<br>
-        • Затисни <strong>ПРОБІЛ</strong> — ТУРБО 🔥<br>
-        • Клавіша <strong>R</strong> — Полагодити мопед
-    </div>
-    <div id="infoMobile" style="display:none;">
-        <strong>Керування (Телефон):</strong><br>
-        • Кнопка «→» — Ручка газа<br>
-        • Кнопка «↑» — СТАНТ / ВІЛЛІ<br>
-        • Кнопка ТУРБО — МАКСИМАЛЬНИЙ РОЗГІН 🔥
-    </div>
-</div>
-
 <div id="dashboard">
-    <div id="speedometer"><span id="speedVal">0</span> км/год</div>
-    <div id="cashCounter">+0 грн.</div>
-    <div id="turboText">ТУРБО ЗАРЯДЖЕНО</div>
+    <div id="speedometer"><span id="speedVal">0</span> км/ч</div>
+    <div id="cashCounter">+0 руб.</div>
+    <div id="turboText">АКТИВИРОВАНА ЗАКИСЬ АЗОТА 🔥</div>
     <div id="fpsCounter">FPS: <span id="fpsVal">60</span></div>
 </div>
 
 <div id="mobileControls">
-    <div class="btn-left-group">
+    <div class="control-group">
         <div class="touch-btn" id="btnBack">←</div>
         <div class="touch-btn" id="btnUp">↑</div>
         <div class="touch-btn" id="btnDown">↓</div>
         <div class="touch-btn" id="btnRepair">R</div>
     </div>
-    <div class="btn-right-group">
-        <div class="touch-btn" id="btnTurbo">ТУРБО</div>
+    <div class="control-group">
+        <div class="touch-btn" id="btnTurbo">НИТРО</div>
         <div class="touch-btn" id="btnGas">→</div>
     </div>
 </div>
 
-<div id="flightStatus">ЗЛІТ!</div>
-<div id="boom"></div>
-
 <script>
-    // Весь код написан на чистом JS без внешних тяжелых библиотек
-    let canvas, ctxGame;
-    let carX = 150, carY = 0, carVx = 0, carVy = 0, carAngle = 0;
-    let map = 'autobahn', isExploded = false, isRunning = false;
-    let keysActive = {}, currentMode = 'pc', chosenVehicle = 'honda_dio';
-    let frameCount = 0, lastCalledTime = performance.now(), fps = 60;
-    let obstacles = [];
-    let groundY = 0, currentSessionCash = 0;
-    let soundTimer = 0;
+    let canvas, ctx;
+    let sX = 150, sY = 0, sVx = 0, sVy = 0, sAngle = 0;
+    let selectedMap = 'autobahn', isLoopStarted = false;
+    let inputs = {}, controlMode = 'pc', currentModel = 'honda_dio';
+    let frames = 0, lastTick = performance.now(), currentFps = 60;
+    let elements = [], exhaustParticles = [], cops = [];
+    let trackY = 0, earnedCash = 0, copFlashTimer = 0;
 
-    let gameData = {
+    let saveState = {
         cash: 0,
-        upgrades: { engine: 1, stunt: 1, weight: 1 }
+        upgrades: { cylinder: 1, exhaust: 1, carburetor: 1, variator: 1, stunt: 1 }
     };
     
     try {
-        if (localStorage.getItem('beamng_scooter_save')) {
-            gameData = JSON.parse(localStorage.getItem('beamng_scooter_save'));
+        if (localStorage.getItem('beamng_scooter_v3')) {
+            saveState = JSON.parse(localStorage.getItem('beamng_scooter_v3'));
         }
     } catch(e) {}
 
-    const scooterSpecs = {
-        honda_dio: { maxNormal: 140, turboSpeed: 380, accel: 0.40, color: '#3498db' },
-        yamaha_jog: { maxNormal: 210, turboSpeed: 411, accel: 0.65, color: '#e74c3c' },
-        honda_tact: { maxNormal: 110, turboSpeed: 320, accel: 0.30, color: '#f1c40f' }
+    const profileSpecs = {
+        honda_dio: { baseMax: 65, nitroMax: 155, baseAccel: 0.12, baseColor: '#3498db' },
+        yamaha_jog: { baseMax: 70, nitroMax: 165, baseAccel: 0.16, baseColor: '#e74c3c' },
+        honda_tact: { baseMax: 60, nitroMax: 145, baseAccel: 0.10, baseColor: '#f1c40f' }
     };
 
-    // Создаем кастомный звук "дзинь-дзинь-дзинь" через Web Audio API (без файлов!)
-    let audioCtx = null;
-    function playDzinSound() {
-        try {
-            if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-            let osc = audioCtx.createOscillator();
-            let gain = audioCtx.createGain();
-            osc.type = 'sawtooth';
-            osc.frequency.setValueAtTime(120 + Math.random() * 40, audioCtx.currentTime); 
-            gain.gain.setValueAtTime(0.08, audioCtx.currentTime);
-            gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.1);
-            osc.connect(gain);
-            gain.connect(audioCtx.destination);
-            osc.start();
-            osc.stop(audioCtx.currentTime + 0.1);
-        } catch(e) {}
+    function save() {
+        localStorage.setItem('beamng_scooter_v3', JSON.stringify(saveState));
+        refreshUi();
     }
 
-    function saveGame() {
-        localStorage.setItem('beamng_scooter_save', JSON.stringify(gameData));
-        updateMenuUi();
+    function refreshUi() {
+        document.getElementById('wallet').textContent = "💰 " + saveState.cash + " руб.";
+        document.getElementById('upCylinder').textContent = "🔥 Malossi 70cc (Лвл " + saveState.upgrades.cylinder + ") - " + (saveState.upgrades.cylinder * 150) + "р.";
+        document.getElementById('upExhaust').textContent = "🎺 Yasuni R (Лвл " + saveState.upgrades.exhaust + ") - " + (saveState.upgrades.exhaust * 180) + "р.";
+        document.getElementById('upCarb').textContent = "⛽ Dell'Orto 19mm (Лвл " + saveState.upgrades.carburetor + ") - " + (saveState.upgrades.carburetor * 120) + "р.";
+        document.getElementById('upVariator').textContent = "⚙️ Multivar (Лвл " + saveState.upgrades.variator + ") - " + (saveState.upgrades.variator * 130) + "р.";
+        document.getElementById('upStunt').textContent = "🏍️ Stage6 Кит (Лвл " + saveState.upgrades.stunt + ") - " + (saveState.upgrades.stunt * 200) + "р.";
     }
 
-    function updateMenuUi() {
-        document.getElementById('wallet').textContent = "💰 " + gameData.cash + " грн.";
-        document.getElementById('upEngine').textContent = "🚀 Двигун (Рів. " + gameData.upgrades.engine + ") - " + (gameData.upgrades.engine * 150) + " грн.";
-        document.getElementById('upStunt').textContent = "🏍️ Стант-Кіт (Рів. " + gameData.upgrades.stunt + ") - " + (gameData.upgrades.stunt * 200) + " грн.";
-        document.getElementById('upWeight').textContent = "🎈 Полегшення (Рів. " + gameData.upgrades.weight + ") - " + (gameData.upgrades.weight * 250) + " грн.";
-    }
-
-    function buyUpgrade(type) {
-        let cost = 0;
-        if(type === 'engine') cost = gameData.upgrades.engine * 150;
-        if(type === 'stunt') cost = gameData.upgrades.stunt * 200;
-        if(type === 'weight') cost = gameData.upgrades.weight * 250;
-
-        if (gameData.cash >= cost) {
-            gameData.cash -= cost;
-            gameData.upgrades[type]++;
-            saveGame();
+    function buyComponent(item, baseCost) {
+        let currentLvl = saveState.upgrades[item];
+        let calculatedCost = currentLvl * baseCost;
+        if (saveState.cash >= calculatedCost) {
+            saveState.cash -= calculatedCost;
+            saveState.upgrades[item]++;
+            save();
         } else {
-            alert("Не вистачає ігрових гривень для прокачування!");
+            alert("Не хватает рублей на покупку тюнинга!");
         }
     }
 
-    function selectDeviceMode(mode) {
-        currentMode = mode;
-        document.getElementById('modePc').className = 'mode-btn' + (mode==='pc'?' active':'');
-        document.getElementById('modeMobile').className = 'mode-btn' + (mode==='mobile'?' active':'');
-        if(mode === 'mobile') checkOrientation();
+    function setDevice(type) {
+        controlMode = type;
+        document.getElementById('modePc').className = 'btn-ui' + (type === 'pc' ? ' active' : '');
+        document.getElementById('modeMobile').className = 'btn-ui' + (type === 'mobile' ? ' active' : '');
+        if (type === 'mobile') verifyLayout();
         else document.getElementById('orientationWarning').style.display = 'none';
     }
 
-    function checkOrientation() {
-        if (currentMode === 'mobile' && window.innerHeight > window.innerWidth) {
+    function verifyLayout() {
+        if (controlMode === 'mobile' && window.innerHeight > window.innerWidth) {
             document.getElementById('orientationWarning').style.display = 'flex';
         } else {
             document.getElementById('orientationWarning').style.display = 'none';
         }
     }
-    window.addEventListener('resize', checkOrientation);
+    window.addEventListener('resize', verifyLayout);
 
-    function selectVehicle(type) {
-        chosenVehicle = type;
-        document.getElementById('vDio').className = 'v-btn';
-        document.getElementById('vJog').className = 'v-btn';
-        document.getElementById('vTact').className = 'v-btn';
-        if (type === 'honda_dio') document.getElementById('vDio').className = 'v-btn active';
-        if (type === 'yamaha_jog') document.getElementById('vJog').className = 'v-btn active';
-        if (type === 'honda_tact') document.getElementById('vTact').className = 'v-btn active';
+    function setScooter(model) {
+        currentModel = model;
+        document.getElementById('vDio').className = 'btn-ui' + (model === 'honda_dio' ? ' active' : '');
+        document.getElementById('vJog').className = 'btn-ui' + (model === 'yamaha_jog' ? ' active' : '');
+        document.getElementById('vTact').className = 'btn-ui' + (model === 'honda_tact' ? ' active' : '');
     }
 
-    function spawnMapObstacles(type) {
-        obstacles = [];
-        if (type === 'autobahn') {
-        } else if (type === 'lemans') {
-            obstacles.push({x: 1000, type: 'ramp', w: 300, h: 100}, {x: 2600, type: 'ramp', w: 350, h: 140}, {x: 5500, type: 'wall'});
+    function generateEnvironment(type) {
+        elements = [];
+        cops = [];
+        trackY = window.innerHeight - 60;
+
+        // Спавним двух копов на хвост в начале заезда
+        cops.push({ x: -100, y: trackY - 16, vx: 0, angle: 0 }, { x: -250, y: trackY - 16, vx: 0, angle: 0 });
+
+        if (type === 'lemans') {
+            elements.push({x: 1000, type: 'ramp', w: 300, h: 100}, {x: 2600, type: 'ramp', w: 350, h: 140}, {x: 5500, type: 'wall'});
         } else if (type === 'chaos') {
-            for(let i=0; i<6; i++) obstacles.push({x: 1200 + i*500, type: 'car', color: i%2===0?'#9b59b6':'#1abc9c'});
-            for(let i=0; i<5; i++) obstacles.push({x: 1500 + i*650, type: 'box'});
-            obstacles.push({x: 6000, type: 'wall'});
+            for(let i=0; i<6; i++) elements.push({x: 1200 + i*500, type: 'car', color: i%2===0?'#9b59b6':'#1abc9c'});
+            for(let i=0; i<5; i++) elements.push({x: 1500 + i*650, type: 'box'});
+            elements.push({x: 6000, type: 'wall'});
         }
     }
 
-    function startGame(mapType) {
-        if(isRunning) return; 
-        isRunning = true;
-        map = mapType;
-        
+    function launchGame(mapName) {
+        if (isLoopStarted) return;
+        isLoopStarted = true;
+        selectedMap = mapName;
+
         document.getElementById('menu').style.display = 'none';
-        document.getElementById('info').style.display = 'block';
         document.getElementById('backToMenu').style.display = 'block';
         document.getElementById('dashboard').style.display = 'block';
 
-        if (currentMode === 'pc') {
-            document.getElementById('infoPc').style.display = 'block';
-            document.getElementById('infoMobile').style.display = 'none';
-            document.getElementById('mobileControls').style.display = 'none';
-        } else {
-            document.getElementById('infoPc').style.display = 'none';
-            document.getElementById('infoMobile').style.display = 'block';
+        if (controlMode === 'mobile') {
             document.getElementById('mobileControls').style.display = 'flex';
         }
 
@@ -250,214 +207,256 @@
         canvas.width = window.innerWidth;
         canvas.height = window.innerHeight;
         document.body.appendChild(canvas);
-        ctxGame = canvas.getContext('2d');
+        ctx = canvas.getContext('2d');
 
-        groundY = window.innerHeight - 60;
-        carX = 150; carY = groundY - 16; 
-        carVx = 0; carVy = 0; carAngle = 0; isExploded = false; currentSessionCash = 0;
-        
-        spawnMapObstacles(mapType);
-        setupControls();
-        requestAnimationFrame(gameLoop);
+        trackY = window.innerHeight - 60;
+        sX = 150; sY = trackY - 16;
+        sVx = 0; sVy = 0; sAngle = 0; earnedCash = 0;
+        exhaustParticles = [];
+
+        bindInputEvents();
+        generateEnvironment(mapName);
+        requestAnimationFrame(engineFrame);
     }
 
-    function setupControls() {
-        // Очищаем старые бинды, вешаем новые наглухо
-        window.onkeydown = (e) => { keysActive[e.code] = true; if(e.code==='KeyR') restartCar(); };
-        window.onkeyup = (e) => { keysActive[e.code] = false; };
+    function bindInputEvents() {
+        window.addEventListener('keydown', (e) => {
+            if (controlMode !== 'pc') return;
+            if (e.code === 'Space') e.preventDefault();
+            inputs[e.code] = true;
+            if (e.code === 'KeyR') hardReset();
+        });
+        window.addEventListener('keyup', (e) => {
+            if (controlMode !== 'pc') return;
+            inputs[e.code] = false;
+        });
 
-        const attachTouch = (id, key) => {
+        const configureTouch = (id, mappingKey) => {
             const btn = document.getElementById(id);
-            if(!btn) return;
-            btn.ontouchstart = (e) => { e.preventDefault(); keysActive[key] = true; };
-            btn.ontouchend = (e) => { e.preventDefault(); keysActive[key] = false; };
+            if (!btn) return;
+            btn.ontouchstart = (e) => { e.preventDefault(); inputs[mappingKey] = true; };
+            btn.ontouchend = (e) => { e.preventDefault(); inputs[mappingKey] = false; };
         };
-        attachTouch('btnGas', 'ArrowRight');
-        attachTouch('btnBack', 'ArrowLeft');
-        attachTouch('btnTurbo', 'Space');
-        attachTouch('btnUp', 'ArrowUp');     
-        attachTouch('btnDown', 'ArrowDown'); 
-        
-        document.getElementById('btnRepair').ontouchstart = (e) => { e.preventDefault(); restartCar(); };
+        configureTouch('btnGas', 'ArrowRight');
+        configureTouch('btnBack', 'ArrowLeft');
+        configureTouch('btnTurbo', 'Space');
+        configureTouch('btnUp', 'ArrowUp');
+        configureTouch('btnDown', 'ArrowDown');
+
+        const repairNode = document.getElementById('btnRepair');
+        if (repairNode) repairNode.ontouchstart = (e) => { e.preventDefault(); hardReset(); };
     }
 
-    function restartCar() {
-        carX = 150; carY = groundY - 16; carVx = 0; carVy = 0; carAngle = 0; isExploded = false;
-        document.getElementById('flightStatus').style.opacity = '0';
+    function hardReset() {
+        sX = 150; sY = trackY - 16; sVx = 0; sVy = 0; sAngle = 0;
+        exhaustParticles = [];
+        cops.forEach((cop, i) => {
+            cop.x = sX - 200 - i * 150;
+            cop.y = trackY - 16;
+            cop.vx = 0;
+            cop.angle = 0;
+        });
     }
 
-    function triggerExplosionEffect() {
-        isExploded = true;
-        document.getElementById('boom').style.opacity = '1';
-        setTimeout(() => document.getElementById('boom').style.opacity = '0', 200);
-    }
-
-    function gameLoop() {
-        frameCount++;
-        let now = performance.now();
-        if (now - lastCalledTime >= 1000) {
-            fps = Math.round((frameCount * 1000) / (now - lastCalledTime));
-            document.getElementById('fpsVal').textContent = fps;
-            frameCount = 0; lastCalledTime = now;
+    function engineFrame(currentTime) {
+        frames++;
+        if (currentTime - lastTick >= 1000) {
+            currentFps = Math.round((frames * 1000) / (currentTime - lastTick));
+            document.getElementById('fpsVal').textContent = currentFps;
+            frames = 0; lastTick = currentTime;
         }
 
-        const specs = scooterSpecs[chosenVehicle];
-        
-        let upgradedMaxNormal = specs.maxNormal + (gameData.upgrades.engine - 1) * 25; 
-        let upgradedAccel = specs.accel + (gameData.upgrades.engine - 1) * 0.08;
-        let stuntPower = 0.015 + (gameData.upgrades.stunt - 1) * 0.005; 
-        
-        let speedKmh = Math.floor(carVx * 15);
+        copFlashTimer++;
 
-        if (keysActive['Space']) {
-            carVx = specs.turboSpeed / 15; 
-            speedKmh = specs.turboSpeed;
+        const stats = profileSpecs[currentModel];
+        let maxAllowedNormal = stats.baseMax + ((saveState.upgrades.cylinder - 1) * 6) + ((saveState.upgrades.variator - 1) * 5);
+        let currentAcceleration = stats.baseAccel + ((saveState.upgrades.carburetor - 1) * 0.02) + ((saveState.upgrades.cylinder - 1) * 0.02);
+        let dynamicStuntPower = 0.015 + (saveState.upgrades.stunt - 1) * 0.005;
+        let flightAltitudeFactor = 0.55 + (saveState.upgrades.exhaust - 1) * 0.05;
+
+        let displaySpeed = Math.floor(sVx * 35); 
+
+        if (inputs['Space']) {
+            let nitroTarget = stats.nitroMax / 35;
+            if (sVx < nitroTarget) sVx += 0.4;
+            else sVx = nitroTarget;
+            displaySpeed = Math.floor(sVx * 35);
             document.getElementById('turboText').style.display = 'block';
-            document.getElementById('turboText').textContent = "ТУРБО: " + specs.turboSpeed + " КМ/ГОД";
         } else {
             document.getElementById('turboText').style.display = 'none';
-            if (keysActive['ArrowRight'] && !isExploded && speedKmh < upgradedMaxNormal) {
-                carVx += upgradedAccel; 
+            if (inputs['ArrowRight'] && displaySpeed < maxAllowedNormal) {
+                sVx += currentAcceleration;
             }
-            if (keysActive['ArrowLeft'] && !isExploded) carVx -= 0.35;
-            carVx *= 0.98; 
+            if (inputs['ArrowLeft']) sVx -= 0.25;
+            sVx *= 0.98; 
         }
 
-        carX += carVx;
-        carY += carVy;
+        sX += sVx;
+        sY += sVy;
 
-        // Звук выхлопа двухтактника "дзинь-дзинь-дзинь" во время движения
-        if (carVx > 0.5 && !isExploded) {
-            soundTimer++;
-            let soundDelay = Math.max(2, 12 - Math.floor(carVx * 0.4)); // Чем быстрее едем, тем чаще дзинькает
-            if (soundTimer % soundDelay === 0) {
-                playDzinSound();
+        // ЛОГИКА ДВИЖЕНИЯ ПОЛИЦЕЙСКИХ МУСОРОВ
+        cops.forEach((cop) => {
+            let distanceToPlayer = sX - cop.x;
+            
+            // Мусора едут агрессивно, пытаясь зажать игрока
+            let copDesiredSpeed = maxAllowedNormal / 35 + 0.5; // Базовая скорость копов чуть выше стока игрока
+            if (inputs['Space']) {
+                copDesiredSpeed = (stats.nitroMax / 35) - 0.8; // При нитро игрок отрывается
             }
-        }
 
-        if (!isExploded && carVx > 2) {
-            let cashReward = Math.floor(carVx * 0.1);
-            if (carY < groundY - 30) cashReward += 2; 
-            currentSessionCash += cashReward;
-            gameData.cash += cashReward;
-            try { localStorage.setItem('beamng_scooter_save', JSON.stringify(gameData)); } catch(e){}
-            document.getElementById('cashCounter').textContent = "+" + currentSessionCash + " грн.";
-        }
+            if (cop.vx < copDesiredSpeed) cop.vx += 0.15;
+            cop.x += cop.vx;
 
-        let currentGround = groundY - 16;
-        let onRamp = false;
-
-        obstacles.forEach(obs => {
-            if (obs.type === 'ramp' && carX >= obs.x && carX <= obs.x + obs.w) {
-                let ratio = (carX - obs.x) / obs.w;
-                currentGround = (groundY - 16) - (obs.h * ratio);
-                onRamp = true;
-            }
-        });
-
-        if (!isExploded) {
-            let isAirborne = carY < currentGround - 5;
-            if (isAirborne) {
-                if (keysActive['ArrowUp']) carAngle -= 0.04;
-                if (keysActive['ArrowDown']) carAngle += 0.04;
-            } else {
-                if (keysActive['ArrowUp'] && carVx > 1) {
-                    carAngle -= stuntPower;
-                    if (carAngle < -0.85) carAngle = -0.85; 
-                } else if (keysActive['ArrowDown']) {
-                    carAngle += 0.04;
-                    if (carAngle > 0) carAngle = 0;
-                } else {
-                    if (carAngle < 0) {
-                        carAngle += 0.007; 
-                        if (carAngle > 0) carAngle = 0;
-                    }
+            // Копы повторяют высоту ландшафта (земли)
+            let copRoadLevel = trackY - 16;
+            elements.forEach(obs => {
+                if (obs.type === 'ramp' && cop.x >= obs.x && cop.x <= obs.x + obs.w) {
+                    let ratio = (cop.x - obs.x) / obs.w;
+                    copRoadLevel = (trackY - 16) - (obs.h * ratio);
                 }
-            }
-        }
+            });
 
-        if (speedKmh >= 300 && !isExploded) {
-            document.getElementById('flightStatus').style.opacity = '1';
-            carVy -= (0.45 + (gameData.upgrades.weight - 1) * 0.05); 
-        } else {
-            document.getElementById('flightStatus').style.opacity = '0';
-            if (carY < currentGround) {
-                carVy += 0.4; 
+            if (cop.y < copRoadLevel) {
+                cop.y += 4; // Падение копа
             } else {
-                let normalizedAngle = Math.abs(carAngle % (Math.PI * 2));
-                if (carVy > 6 && (normalizedAngle > 1.4 && normalizedAngle < 4.8) && !isExploded) {
-                    triggerExplosionEffect();
-                    carVy = 0;
-                } else {
-                    if (onRamp && carVx > 5) {
-                        carVy = -carVx * (0.55 + (gameData.upgrades.weight - 1) * 0.05); 
-                    } else {
-                        carY = currentGround; 
-                        carVy = 0; 
-                        if (!keysActive['ArrowUp'] && !keysActive['ArrowDown']) carAngle *= 0.7; 
-                    }
-                }
+                cop.y = copRoadLevel;
+            }
+        });
+
+        if (sVx > 0.5) {
+            if (Math.random() < 0.3) {
+                exhaustParticles.push({
+                    x: sX - 42, y: sY - 4, r: 3 + Math.random() * (4 + saveState.upgrades.exhaust * 0.5), o: 0.6,
+                    vx: -sVx * 0.4 - (Math.random() * 1.5), vy: -0.5 - (Math.random() * 1.5)
+                });
             }
         }
 
-        document.getElementById('speedVal').textContent = speedKmh;
-        if(speedKmh >= 300) document.getElementById('speedometer').style.color = '#ff4757';
-        else document.getElementById('speedometer').style.color = 'white';
-
-        obstacles.forEach(obs => {
-            let hit = false;
-            if (obs.type === 'wall' && carX + 40 >= obs.x && carX - 40 <= obs.x + 70 && carY >= groundY - 140) hit = true;
-            if (obs.type === 'box' && carX + 40 >= obs.x && carX - 40 <= obs.x + 50 && carY >= groundY - 110) hit = true;
-            if (obs.type === 'car' && carX + 40 >= obs.x && carX - 40 <= obs.x + 70 && carY >= groundY - 100) hit = true;
-            if (hit && !isExploded) triggerExplosionEffect();
+        exhaustParticles.forEach((p, idx) => {
+            p.x += p.vx; p.y += p.vy; p.o -= 0.02;
+            if (p.o <= 0) exhaustParticles.splice(idx, 1);
         });
 
-        ctxGame.fillStyle = '#222';
-        ctxGame.fillRect(0, 0, canvas.width, canvas.height);
+        if (sVx > 0.5) {
+            let addCash = Math.floor(sVx * 0.15);
+            if (sY < trackY - 30) addCash += 2; 
+            earnedCash += addCash; saveState.cash += addCash;
+            try { localStorage.setItem('beamng_scooter_v3', JSON.stringify(saveState)); } catch(e){}
+            document.getElementById('cashCounter').textContent = "+" + earnedCash + " руб.";
+        }
 
-        ctxGame.save();
-        ctxGame.translate(-carX + 200, 0);
+        let roadLevel = trackY - 16;
+        let isDrivingOnRamp = false;
 
-        ctxGame.fillStyle = '#333';
-        ctxGame.fillRect(0, groundY, carX + window.innerWidth * 15, 60);
-        ctxGame.fillStyle = '#fff';
-        for(let i=0; i<150; i++) ctxGame.fillRect(i * 300, groundY + 2, 100, 4);
-
-        obstacles.forEach(obs => {
-            if(obs.type === 'wall') { ctxGame.fillStyle = '#ff4757'; ctxGame.fillRect(obs.x, groundY - 140, 70, 140); }
-            else if(obs.type === 'box') { ctxGame.fillStyle = '#f1c40f'; ctxGame.fillRect(obs.x, groundY - 50, 50, 50); }
-            else if(obs.type === 'ramp') { ctxGame.fillStyle = '#ffa502'; ctxGame.beginPath(); ctxGame.moveTo(obs.x, groundY); ctxGame.lineTo(obs.x + obs.w, groundY - obs.h); ctxGame.lineTo(obs.x + obs.w, groundY); ctxGame.fill(); }
-            else if(obs.type === 'car') { ctxGame.fillStyle = obs.color; ctxGame.fillRect(obs.x, groundY - 40, 70, 40); ctxGame.fillStyle = '#111'; ctxGame.beginPath(); ctxGame.arc(obs.x+15, groundY, 12, 0, Math.PI*2); ctxGame.arc(obs.x+55, groundY, 12, 0, Math.PI*2); ctxGame.fill(); }
-        });
-
-        ctxGame.save();
-        ctxGame.translate(carX, carY);
-        ctxGame.rotate(carAngle);
-
-        if (!isExploded) {
-            ctxGame.strokeStyle = specs.color; ctxGame.lineWidth = 5;
-            ctxGame.beginPath(); ctxGame.moveTo(-20, 0); ctxGame.lineTo(0, 10); ctxGame.lineTo(20, 0); ctxGame.lineTo(25, -35); ctxGame.stroke();
-            ctxGame.fillStyle = '#111'; ctxGame.fillRect(15, -38, 15, 5);
-            ctxGame.fillStyle = specs.color; ctxGame.fillRect(-22, -18, 25, 12);
-            ctxGame.fillStyle = '#222'; ctxGame.fillRect(-25, -23, 20, 5); 
-            ctxGame.fillStyle = '#111';
-            ctxGame.beginPath(); ctxGame.arc(-20, 8, 10, 0, Math.PI * 2); ctxGame.arc(22, 8, 10, 0, Math.PI * 2); ctxGame.fill();
-            ctxGame.fillStyle = '#bdc3c7';
-            ctxGame.beginPath(); ctxGame.arc(-20, 8, 4, 0, Math.PI * 2); ctxGame.arc(22, 8, 4, 0, Math.PI * 2); ctxGame.fill();
-
-            if(keysActive['Space']) {
-                ctxGame.fillStyle = '#ff4757'; ctxGame.beginPath(); ctxGame.moveTo(-45, -10); ctxGame.lineTo(-70, -5); ctxGame.lineTo(-45, 0); ctxGame.fill();
+        elements.forEach(obs => {
+            if (obs.type === 'ramp' && sX >= obs.x && sX <= obs.x + obs.w) {
+                let ratio = (sX - obs.x) / obs.w;
+                roadLevel = (trackY - 16) - (obs.h * ratio);
+                isDrivingOnRamp = true;
             }
+        });
+
+        if (inputs['ArrowUp']) sAngle -= dynamicStuntPower; 
+        if (inputs['ArrowDown']) sAngle += dynamicStuntPower; 
+
+        if (sY < roadLevel) {
+            sVy += 0.45; 
         } else {
-            ctxGame.fillStyle = specs.color; ctxGame.fillRect(-15, -20, 15, 10);
-            ctxGame.fillStyle = '#111'; ctxGame.beginPath(); ctxGame.arc(-30, 5, 10, 0, Math.PI * 2); ctxGame.arc(40, -25, 10, 0, Math.PI * 2); ctxGame.fill();
+            if (isDrivingOnRamp && sVx > 1) {
+                sVy = -sVx * flightAltitudeFactor; 
+            } else {
+                sY = roadLevel;
+                sVy = 0;
+                if (!inputs['ArrowUp'] && !inputs['ArrowDown']) sAngle *= 0.65;
+            }
         }
-        ctxGame.restore();
-        ctxGame.restore();
-        requestAnimationFrame(gameLoop);
-    }
 
-    updateMenuUi();
-</script>
-</body>
-</html>
+        document.getElementById('speedVal').textContent = displaySpeed;
+        document.getElementById('speedometer').style.color = (displaySpeed >= 120) ? '#ff4757' : 'white';
+
+        ctx.fillStyle = '#1e1e1e';
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+        ctx.save();
+        ctx.translate(-sX + 200, 0);
+
+        ctx.fillStyle = '#2c3e50';
+        ctx.fillRect(0, trackY, sX + window.innerWidth * 15, 60);
+        ctx.fillStyle = '#fff';
+        for(let i=0; i<150; i++) ctx.fillRect(i * 300, trackY + 2, 100, 4);
+
+        exhaustParticles.forEach(p => {
+            ctx.fillStyle = 'rgba(180, 200, 220, ' + p.o + ')';
+            ctx.beginPath(); ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2); ctx.fill();
+        });
+
+        elements.forEach(obs => {
+            if(obs.type === 'wall') { ctx.fillStyle = '#ff4757'; ctx.fillRect(obs.x, trackY - 140, 70, 140); }
+            else if(obs.type === 'box') { ctx.fillStyle = '#f1c40f'; ctx.fillRect(obs.x, trackY - 50, 50, 50); }
+            else if(obs.type === 'ramp') { ctx.fillStyle = '#ffa502'; ctx.beginPath(); ctx.moveTo(obs.x, trackY); ctx.lineTo(obs.x + obs.w, trackY - obs.h); ctx.lineTo(obs.x + obs.w, trackY); ctx.fill(); }
+            else if(obs.type === 'car') { ctx.fillStyle = obs.color; ctx.fillRect(obs.x, trackY - 40, 70, 40); ctx.fillStyle = '#111'; ctx.beginPath(); ctx.arc(obs.x+15, trackY, 12, 0, Math.PI*2); ctx.arc(obs.x+55, trackY, 12, 0, Math.PI*2); ctx.fill(); }
+        });
+
+        // ОТРИСОВКА ПОЛИЦЕЙСКИХ МУСОРОВ
+        cops.forEach((cop) => {
+            ctx.save();
+            ctx.translate(cop.x, cop.y);
+            
+            // Корпус коповского мопеда (Бело-синий)
+            ctx.strokeStyle = '#2980b9'; ctx.lineWidth = 5;
+            ctx.beginPath(); ctx.moveTo(-20, 0); ctx.lineTo(0, 10); ctx.lineTo(20, 0); ctx.lineTo(25, -35); ctx.stroke();
+            ctx.fillStyle = '#fff'; ctx.fillRect(-22, -18, 25, 12);
+            ctx.fillStyle = '#111'; ctx.fillRect(-25, -23, 20, 5); 
+
+            // Колеса копа
+            ctx.fillStyle = '#111';
+            ctx.beginPath(); ctx.arc(-20, 8, 10, 0, Math.PI * 2); ctx.arc(22, 8, 10, 0, Math.PI * 2); ctx.fill();
+
+            // Человечек-мент в форме
+            ctx.fillStyle = '#2c3e50'; ctx.fillRect(-5, -22, 12, 22); // Синяя форма копа
+            ctx.fillStyle = '#f39c12'; ctx.beginPath(); ctx.arc(2, -28, 6, 0, Math.PI * 2); ctx.fill(); // Лицо
+            ctx.fillStyle = '#34495e'; ctx.beginPath(); ctx.arc(2, -29, 7, 0, Math.PI * 2); ctx.fill(); // Фуражка/Шлем
+
+            // ПРОБЛЕСКОВЫЙ МАЯЧОК (МИГАЛКА)
+            let flashColor = (Math.floor(copFlashTimer / 8) % 2 === 0) ? '#ff3838' : '#2e86de';
+            ctx.fillStyle = flashColor;
+            ctx.beginPath(); ctx.arc(-20, -25, 5, 0, Math.PI * 2); ctx.fill();
+            
+            ctx.restore();
+        });
+
+        // ОТРИСОВКА СКУТЕРА ИГРОКА С ЧЕЛОВЕЧКОМ
+        ctx.save();
+        ctx.translate(sX, sY);
+        ctx.rotate(sAngle);
+
+        ctx.strokeStyle = stats.baseColor; ctx.lineWidth = 5;
+        ctx.beginPath(); ctx.moveTo(-20, 0); ctx.lineTo(0, 10); ctx.lineTo(20, 0); ctx.lineTo(25, -35); ctx.stroke();
+        ctx.fillStyle = '#111'; ctx.fillRect(15, -38, 15, 5);
+        ctx.fillStyle = stats.baseColor; ctx.fillRect(-22, -18, 25, 12);
+        ctx.fillStyle = '#222'; ctx.fillRect(-25, -23, 20, 5); 
+        ctx.fillStyle = '#111';
+        ctx.beginPath(); ctx.arc(-20, 8, 10, 0, Math.PI * 2); ctx.arc(22, 8, 10, 0, Math.PI * 2); ctx.fill();
+        ctx.fillStyle = '#bdc3c7';
+        ctx.beginPath(); ctx.arc(-20, 8, 4, 0, Math.PI * 2); ctx.arc(22, 8, 4, 0, Math.PI * 2); ctx.fill();
+
+        ctx.save();
+        ctx.translate(-5, -25); 
+        
+        ctx.strokeStyle = '#f39c12'; ctx.lineWidth = 4; 
+        ctx.beginPath(); ctx.moveTo(0, 0); ctx.lineTo(8, 20); ctx.lineTo(15, 25); ctx.stroke(); 
+        ctx.fillStyle = '#34495e'; ctx.fillRect(-2, 0, 7, 10); 
+        ctx.fillStyle = '#e74c3c'; ctx.fillRect(12, 23, 6, 4); 
+
+        ctx.fillStyle = '#fff'; ctx.fillRect(-5, -22, 12, 22); 
+
+        ctx.strokeStyle = '#f39c12'; ctx.lineWidth = 4;
+        ctx.beginPath(); ctx.moveTo(4, -18); ctx.lineTo(22, -13); ctx.stroke();
+
+        ctx.fillStyle = '#f39c12'; ctx.beginPath(); ctx.arc(2, -28, 6, 0, Math.PI * 2); ctx.fill(); 
+        ctx.fillStyle = '#e74c3c'; ctx.beginPath(); ctx.arc(2, -29, 8, 0, Math.PI * 2); ctx.fill(); 
+        
+        ctx.fillStyle = '#111';
+        ctx.beginPath(); ctx.moveTo(4, -34); ctx.lineTo(16, -35); ctx.lineTo(6, -30); ctx.closePath(); ctx.fill();
+        
+        ctx.fillStyle = '#111'; ctx.fillRect(4, -31
