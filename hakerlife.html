@@ -3,28 +3,33 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>2D Scooter Stunt: Jog Edition</title>
+    <title>2D Scooter Stunt: Yamaha Jog Simulator</title>
     <style>
         body { margin: 0; background: #111; color: white; font-family: 'Arial', sans-serif; overflow: hidden; touch-action: none; -webkit-user-select: none; user-select: none; }
         #menu { position: absolute; top: 0; left: 0; width: 100vw; height: 100vh; background: #1a1a1a; display: flex; flex-direction: column; justify-content: center; align-items: center; z-index: 100; overflow-y: auto; padding: 20px 0; box-sizing: border-box; }
         h1 { font-size: 26px; margin: 0 0 10px 0; text-shadow: 0 0 8px #ff4757; color: #ff4757; text-align: center; }
-        h2 { font-size: 16px; margin: 12px 0 6px 0; color: #ccc; text-transform: uppercase; letter-spacing: 1px; }
-        #wallet { font-size: 20px; font-weight: bold; color: #2ecc71; background: rgba(0,0,0,0.4); padding: 6px 20px; border-radius: 20px; border: 2px solid #2ecc71; margin-bottom: 10px; }
+        h2 { font-size: 15px; margin: 10px 0 5px 0; color: #ccc; text-transform: uppercase; letter-spacing: 1px; }
+        #wallet { font-size: 20px; font-weight: bold; color: #2ecc71; background: rgba(0,0,0,0.4); padding: 5px 15px; border-radius: 20px; border: 2px solid #2ecc71; margin-bottom: 8px; }
         .block-container { display: flex; flex-wrap: wrap; justify-content: center; gap: 8px; margin-bottom: 5px; max-width: 600px; }
+        
+        /* Исправленные отзывчивые кнопки */
         .btn-ui { background: #222; color: #bbb; border: 2px solid #333; padding: 8px 16px; font-size: 13px; font-weight: bold; border-radius: 6px; cursor: pointer; }
-        .btn-ui.active { background: #2ecc71; color: white; border-color: #2ecc71; box-shadow: 0 0 8px rgba(46, 204, 113, 0.4); }
+        .btn-ui.active { background: #2ecc71; color: white; border-color: #2ecc71; box-shadow: 0 0 8px #2ecc71; }
         .btn-shop { border-color: #f1c40f; color: #f1c40f; }
-        .btn-map { background: #2e86de; color: white; border: none; padding: 12px 25px; font-size: 15px; font-weight: bold; margin: 4px; border-radius: 6px; cursor: pointer; width: 260px; }
-        #backToMenu { position: absolute; top: 10px; right: 10px; background: #ff4757; color: white; border: none; padding: 8px 14px; font-size: 13px; border-radius: 4px; cursor: pointer; z-index: 10; display: none; }
+        .btn-map { background: #2e86de; color: white; border: none; padding: 12px 25px; font-size: 15px; font-weight: bold; margin: 4px; border-radius: 6px; cursor: pointer; width: 270px; }
+        
+        #backToMenu { position: absolute; top: 10px; right: 10px; background: #ff4757; color: white; border: none; padding: 8px 14px; font-size: 13px; border-radius: 4px; cursor: pointer; z-index: 110; display: none; }
         #dashboard { position: absolute; bottom: 15px; right: 15px; background: rgba(0,0,0,0.85); padding: 10px 15px; border-radius: 8px; border: 2px solid #333; z-index: 10; display: none; min-width: 150px; }
         #speedometer { font-size: 26px; font-weight: bold; text-align: right; font-family: monospace; }
-        #cashCounter { font-size: 15px; color: #2ecc71; font-weight: bold; text-align: right; margin-top: 2px; }
+        #cashCounter { font-size: 16px; color: #2ecc71; font-weight: bold; text-align: right; margin-top: 2px; }
         #fpsCounter { font-size: 11px; color: #777; margin-top: 4px; text-align: right; font-family: monospace; }
-        #turboText { font-size: 11px; color: #ff4757; margin-top: 2px; text-align: right; font-weight: bold; }
-        #soundText { position: absolute; bottom: 90px; left: 20px; font-size: 24px; font-weight: bold; color: #f1c40f; text-shadow: 0 0 10px rgba(241, 196, 15, 0.5); font-style: italic; pointer-events: none; z-index: 9; opacity: 0; }
+        #turboText { font-size: 11px; color: #ff4757; margin-top: 2px; text-align: right; font-weight: bold; display: none; }
+        
+        /* Сенсорное мобильное управление без задержек */
         #mobileControls { position: absolute; bottom: 15px; left: 0; width: 100vw; display: none; justify-content: space-between; padding: 0 20px; box-sizing: border-box; z-index: 80; }
-        .control-group { display: flex; gap: 8px; }
-        .touch-btn { width: 55px; height: 55px; background: rgba(255, 255, 255, 0.12); border: 2px solid rgba(255, 255, 255, 0.4); border-radius: 50%; color: white; font-size: 20px; font-weight: bold; display: flex; justify-content: center; align-items: center; }
+        .control-group { display: flex; gap: 10px; }
+        .touch-btn { width: 58px; height: 58px; background: rgba(255, 255, 255, 0.15); border: 2px solid rgba(255, 255, 255, 0.5); border-radius: 50%; color: white; font-size: 22px; font-weight: bold; display: flex; justify-content: center; align-items: center; cursor: pointer; }
+        #btnTurbo { background: rgba(231, 76, 60, 0.3); border-color: #ff4757; font-size: 11px; }
         #orientationWarning { position: absolute; top: 0; left: 0; width: 100vw; height: 100vh; background: #111; z-index: 999; display: none; flex-direction: column; justify-content: center; align-items: center; text-align: center; padding: 20px; box-sizing: border-box; }
     </style>
 </head>
@@ -37,6 +42,7 @@
 
 <div id="menu">
     <h1>2D SCOOTER STUNT SIMULATOR</h1>
+    
     <div id="wallet">💰 0 руб.</div>
 
     <h2>Оригинальные запчасти (Магазин)</h2>
@@ -56,14 +62,14 @@
 
     <h2>Выбери свой скутер</h2>
     <div class="block-container">
-        <button id="vDio" class="btn-ui active" onclick="setScooter('honda_dio')">🛵 Honda Dio</button>
-        <button id="vJog" class="btn-ui" onclick="setScooter('yamaha_jog')">🔥 Yamaha Jog</button>
-        <button id="vTact" class="btn-ui" onclick="setScooter('honda_tact')">🛵 Honda Tact</button>
+        <button id="vDio" class="btn-ui" onclick="setScooter('honda_dio')">跑 Honda Dio</button>
+        <button id="vJog" class="btn-ui active" onclick="setScooter('yamaha_jog')">🔥 Yamaha Jog</button>
+        <button id="vTact" class="btn-ui" onclick="setScooter('honda_tact')">跑 Honda Tact</button>
     </div>
 
     <h2>Выбери трассу гонки</h2>
     <div class="block-container">
-        <button class="btn-map" onclick="launchGame('autobahn')">1. Бесконечный автобан (Погоня)</button>
+        <button class="btn-map" onclick="launchGame('autobahn')">1. Бесконечный автобан (Погоня ДПС)</button>
         <button class="btn-map" onclick="launchGame('lemans')">2. Трасса Ле-Ман (Трамплины)</button>
         <button class="btn-map" onclick="launchGame('chaos')">3. Городской хаос (Препятствия)</button>
     </div>
@@ -71,12 +77,10 @@
 
 <button id="backToMenu" onclick="location.reload()">В меню</button>
 
-<div id="soundText">ДРИНЬ-ДРИНЬ-ДРИНЬ!</div>
-
 <div id="dashboard">
     <div id="speedometer"><span id="speedVal">0</span> км/ч</div>
     <div id="cashCounter">+0 руб.</div>
-    <div id="turboText">АКТИВИРОВАНА ЗАКИСЬ АЗОТА 🔥</div>
+    <div id="turboText">НИТРО КИТ АКТИВЕН 🔥</div>
     <div id="fpsCounter">FPS: <span id="fpsVal">60</span></div>
 </div>
 
@@ -97,10 +101,16 @@
     let canvas, ctx;
     let sX = 150, sY = 0, sVx = 0, sVy = 0, sAngle = 0;
     let selectedMap = 'autobahn', isLoopStarted = false;
-    let inputs = {}, controlMode = 'pc', currentModel = 'honda_dio';
+    let inputs = {}, controlMode = 'pc', currentModel = 'yamaha_jog';
     let frames = 0, lastTick = performance.now(), currentFps = 60;
     let elements = [], exhaustParticles = [], copCars = [];
-    let trackY = 0, earnedCash = 0, sirenTimer = 0, soundTimer = 0;
+    let trackY = 0, earnedCash = 0, sirenTimer = 0;
+    let roadOffset = 0; // Для плавной и быстрой прокрутки разметки дороги
+
+    // ЗВУКОВОЙ СИНТЕЗАТОР СКУТЕРА «ДРИНЬ-ДРИНЬ»
+    let audioCtx = null;
+    let motorOsc = null;
+    let motorGain = null;
 
     let saveState = {
         cash: 0,
@@ -114,10 +124,40 @@
     } catch(e) {}
 
     const profileSpecs = {
-        honda_dio: { baseMax: 65, nitroMax: 155, baseAccel: 0.15, baseColor: '#3498db' },
-        yamaha_jog: { baseMax: 70, nitroMax: 165, baseAccel: 0.22, baseColor: '#e74c3c' },
-        honda_tact: { baseMax: 60, nitroMax: 145, baseAccel: 0.12, baseColor: '#f1c40f' }
+        honda_dio: { baseMax: 65, nitroMax: 155, baseAccel: 0.14, baseColor: '#3498db' },
+        yamaha_jog: { baseMax: 70, nitroMax: 165, baseAccel: 0.20, baseColor: '#e74c3c' }, // Джог самый злой!
+        honda_tact: { baseMax: 60, nitroMax: 145, baseAccel: 0.11, baseColor: '#f1c40f' }
     };
+
+    function startAudio() {
+        try {
+            audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+            motorOsc = audioCtx.createOscillator();
+            motorGain = audioCtx.createGain();
+            
+            motorOsc.type = 'sawtooth'; // Двухтактный пилообразный звук
+            motorOsc.frequency.setValueAtTime(40, audioCtx.currentTime); // Базовый холостой ход
+            
+            motorGain.gain.setValueAtTime(0.02, audioCtx.currentTime);
+            
+            motorOsc.connect(motorGain);
+            motorGain.connect(audioCtx.destination);
+            motorOsc.start();
+        } catch(e) { console.log("Аудио не поддерживается"); }
+    }
+
+    function updateAudioPitch(speedKmh, isAccelerating) {
+        if (!audioCtx || !motorOsc) return;
+        // Эмуляция звука 2Т дзинь-дзинь
+        let targetFreq = 35 + (speedKmh * 2.5);
+        if (isAccelerating) {
+            targetFreq += Math.sin(performance.now() * 0.05) * 15; // Дринь-дринь прерывистый под нагрузкой
+            motorGain.gain.linearRampToValueAtTime(0.08, audioCtx.currentTime + 0.1);
+        } else {
+            motorGain.gain.linearRampToValueAtTime(0.02, audioCtx.currentTime + 0.1);
+        }
+        motorOsc.frequency.setValueAtTime(targetFreq, audioCtx.currentTime);
+    }
 
     function save() {
         localStorage.setItem('beamng_scooter_v4', JSON.stringify(saveState));
@@ -173,15 +213,14 @@
         elements = [];
         copCars = [];
         
-        // Менты теперь едут только сзади, не блокируя дорогу впереди!
-        copCars.push({ x: -250, y: trackY - 40, vx: 0, targetOffset: -160 });
-        copCars.push({ x: -550, y: trackY - 40, vx: 0, targetOffset: -300 });
+        // Исправлено: Мусора теперь спавнятся ТОЛЬКО сзади и преследуют хвост!
+        copCars.push({ x: -250, y: trackY - 40, vx: 0 });
 
         if (type === 'lemans') {
-            elements.push({x: 1200, type: 'ramp', w: 350, h: 120}, {x: 3000, type: 'ramp', w: 400, h: 150});
+            elements.push({x: 1200, type: 'ramp', w: 320, h: 110}, {x: 3000, type: 'ramp', w: 360, h: 150});
         } else if (type === 'chaos') {
-            for(let i=0; i<6; i++) elements.push({x: 1400 + i*600, type: 'car', color: i%2===0?'#9b59b6':'#1abc9c'});
-            for(let i=0; i<5; i++) elements.push({x: 1700 + i*750, type: 'box'});
+            for(let i=0; i<8; i++) elements.push({x: 1400 + i*600, type: 'car', color: i%2===0?'#9b59b6':'#1abc9c'});
+            for(let i=0; i<6; i++) elements.push({x: 1700 + i*750, type: 'box'});
         }
     }
 
@@ -189,6 +228,8 @@
         if (isLoopStarted) return;
         isLoopStarted = true;
         selectedMap = mapName;
+
+        startAudio(); // Включаем звук дзинь-дзинь
 
         document.getElementById('menu').style.display = 'none';
         document.getElementById('backToMenu').style.display = 'block';
@@ -214,34 +255,33 @@
         requestAnimationFrame(engineFrame);
     }
 
+    // Мгновенный отклик кнопок без задержек браузера
     function bindInputEvents() {
-        // Очищенная и мгновенная обработка клавиатуры ПК
+        const handleKeys = (code, state) => { inputs[code] = state; };
+
         window.onkeydown = (e) => {
             if (controlMode !== 'pc') return;
             if (e.code === 'Space') e.preventDefault();
-            inputs[e.code] = true;
+            handleKeys(e.code, true);
             if (e.code === 'KeyR') hardReset();
         };
-        window.onkeyup = (e) => {
-            if (controlMode !== 'pc') return;
-            inputs[e.code] = false;
+        window.onkeyup = (e) => { if (controlMode === 'pc') handleKeys(e.code, false); };
+
+        const bindTouch = (elementId, simulatedKey) => {
+            const el = document.getElementById(elementId);
+            if (!el) return;
+            el.addEventListener('touchstart', (e) => { e.preventDefault(); handleKeys(simulatedKey, true); }, {passive: false});
+            el.addEventListener('touchend', (e) => { e.preventDefault(); handleKeys(simulatedKey, false); }, {passive: false});
         };
 
-        // Мгновенная сенсорная обработка телефона без лагов
-        const configureTouch = (id, mappingKey) => {
-            const btn = document.getElementById(id);
-            if (!btn) return;
-            btn.ontouchstart = (e) => { e.preventDefault(); inputs[mappingKey] = true; };
-            btn.ontouchend = (e) => { e.preventDefault(); inputs[mappingKey] = false; };
-        };
-        configureTouch('btnGas', 'ArrowRight');
-        configureTouch('btnBack', 'ArrowLeft');
-        configureTouch('btnTurbo', 'Space');
-        configureTouch('btnUp', 'ArrowUp');
-        configureTouch('btnDown', 'ArrowDown');
+        bindTouch('btnGas', 'ArrowRight');
+        bindTouch('btnBack', 'ArrowLeft');
+        bindTouch('btnTurbo', 'Space');
+        bindTouch('btnUp', 'ArrowUp');
+        bindTouch('btnDown', 'ArrowDown');
 
-        const repairNode = document.getElementById('btnRepair');
-        if (repairNode) repairNode.ontouchstart = (e) => { e.preventDefault(); hardReset(); };
+        const rep = document.getElementById('btnRepair');
+        if(rep) rep.ontouchstart = (e) => { e.preventDefault(); hardReset(); };
     }
 
     function hardReset() {
@@ -260,65 +300,63 @@
         const stats = profileSpecs[currentModel];
         sirenTimer++;
 
-        let maxAllowedNormal = stats.baseMax + ((saveState.upgrades.cylinder - 1) * 8) + ((saveState.upgrades.variator - 1) * 6);
+        let maxAllowedNormal = stats.baseMax + ((saveState.upgrades.cylinder - 1) * 12) + ((saveState.upgrades.variator - 1) * 8);
         let currentAcceleration = stats.baseAccel + ((saveState.upgrades.carburetor - 1) * 0.03) + ((saveState.upgrades.cylinder - 1) * 0.03);
-        let dynamicStuntPower = 0.016 + (saveState.upgrades.stunt - 1) * 0.005;
+        let dynamicStuntPower = 0.015 + (saveState.upgrades.stunt - 1) * 0.005;
         let flightAltitudeFactor = 0.55 + (saveState.upgrades.exhaust - 1) * 0.05;
 
-        // ИСПРАВЛЕНО: Теперь физическая скорость sVx правильно переводится в displaySpeed и деньги стабильно растут!
+        let displaySpeed = Math.floor(sVx * 35); 
+
+        let checkingGas = inputs['ArrowRight'] || inputs['Space'];
+        updateAudioPitch(displaySpeed, checkingGas); // Меняем частоту звука под скорость
+
         if (inputs['Space']) {
-            let nitroTarget = stats.nitroMax / 22;
+            let nitroTarget = stats.nitroMax / 35;
             if (sVx < nitroTarget) sVx += 0.5;
             else sVx = nitroTarget;
+            displaySpeed = Math.floor(sVx * 35);
             document.getElementById('turboText').style.display = 'block';
         } else {
             document.getElementById('turboText').style.display = 'none';
-            if (inputs['ArrowRight'] && (sVx * 22) < maxAllowedNormal) {
+            if (inputs['ArrowRight'] && displaySpeed < maxAllowedNormal) {
                 sVx += currentAcceleration;
             }
             if (inputs['ArrowLeft']) sVx -= 0.3;
             sVx *= 0.985; 
         }
 
-        let displaySpeed = Math.floor(sVx * 22);
-        if (displaySpeed < 0) displaySpeed = 0;
-
         sX += sVx;
         sY += sVy;
+        
+        // Исправлено: Быстрое и реалистичное движение дороги в такт мопеду!
+        roadOffset -= sVx; 
 
-        // Движение ментов
+        // Погоня: Мусора жестко валят сзади
         copCars.forEach(cop => {
-            let targetX = sX + cop.targetOffset;
-            cop.vx = sVx + ((targetX - cop.x) * 0.05);
+            let targetX = sX - 160; // Всегда сидят строго на хвосте
+            let dist = targetX - cop.x;
+            cop.vx = sVx + (dist * 0.06);
             cop.x += cop.vx;
-            if (sX - cop.x > window.innerWidth * 1.5) cop.x = sX - window.innerWidth;
         });
 
-        // ДРИНЬ-ДРИНЬ ТЕКСТ И СИЗЫЙ ДЫМ
-        let soundLabel = document.getElementById('soundText');
-        if (inputs['ArrowRight'] || inputs['Space']) {
-            soundTimer++;
-            soundLabel.style.opacity = (Math.floor(soundTimer / 8) % 2 === 0) ? '1' : '0';
-            
-            if (Math.random() < 0.4) {
+        if (sVx > 0.5) {
+            if (Math.random() < 0.35) {
                 exhaustParticles.push({
-                    x: sX - 42, y: sY - 4, r: 3 + Math.random() * (4 + saveState.upgrades.exhaust * 0.6), o: 0.7,
-                    vx: -sVx * 0.5 - (Math.random() * 2), vy: -0.5 - (Math.random() * 2)
+                    x: sX - 42, y: sY - 4, r: 3 + Math.random() * (4 + saveState.upgrades.exhaust * 0.5), o: 0.6,
+                    vx: -sVx * 0.4 - (Math.random() * 2), vy: -0.6 - (Math.random() * 1.5)
                 });
             }
-        } else {
-            soundLabel.style.opacity = '0';
         }
 
         exhaustParticles.forEach((p, idx) => {
-            p.x += p.vx; p.y += p.vy; p.o -= 0.025;
+            p.x += p.vx; p.y += p.vy; p.o -= 0.02;
             if (p.o <= 0) exhaustParticles.splice(idx, 1);
         });
 
-        // ИСПРАВЛЕНО: Стабильное и безотказное начисление игровых рублей
-        if (sVx > 0.5) {
-            let addCash = Math.ceil(sVx * 0.12);
-            if (sY < trackY - 35) addCash += 3; // Бонус за вилли/полет
+        // ИСПРАВЛЕНО: Стабильное непрерывное накопление игровых рублей
+        if (sVx > 0.3) {
+            let addCash = Math.floor(sVx * 0.25) + 1; // Всегда идет плюс!
+            if (sY < trackY - 30) addCash += 3; 
             earnedCash += addCash; 
             saveState.cash += addCash;
             try { localStorage.setItem('beamng_scooter_v4', JSON.stringify(saveState)); } catch(e){}
@@ -336,20 +374,8 @@
             }
         });
 
-        // Стант баланс
-        if (inputs['ArrowUp']) {
-            sAngle -= dynamicStuntPower;
-            if (sAngle < -0.85) sAngle = -0.85; 
-        } else if (inputs['ArrowDown']) {
-            sAngle += 0.045;
-            if (sAngle > 0) sAngle = 0;
-        } else {
-            // Плавное опускание переднего колеса под весом тяжести
-            if (sAngle < 0 && sY >= roadLevel - 5) {
-                sAngle += 0.006; 
-                if (sAngle > 0) sAngle = 0;
-            }
-        }
+        if (inputs['ArrowUp']) sAngle -= dynamicStuntPower; 
+        if (inputs['ArrowDown']) sAngle += dynamicStuntPower; 
 
         if (sY < roadLevel) {
             sVy += 0.45; 
@@ -366,26 +392,25 @@
         document.getElementById('speedVal').textContent = displaySpeed;
         document.getElementById('speedometer').style.color = (displaySpeed >= 120) ? '#ff4757' : 'white';
 
-        // РЕНДЕР КАДРА С ВЫСОКОЙ СКОРОСТЬЮ ДВИЖЕНИЯ ТРАССЫ
         ctx.fillStyle = '#1e1e1e';
         ctx.fillRect(0, 0, canvas.width, canvas.height);
 
         ctx.save();
-        // Динамическая камера следует за мопедом
-        ctx.translate(-sX + 220, 0);
+        ctx.translate(-sX + 200, 0);
 
-        // Реалистичный серый асфальт
-        ctx.fillStyle = '#34495e';
+        // Асфальт
+        ctx.fillStyle = '#2c3e50';
         ctx.fillRect(sX - 300, trackY, window.innerWidth + 600, 60);
+        
+        // Динамическая разметка (ЛЕТИТ НАВСТРЕЧУ РЕАЛИСТИЧНО)
         ctx.fillStyle = '#fff';
-        // Бешеное движение разметки дороги
-        let startLine = Math.floor((sX - 500) / 200) * 200;
-        for(let i = startLine; i < sX + window.innerWidth + 500; i += 200) {
-            ctx.fillRect(i, trackY + 2, 80, 4);
+        let startLineX = Math.floor((sX - 300) / 300) * 300;
+        for (let i = startLineX; i < sX + window.innerWidth + 300; i += 300) {
+            ctx.fillRect(i + (roadOffset % 300), trackY + 2, 100, 4);
         }
 
         exhaustParticles.forEach(p => {
-            ctx.fillStyle = 'rgba(190, 210, 230, ' + p.o + ')';
+            ctx.fillStyle = 'rgba(180, 200, 220, ' + p.o + ')';
             ctx.beginPath(); ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2); ctx.fill();
         });
 
@@ -396,7 +421,7 @@
             else if(obs.type === 'car') { ctx.fillStyle = obs.color; ctx.fillRect(obs.x, trackY - 40, 70, 40); ctx.fillStyle = '#111'; ctx.beginPath(); ctx.arc(obs.x+15, trackY, 12, 0, Math.PI*2); ctx.arc(obs.x+55, trackY, 12, 0, Math.PI*2); ctx.fill(); }
         });
 
-        // Менты
+        // ОТРИСОВКА ПОЛИЦИИ С КРАСНО-СИНЕЙ СВЕТОДИОДНОЙ ЛЮСТРОЙ
         copCars.forEach(cop => {
             ctx.save();
             ctx.translate(cop.x, cop.y);
@@ -406,14 +431,15 @@
             ctx.fillStyle = '#111'; ctx.beginPath(); ctx.arc(20, 30, 12, 0, Math.PI*2); ctx.arc(65, 30, 12, 0, Math.PI*2); ctx.fill();
             ctx.fillStyle = '#bdc3c7'; ctx.beginPath(); ctx.arc(20, 30, 5, 0, Math.PI*2); ctx.arc(65, 30, 5, 0, Math.PI*2); ctx.fill();
             ctx.fillStyle = '#fff'; ctx.font = 'bold 9px Arial'; ctx.fillText('ДПС', 30, 18);
-            let flashColor = (Math.floor(sirenTimer / 6) % 2 === 0) ? '#ff3838' : '#2e86de';
-            ctx.fillStyle = flashColor; ctx.fillRect(35, -8, 15, 8);
-            ctx.fillStyle = (flashColor === '#ff3838') ? 'rgba(255, 56, 56, 0.15)' : 'rgba(46, 134, 222, 0.15)';
-            ctx.beginPath(); ctx.arc(42, -4, 30, 0, Math.PI * 2); ctx.fill();
+
+            let flashColor = (Math.floor(sirenTimer / 5) % 2 === 0) ? '#ff3838' : '#2e86de';
+            ctx.fillStyle = flashColor; ctx.fillRect(35, -8, 15, 8); 
+            ctx.fillStyle = (flashColor === '#ff3838') ? 'rgba(255, 56, 56, 0.25)' : 'rgba(46, 134, 222, 0.25)';
+            ctx.beginPath(); ctx.arc(42, -4, 40, 0, Math.PI * 2); ctx.fill();
             ctx.restore();
         });
 
-        // Отрисовка мопеда
+        // ОТРИСОВКА СКУТЕРА С ЧЕЛОВЕЧКОМ
         ctx.save();
         ctx.translate(sX, sY);
         ctx.rotate(sAngle);
@@ -428,14 +454,8 @@
         ctx.fillStyle = '#bdc3c7';
         ctx.beginPath(); ctx.arc(-20, 8, 4, 0, Math.PI * 2); ctx.arc(22, 8, 4, 0, Math.PI * 2); ctx.fill();
 
-        // Человечек
+        // Человечек стантит в шортах, белой футболке и тапках
         ctx.save();
         ctx.translate(-5, -25); 
         ctx.strokeStyle = '#f39c12'; ctx.lineWidth = 4; 
-        ctx.beginPath(); ctx.moveTo(0, 0); ctx.lineTo(8, 20); ctx.lineTo(15, 25); ctx.stroke(); 
-        ctx.fillStyle = '#34495e'; ctx.fillRect(-2, 0, 7, 10); 
-        ctx.fillStyle = '#e74c3c'; ctx.fillRect(12, 23, 6, 4); 
-        ctx.fillStyle = '#fff'; ctx.fillRect(-5, -22, 12, 22); 
-        ctx.strokeStyle = '#f39c12'; ctx.lineWidth = 4;
-        ctx.beginPath(); ctx.moveTo(4, -18); ctx.lineTo(22, -13); ctx.stroke();
-        ctx.fillStyle = '#f39c12'; ctx.beginPath(); ctx.arc(2, -28, 6, 0, Math.PI * 2);
+        ctx
