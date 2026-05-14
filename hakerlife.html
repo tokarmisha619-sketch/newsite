@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>2D Scooter Stunt: Realistic Weight Balance</title>
+    <title>2D Scooter Stunt: Open Orientation Edition</title>
     <style>
         body { margin: 0; background: #111; color: white; font-family: 'Arial', sans-serif; overflow: hidden; touch-action: none; -webkit-user-select: none; user-select: none; }
         #menu { position: absolute; top: 0; left: 0; width: 100vw; height: 100vh; background: #1a1a1a; display: flex; flex-direction: column; justify-content: center; align-items: center; z-index: 100; overflow-y: auto; padding: 20px 0; box-sizing: border-box; }
@@ -25,16 +25,10 @@
         #mobileControls { position: absolute; bottom: 15px; left: 0; width: 100vw; display: none; justify-content: space-between; padding: 0 20px; box-sizing: border-box; z-index: 80; }
         .control-group { display: flex; gap: 8px; }
         .touch-btn { width: 55px; height: 55px; background: rgba(255, 255, 255, 0.15); border: 2px solid rgba(255, 255, 255, 0.5); border-radius: 50%; color: white; font-size: 20px; font-weight: bold; display: flex; justify-content: center; align-items: center; cursor: pointer; }
-        #orientationWarning { position: absolute; top: 0; left: 0; width: 100vw; height: 100vh; background: #111; z-index: 999; display: none; flex-direction: column; justify-content: center; align-items: center; text-align: center; padding: 20px; box-sizing: border-box; }
     </style>
     <script src="cloudflare.com"></script>
 </head>
 <body>
-
-<div id="orientationWarning">
-    <h3>Переверните устройство!</h3>
-    <p>Для игры на смартфоне поверните его горизонтально.</p>
-</div>
 
 <div id="menu">
     <h1>2D SCOOTER STUNT: REAL BALANCE</h1>
@@ -102,13 +96,11 @@
     let frames = 0, lastTick = performance.now(), currentFps = 60;
     let elements = [], exhaustParticles = [], copCars = [];
     let trackY = 0, earnedCash = 0, engineSoundTick = 0, sirenTimer = 0, moneyTimer = 0;
-
-    // Скорость изменения угла (угловая скорость для плавности)
     let sAngleVelocity = 0;
 
     let saveState = {
         cash: 0,
-        upgrades: { cylinder: 1, exhaust: 1, carburetor: 1, variables: 1, stunt: 1 }
+        upgrades: { cylinder: 1, exhaust: 1, carburetor: 1, variator: 1, stunt: 1 }
     };
     
     try {
@@ -152,18 +144,7 @@
         controlMode = type;
         document.getElementById('modePc').className = 'btn-ui' + (type === 'pc' ? ' active' : '');
         document.getElementById('modeMobile').className = 'btn-ui' + (type === 'mobile' ? ' active' : '');
-        if (type === 'mobile') verifyLayout();
-        else document.getElementById('orientationWarning').style.display = 'none';
     }
-
-    function verifyLayout() {
-        if (controlMode === 'mobile' && window.innerHeight > window.innerWidth) {
-            document.getElementById('orientationWarning').style.display = 'flex';
-        } else {
-            document.getElementById('orientationWarning').style.display = 'none';
-        }
-    }
-    window.addEventListener('resize', verifyLayout);
 
     function setScooter(model) {
         currentModel = model;
@@ -256,7 +237,7 @@
         
         let maxAllowedNormal = stats.baseMax + ((saveState.upgrades.cylinder - 1) * 15);
         let currentAcceleration = stats.baseAccel + ((saveState.upgrades.carburetor - 1) * 0.05);
-        let dynamicStuntPower = 0.0025 + (saveState.upgrades.stunt - 1) * 0.0008; // Умеренное ускорение подъема
+        let dynamicStuntPower = 0.0025 + (saveState.upgrades.stunt - 1) * 0.0008;
         let flightAltitudeFactor = 0.55 + (saveState.upgrades.exhaust - 1) * 0.05;
 
         let displaySpeed = Math.floor(sVx * 15); 
@@ -326,22 +307,19 @@
             }
         });
 
-        // ИСПРАВЛЕННАЯ ФИЗИКА С ПЛАВНЫМ ПОДЪЕМОМ И МЕДЛЕННЫМ ОПУСКАНИЕМ КОЛЕСА
         let isAir = sY < roadLevel - 5;
         if (isAir) {
             if (inputs['ArrowUp']) sAngleVelocity -= 0.003;
             if (inputs['ArrowDown']) sAngleVelocity += 0.003;
-            sAngleVelocity *= 0.92; // Физическое затухание в полете
+            sAngleVelocity *= 0.92; 
             sAngle += sAngleVelocity;
         } else {
             if (inputs['ArrowUp'] && sVx > 0.5) {
-                // Плавный набор угла подъема
                 sAngleVelocity -= dynamicStuntPower;
                 if (sAngleVelocity < -0.04) sAngleVelocity = -0.04;
             } else if (inputs['ArrowDown']) {
                 sAngleVelocity += 0.005;
             } else {
-                // ИСПРАВЛЕНО: Гравитационная сила возврата теперь ОЧЕНЬ маленькая (0.0015). Нос опускается медленно!
                 if (sAngle < 0) {
                     sAngleVelocity += 0.0015; 
                 } else {
@@ -350,10 +328,9 @@
                 }
             }
             
-            sAngleVelocity *= 0.85; // Мягкое гашение скорости подъема/падения
+            sAngleVelocity *= 0.85; 
             sAngle += sAngleVelocity;
             
-            // Замок на максимальный угол вилли (45 градусов)
             if (sAngle < -0.78) {
                 sAngle = -0.78;
                 sAngleVelocity = 0;
