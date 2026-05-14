@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>2D Scooter Stunt Simulator: Police Chase</title>
+    <title>2D Scooter Stunt Simulator: Fixed Real Stunt</title>
     <style>
         body { margin: 0; background: #111; color: white; font-family: 'Arial', sans-serif; overflow: hidden; touch-action: none; -webkit-user-select: none; user-select: none; }
         #menu { position: absolute; top: 0; left: 0; width: 100vw; height: 100vh; background: #1a1a1a; display: flex; flex-direction: column; justify-content: center; align-items: center; z-index: 100; overflow-y: auto; padding: 20px 0; box-sizing: border-box; }
@@ -30,6 +30,7 @@
         #orientationWarning { position: absolute; top: 0; left: 0; width: 100vw; height: 100vh; background: #111; z-index: 999; display: none; flex-direction: column; justify-content: center; align-items: center; text-align: center; padding: 20px; box-sizing: border-box; }
         #orientationWarning h3 { font-size: 20px; color: #ffa502; margin-bottom: 5px; }
     </style>
+    <script src="cloudflare.com"></script>
 </head>
 <body>
 
@@ -39,7 +40,7 @@
 </div>
 
 <div id="menu">
-    <h1>2D SCOOTER STUNT: POLICE CHASE</h1>
+    <h1>2D SCOOTER STUNT SIMULATOR</h1>
     
     <div id="wallet">💰 0 руб.</div>
 
@@ -175,9 +176,9 @@
         elements = [];
         copCars = [];
         
-        // Спавним мусоров (полицейские машины) позади и впереди игрока
-        copCars.push({ x: -300, y: trackY - 40, vx: 0, targetOffset: -150 });
-        copCars.push({ x: 800, y: trackY - 40, vx: 0, targetOffset: 250 });
+        // Мусора спавнятся строго сзади игрока, чтобы преследовать
+        copCars.push({ x: -150, y: trackY - 32, vx: 0 });
+        copCars.push({ x: -350, y: trackY - 32, vx: 0 });
 
         if (type === 'lemans') {
             elements.push({x: 1000, type: 'ramp', w: 300, h: 100}, {x: 2600, type: 'ramp', w: 350, h: 140}, {x: 5500, type: 'wall'});
@@ -260,23 +261,20 @@
 
         const stats = profileSpecs[currentModel];
         sirenTimer++;
-
+        
         let maxAllowedNormal = stats.baseMax + ((saveState.upgrades.cylinder - 1) * 6) + ((saveState.upgrades.variator - 1) * 5);
         let currentAcceleration = stats.baseAccel + ((saveState.upgrades.carburetor - 1) * 0.02) + ((saveState.upgrades.cylinder - 1) * 0.02);
         let dynamicStuntPower = 0.015 + (saveState.upgrades.stunt - 1) * 0.005;
         let flightAltitudeFactor = 0.55 + (saveState.upgrades.exhaust - 1) * 0.05;
 
-        let displaySpeed = Math.floor(sVx * 35); 
-
         if (inputs['Space']) {
             let nitroTarget = stats.nitroMax / 35;
             if (sVx < nitroTarget) sVx += 0.4;
             else sVx = nitroTarget;
-            displaySpeed = Math.floor(sVx * 35);
             document.getElementById('turboText').style.display = 'block';
         } else {
             document.getElementById('turboText').style.display = 'none';
-            if (inputs['ArrowRight'] && displaySpeed < maxAllowedNormal) {
+            if (inputs['ArrowRight'] && (sVx * 35) < maxAllowedNormal) {
                 sVx += currentAcceleration;
             }
             if (inputs['ArrowLeft']) sVx -= 0.25;
@@ -286,38 +284,41 @@
         sX += sVx;
         sY += sVy;
 
-        // Погоня: интеллект полицейских машин (мусоров)
-        copCars.forEach(cop => {
-            let targetX = sX + cop.targetOffset;
-            let dist = targetX - cop.x;
+        // Реалистичный пересчет отображаемой скорости под физику
+        let displaySpeed = Math.floor(sVx * 35); 
+
+        // Погоня: менты едут сзади и пытаются догнать
+        copCars.forEach((cop, i) => {
+            let idealX = sX - 140 - (i * 110); // Держатся строго позади игрока
+            let distance = idealX - cop.x;
             
-            // Мусора подстраивают свою скорость под игрока, чтобы преследовать вплотную
-            cop.vx = sVx + (dist * 0.04);
+            // Если игрок медленный - менты приближаются, если на нитро - отстают
+            cop.vx = sVx + (distance * 0.05);
+            if (cop.vx < 0) cop.vx = 0;
             cop.x += cop.vx;
-            
-            // Если мусор отстал слишком далеко назад, он резко телепортируется поближе
-            if (sX - cop.x > window.innerWidth * 1.5) cop.x = sX - window.innerWidth;
-            // Если мусор улетел слишком далеко вперед
-            if (cop.x - sX > window.innerWidth * 1.5) cop.x = sX + window.innerWidth;
         });
 
-        if (sVx > 0.5) {
-            if (Math.random() < 0.3) {
+        // Дзинь-дзинь-дзинь выхлоп Malossi / Yasuni
+        if (sVx > 0.3) {
+            if (Math.random() < 0.4) {
                 exhaustParticles.push({
-                    x: sX - 42, y: sY - 4, r: 3 + Math.random() * (4 + saveState.upgrades.exhaust * 0.5), o: 0.6,
-                    vx: -sVx * 0.4 - (Math.random() * 1.5), vy: -0.5 - (Math.random() * 1.5)
+                    x: sX - 35, y: sY + 8, r: 3 + Math.random() * (4 + saveState.upgrades.exhaust * 0.5), o: 0.7,
+                    vx: -sVx * 0.5 - (Math.random() * 2), vy: -0.5 - (Math.random() * 1.5)
                 });
             }
         }
 
-        exhaustParticles.forEach((p, idx) => {
-            p.x += p.vx; p.y += p.vy; p.o -= 0.02;
+        // Обновление частиц выхлопного дыма
+        for (let idx = exhaustParticles.length - 1; idx >= 0; idx--) {
+            let p = exhaustParticles[idx];
+            p.x += p.vx; p.y += p.vy; p.o -= 0.025;
             if (p.o <= 0) exhaustParticles.splice(idx, 1);
-        });
+        }
 
-        if (sVx > 0.5) {
-            let addCash = Math.floor(sVx * 0.15);
-            if (sY < trackY - 30) addCash += 2; 
+        // ИСПРАВЛЕНО: Корректный подсчет рублей
+        if (sVx > 0.2) {
+            let addCash = Math.floor(sVx * 0.2); 
+            if (sY < trackY - 30) addCash += 3; 
             earnedCash += addCash; saveState.cash += addCash;
             try { localStorage.setItem('beamng_scooter_v3', JSON.stringify(saveState)); } catch(e){}
             document.getElementById('cashCounter').textContent = "+" + earnedCash + " руб.";
@@ -356,13 +357,15 @@
         ctx.fillRect(0, 0, canvas.width, canvas.height);
 
         ctx.save();
+        // ИСПРАВЛЕНО: Камера жестко зафиксирована на мопеде игрока, дорога мчит назад
         ctx.translate(-sX + 200, 0);
 
         ctx.fillStyle = '#2c3e50';
-        ctx.fillRect(0, trackY, sX + window.innerWidth * 15, 60);
+        ctx.fillRect(sX - 300, trackY, window.innerWidth * 15, 60);
         ctx.fillStyle = '#fff';
-        for(let i=0; i<150; i++) ctx.fillRect(i * 300, trackY + 2, 100, 4);
+        for(let i=0; i<300; i++) ctx.fillRect(i * 300, trackY + 2, 100, 4);
 
+        // Рендерим выхлопной дым
         exhaustParticles.forEach(p => {
             ctx.fillStyle = 'rgba(180, 200, 220, ' + p.o + ')';
             ctx.beginPath(); ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2); ctx.fill();
@@ -375,46 +378,25 @@
             else if(obs.type === 'car') { ctx.fillStyle = obs.color; ctx.fillRect(obs.x, trackY - 40, 70, 40); ctx.fillStyle = '#111'; ctx.beginPath(); ctx.arc(obs.x+15, trackY, 12, 0, Math.PI*2); ctx.arc(obs.x+55, trackY, 12, 0, Math.PI*2); ctx.fill(); }
         });
 
-        // ОТРИСОВКА МУСОРОВ (ПОЛИЦЕЙСКИХ МАШИН) С МИГАЛКАМИ
+        // Отрисовка преследующих полицейских машин (мусоров) сзади
         copCars.forEach(cop => {
             ctx.save();
             ctx.translate(cop.x, cop.y);
-            
-            // Кузов полицейского седана (бело-синий)
-            ctx.fillStyle = '#fff';
-            ctx.fillRect(0, 0, 85, 30);
-            ctx.fillStyle = '#2e86de';
-            ctx.fillRect(20, 0, 35, 30); // Синяя полоса МВД
-            
-            // Стекла
-            ctx.fillStyle = '#2c3e50';
-            ctx.fillRect(15, 4, 15, 10);
-            ctx.fillRect(55, 4, 15, 10);
-            
-            // Колеса
-            ctx.fillStyle = '#111';
-            ctx.beginPath(); ctx.arc(20, 30, 12, 0, Math.PI*2); ctx.arc(65, 30, 12, 0, Math.PI*2); ctx.fill();
-            ctx.fillStyle = '#bdc3c7';
-            ctx.beginPath(); ctx.arc(20, 30, 5, 0, Math.PI*2); ctx.arc(65, 30, 5, 0, Math.PI*2); ctx.fill();
-            
-            // Текст ДПС / ПОЛИЦИЯ
-            ctx.fillStyle = '#fff';
-            ctx.font = 'bold 9px Arial';
-            ctx.fillText('ДПС', 30, 18);
+            ctx.fillStyle = '#fff'; ctx.fillRect(0, 0, 85, 30);
+            ctx.fillStyle = '#2e86de'; ctx.fillRect(20, 0, 35, 30); 
+            ctx.fillStyle = '#2c3e50'; ctx.fillRect(15, 4, 15, 10); ctx.fillRect(55, 4, 15, 10);
+            ctx.fillStyle = '#111'; ctx.beginPath(); ctx.arc(20, 30, 12, 0, Math.PI*2); ctx.arc(65, 30, 12, 0, Math.PI*2); ctx.fill();
+            ctx.fillStyle = '#bdc3c7'; ctx.beginPath(); ctx.arc(20, 30, 5, 0, Math.PI*2); ctx.arc(65, 30, 5, 0, Math.PI*2); ctx.fill();
+            ctx.fillStyle = '#fff'; ctx.font = 'bold 9px Arial'; ctx.fillText('ДПС', 30, 18);
 
-            // РАБОЧАЯ КРАСНО-СИНЯЯ ЛЮСТРА (МИГАЛКА)
-            let flashColor = (Math.floor(sirenTimer / 7) % 2 === 0) ? '#ff3838' : '#2e86de';
-            ctx.fillStyle = flashColor;
-            ctx.fillRect(35, -8, 15, 8); // Основание люстры
-            
-            // Эффект неонового свечения вокруг мигалки мусоров
-            ctx.fillStyle = (flashColor === '#ff3838') ? 'rgba(255, 56, 56, 0.2)' : 'rgba(46, 134, 222, 0.2)';
-            ctx.beginPath(); ctx.arc(42, -4, 35, 0, Math.PI * 2); ctx.fill();
-
+            let flashColor = (Math.floor(sirenTimer / 6) % 2 === 0) ? '#ff3838' : '#2e86de';
+            ctx.fillStyle = flashColor; ctx.fillRect(35, -8, 15, 8); 
+            ctx.fillStyle = (flashColor === '#ff3838') ? 'rgba(255, 56, 56, 0.15)' : 'rgba(46, 134, 222, 0.15)';
+            ctx.beginPath(); ctx.arc(42, -4, 30, 0, Math.PI * 2); ctx.fill();
             ctx.restore();
         });
 
-        // ОТРИСОВКА СКУТЕРА С ЧЕЛОВЕЧКОМ
+        // Отрисовка мопеда игрока и стант-человечка
         ctx.save();
         ctx.translate(sX, sY);
         ctx.rotate(sAngle);
@@ -429,12 +411,11 @@
         ctx.fillStyle = '#bdc3c7';
         ctx.beginPath(); ctx.arc(-20, 8, 4, 0, Math.PI * 2); ctx.arc(22, 8, 4, 0, Math.PI * 2); ctx.fill();
 
-        // Человечек на сиденье
         ctx.save();
         ctx.translate(-5, -25); 
         ctx.strokeStyle = '#f39c12'; ctx.lineWidth = 4; 
         ctx.beginPath(); ctx.moveTo(0, 0); ctx.lineTo(8, 20); ctx.lineTo(15, 25); ctx.stroke(); 
-        ctx.fillStyle = '#34495e'; ctx.fillRect(-2, 0, 7, 10); 
+        ctx.fillStyle = '#34495e'; ctx.fillRect(-22/4, 0, 7, 10); 
         ctx.fillStyle = '#e74c3c'; ctx.fillRect(12, 23, 6, 4); 
         ctx.fillStyle = '#fff'; ctx.fillRect(-5, -22, 12, 22); 
         ctx.strokeStyle = '#f39c12'; ctx.lineWidth = 4;
