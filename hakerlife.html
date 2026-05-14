@@ -2,7 +2,8 @@
 <html lang="ru">
 <head>
     <meta charset="UTF-8">
-    <title>2D BeamNG Drive: Исправленная Версия</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>2D BeamNG Drive: Режимы ПК и Телефон</title>
     <style>
         body {
             margin: 0;
@@ -10,6 +11,9 @@
             color: white;
             font-family: Arial, sans-serif;
             overflow: hidden;
+            touch-action: none;
+            -webkit-user-select: none;
+            user-select: none;
         }
         #menu {
             position: absolute;
@@ -20,56 +24,81 @@
             justify-content: center;
             align-items: center;
             z-index: 100;
+            overflow-y: auto;
+            padding: 20px 0;
+            box-sizing: border-box;
         }
         h1 {
-            font-size: 38px;
-            margin-bottom: 20px;
+            font-size: 32px;
+            margin: 0 0 15px 0;
             text-shadow: 0 0 10px #ff4757;
+            text-align: center;
         }
         h2 {
-            font-size: 24px;
-            margin-top: 20px;
-            margin-bottom: 15px;
+            font-size: 20px;
+            margin: 15px 0 10px 0;
             color: #bdc3c7;
+        }
+        .mode-container {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 5px;
+        }
+        .mode-btn {
+            background: #222;
+            color: #bdc3c7;
+            border: 2px solid #444;
+            padding: 10px 25px;
+            font-size: 16px;
+            font-weight: bold;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: 0.2s;
+        }
+        .mode-btn.active {
+            background: #2ecc71;
+            color: white;
+            border-color: #2ecc71;
+            box-shadow: 0 0 10px rgba(46, 204, 113, 0.5);
         }
         .map-btn {
             background: #2e86de;
             color: white;
             border: none;
             padding: 12px 30px;
-            font-size: 20px;
+            font-size: 18px;
             font-weight: bold;
-            margin: 8px;
+            margin: 6px;
             border-radius: 8px;
             cursor: pointer;
             transition: 0.2s;
-            width: 320px;
+            width: 300px;
         }
         .map-btn:hover {
             background: #54a0ff;
-            transform: scale(1.05);
+            transform: scale(1.03);
         }
         .color-container {
             display: flex;
             gap: 15px;
         }
         .color-btn {
-            width: 50px;
-            height: 50px;
+            width: 44px;
+            height: 44px;
             border-radius: 50%;
             border: 3px solid white;
             cursor: pointer;
             transition: 0.2s;
         }
         .color-btn:hover, .color-btn.active {
-            transform: scale(1.2);
+            transform: scale(1.15);
             border-color: #ff4757;
         }
         #info {
             position: absolute;
             top: 10px;
             left: 10px;
-            font-size: 16px;
+            font-size: 14px;
             background: rgba(0,0,0,0.7);
             padding: 12px;
             border-radius: 5px;
@@ -77,6 +106,7 @@
             line-height: 1.5;
             z-index: 10;
             display: none;
+            max-width: 280px;
         }
         #backToMenu {
             position: absolute;
@@ -97,38 +127,38 @@
             bottom: 20px;
             right: 20px;
             background: rgba(0,0,0,0.8);
-            padding: 15px;
+            padding: 12px;
             border-radius: 10px;
             border: 2px solid #333;
             z-index: 10;
             display: none;
-            min-width: 160px;
+            min-width: 150px;
         }
         #speedometer {
-            font-size: 32px;
+            font-size: 28px;
             font-weight: bold;
             text-align: right;
         }
         #fpsCounter {
-            font-size: 16px;
+            font-size: 14px;
             color: #2ecc71;
             margin-top: 5px;
             text-align: right;
             font-family: monospace;
         }
         #turboText {
-            font-size: 14px;
-            color: #54a0ff;
-            margin-top: 5px;
-            display: none;
+            font-size: 12px;
+            color: #ff4757;
+            margin-top: 4px;
             text-align: right;
             font-weight: bold;
+            text-shadow: 0 0 5px #ff0000;
         }
         #flightStatus {
             position: absolute;
             top: 30%; left: 50%;
             transform: translate(-50%, -50%);
-            font-size: 80px;
+            font-size: 70px;
             font-weight: bold;
             color: #ff3838;
             text-shadow: 0 0 20px #ff0000;
@@ -146,41 +176,130 @@
             transition: opacity 0.1s ease-out;
             z-index: 5;
         }
+        /* Сенсорный блок управления на экране */
+        #mobileControls {
+            position: absolute;
+            bottom: 15px;
+            left: 0;
+            width: 100vw;
+            display: none;
+            justify-content: space-between;
+            padding: 0 25px;
+            box-sizing: border-box;
+            z-index: 80;
+        }
+        .btn-left-group, .btn-right-group {
+            display: flex;
+            gap: 15px;
+        }
+        .touch-btn {
+            width: 65px;
+            height: 65px;
+            background: rgba(255, 255, 255, 0.15);
+            border: 3px solid rgba(255, 255, 255, 0.5);
+            border-radius: 50%;
+            color: white;
+            font-size: 22px;
+            font-weight: bold;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        .touch-btn:active {
+            background: rgba(255, 255, 255, 0.4);
+            transform: scale(0.95);
+        }
+        #btnTurbo {
+            background: rgba(231, 76, 60, 0.3);
+            border-color: #ff4757;
+            font-size: 13px;
+        }
+        #btnTurbo:active {
+            background: rgba(231, 76, 60, 0.7);
+        }
+        /* Предупреждение о необходимости повернуть смартфон */
+        #orientationWarning {
+            position: absolute;
+            top: 0; left: 0; width: 100vw; height: 100vh;
+            background: #1a1a1a;
+            z-index: 999;
+            display: none;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            padding: 20px;
+            box-sizing: border-box;
+        }
+        #orientationWarning h3 {
+            font-size: 22px;
+            color: #ffa502;
+            margin-bottom: 10px;
+        }
     </style>
-    <!-- НАСТОЯЩАЯ И ПОЛНАЯ ССЫЛКА НА ФИЗИКУ -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/matter-js/0.19.0/matter.min.js"></script>
+    <script src="cloudflare.com"></script>
 </head>
 <body>
 
+<div id="orientationWarning">
+    <h3>Пожалуйста, переверните устройство!</h3>
+    <p>Для игры на телефоне переверните его горизонтально (в альбомный режим).</p>
+</div>
+
 <div id="menu">
-    <h1>ВЫБЕРИ КАРТУ ДЛЯ ТЕСТА</h1>
-    <button class="map-btn" onclick="startGame('autobahn')">1. Прямой автобан</button>
-    <button class="map-btn" onclick="startGame('lemans')">2. Ле-Ман (Холмы)</button>
-    <button class="map-btn" onclick="startGame('chaos')">3. Городской хаос</button>
+    <h1>2D BEAMNG DRIVE</h1>
+    
+    <h2>УСТРОЙСТВО УПРАВЛЕНИЯ</h2>
+    <div class="mode-container">
+        <button id="modePc" class="mode-btn active" onclick="selectDeviceMode('pc')">🖥️ Компьютер (ПК)</button>
+        <button id="modeMobile" class="mode-btn" onclick="selectDeviceMode('mobile')">📱 Телефон</button>
+    </div>
 
     <h2>ВЫБЕРИ ЦВЕТ МАШИНЫ</h2>
     <div class="color-container">
-        <div class="color-btn active" style="background: #bdc3c7;" onclick="selectColor('#bdc3c7', '#95a5a6', this)"></div>
+        <div class="color-btn active" style="background: #3498db;" onclick="selectColor('#3498db', '#2980b9', this)"></div>
         <div class="color-btn" style="background: #e74c3c;" onclick="selectColor('#e74c3c', '#c0392b', this)"></div>
         <div class="color-btn" style="background: #2ecc71;" onclick="selectColor('#2ecc71', '#27ae60', this)"></div>
         <div class="color-btn" style="background: #2c3e50;" onclick="selectColor('#2c3e50', '#1a252f', this)"></div>
     </div>
+
+    <h2>ВЫБЕРИ КАРТУ ДЛЯ ТЕСТА</h2>
+    <button class="map-btn" onclick="startGame('autobahn')">1. Прямой автобан</button>
+    <button class="map-btn" onclick="startGame('lemans')">2. Ле-Ман (Холмы)</button>
+    <button class="map-btn" onclick="startGame('chaos')">3. Городской хаос</button>
 </div>
 
 <button id="backToMenu" onclick="location.reload()">В меню</button>
 
 <div id="info">
-    <strong>Управление:</strong><br>
-    • Стрелка Вправо — Газ<br>
-    • Зажми <strong>ПРОБЕЛ</strong> — ТУРБО-УСКОРЕНИЕ 🔥<br>
-    • Набери 300 км/ч для взлета!<br>
-    • Клавиша <strong>R</strong> — Починить машину
+    <div id="infoPc">
+        <strong>Управление (ПК):</strong><br>
+        • Стрелка Вправо — Обычный газ<br>
+        • Зажми <strong>ПРОБЕЛ</strong> — МГНОВЕННО 411 км/ч 🔥<br>
+        • Клавиша <strong>R</strong> — Починить машину
+    </div>
+    <div id="infoMobile" style="display:none;">
+        <strong>Управление (Телефон):</strong><br>
+        • Используй экранные кнопки под пальцами<br>
+        • Кнопка ТУРБО — МГНОВЕННО 411 км/ч 🔥
+    </div>
 </div>
 
 <div id="dashboard">
     <div id="speedometer"><span id="speedVal">0</span> км/ч</div>
-    <div id="turboText">ТУРБО АКТИВНО</div>
+    <div id="turboText">СУПЕР ТУРБО 411</div>
     <div id="fpsCounter">FPS: <span id="fpsVal">60</span></div>
+</div>
+
+<div id="mobileControls">
+    <div class="btn-left-group">
+        <div class="touch-btn" id="btnBack">←</div>
+        <div class="touch-btn" id="btnRepair">R</div>
+    </div>
+    <div class="btn-right-group">
+        <div class="touch-btn" id="btnTurbo">ТУРБО</div>
+        <div class="touch-btn" id="btnGas">→</div>
+    </div>
 </div>
 
 <div id="flightStatus">ВЗЛЕТ!</div>
@@ -195,12 +314,37 @@
     let car = null;
     const keys = {};
 
-    let carColorBack = '#bdc3c7';
-    let carColorFront = '#95a5a6';
+    let currentMode = 'pc'; // Режим по умолчанию
+    let carColorBack = '#3498db';
+    let carColorFront = '#2980b9';
 
     let lastCalledTime;
     let frameCount = 0;
     let fpsInterval = 0;
+
+    // Переключение режимов ПК / Смартфон в меню
+    function selectDeviceMode(mode) {
+        currentMode = mode;
+        document.getElementById('modePc').classList.remove('active');
+        document.getElementById('modeMobile').classList.remove('active');
+        
+        if (mode === 'pc') {
+            document.getElementById('modePc').classList.add('active');
+            document.getElementById('orientationWarning').style.display = 'none';
+        } else {
+            document.getElementById('modeMobile').classList.add('active');
+            checkOrientation();
+        }
+    }
+
+    function checkOrientation() {
+        if (currentMode === 'mobile' && window.innerHeight > window.innerWidth) {
+            document.getElementById('orientationWarning').style.display = 'flex';
+        } else {
+            document.getElementById('orientationWarning').style.display = 'none';
+        }
+    }
+    window.addEventListener('resize', checkOrientation);
 
     function selectColor(colorBack, colorFront, element) {
         carColorBack = colorBack;
@@ -227,14 +371,14 @@
     }
 
     function buildMap(mapType) {
-        const ground = Bodies.rectangle(window.innerWidth * 3, window.innerHeight - 20, window.innerWidth * 15, 40, { isStatic: true, render: { fillStyle: '#444' } });
+        const ground = Bodies.rectangle(window.innerWidth * 3, window.innerHeight - 20, window.innerWidth * 15, 40, { isStatic: true, render: { fillStyle: '#333' } });
         Composite.add(engine.world, ground);
 
         if (mapType === 'autobahn') {
             const finalWall = Bodies.rectangle(window.innerWidth * 5.5, window.innerHeight - 150, 70, 300, { isStatic: true, render: { fillStyle: '#ff4757' } });
             Composite.add(engine.world, finalWall);
             spawnObstacleCar(1800, '#e67e22');
-            spawnObstacleCar(3200, '#3498db');
+            spawnObstacleCar(3200, '#95a5a6');
         } 
         else if (mapType === 'lemans') {
             const ramp1 = Bodies.rectangle(1200, window.innerHeight - 55, 250, 70, { isStatic: true, angle: -0.3, render: { fillStyle: '#ffa502' } });
@@ -277,18 +421,78 @@
         const carX = 150;
         const carY = window.innerHeight - 100;
 
-        const bodyBack = Bodies.rectangle(carX, carY, 90, 20, { group: -1, render: { fillStyle: carColorBack } });
-        const bodyFront = Bodies.rectangle(carX + 70, carY + 2, 60, 16, { group: -1, render: { fillStyle: carColorFront } });
-        const exhaust = Bodies.rectangle(carX - 50, carY, 10, 8, { isSensor: true, group: -1, render: { fillStyle: 'rgba(0,0,0,0)' } });
+        const bodyBack = Bodies.rectangle(carX, carY - 5, 80, 28, { 
+            group: -1, 
+            render: {
+                fillStyle: carColorBack,
+                updater: function(ctx, body) {
+                    ctx.fillStyle = carColorBack;
+                    ctx.beginPath();
+                    ctx.rect(-40, -14, 80, 28);
+                    ctx.fill();
+                    ctx.fillStyle = '#2c3e50';
+                    ctx.fillRect(-25, -28, 40, 14);
+                    ctx.fillStyle = carColorBack;
+                    ctx.fillRect(-30, -28, 5, 14);
+                    ctx.fillRect(15, -28, 5, 14);
+                }
+            } 
+        });
 
-        const wheelA = Bodies.circle(carX - 25, carY + 15, 18, { friction: 0.9, density: 0.03, render: { fillStyle: '#111' } });
-        const wheelB = Bodies.circle(carX + 55, carY + 15, 18, { friction: 0.9, density: 0.03, render: { fillStyle: '#111' } });
+        const bodyFront = Bodies.rectangle(carX + 65, carY, 50, 18, { 
+            group: -1, 
+            render: {
+                fillStyle: carColorFront,
+                updater: function(ctx, body) {
+                    ctx.fillStyle = carColorFront;
+                    ctx.beginPath();
+                    ctx.rect(-25, -9, 50, 18);
+                    ctx.fill();
+                    ctx.fillStyle = '#2c3e50';
+                    ctx.beginPath();
+                    ctx.moveTo(-25, -9);
+                    ctx.lineTo(-12, -23);
+                    ctx.lineTo(-5, -23);
+                    ctx.lineTo(-5, -9);
+                    ctx.fill();
+                    ctx.fillStyle = '#fff';
+                    ctx.fillRect(18, -6, 7, 5);
+                }
+            } 
+        });
 
-        const spring1 = Constraint.create({ bodyA: bodyBack, bodyB: bodyFront, pointA: { x: 45, y: -5 }, pointB: { x: -30, y: -5 }, stiffness: 0.2, render: { strokeStyle: '#fff' } });
-        const spring2 = Constraint.create({ bodyA: bodyBack, bodyB: bodyFront, pointA: { x: 45, y: 5 }, pointB: { x: -30, y: 5 }, stiffness: 0.2, render: { strokeStyle: '#fff' } });
-        const axelA = Constraint.create({ bodyA: bodyBack, bodyB: wheelA, stiffness: 0.4, render: { strokeStyle: '#555' } });
-        const axelB = Constraint.create({ bodyA: bodyFront, bodyB: wheelB, stiffness: 0.4, render: { strokeStyle: '#555' } });
-        const exhaustConnect = Constraint.create({ bodyA: bodyBack, bodyB: exhaust, pointA: { x: -45, y: 5 }, pointB: { x: 0, y: 0 }, stiffness: 1, render: { visible: false } });
+        const exhaust = Bodies.rectangle(carX - 45, carY, 10, 8, { isSensor: true, group: -1, render: { fillStyle: 'rgba(0,0,0,0)' } });
+
+        const wheelOptions = { 
+            friction: 0.85, 
+            density: 0.025, 
+            render: { 
+                fillStyle: '#111',
+                updater: function(ctx, body) {
+                    ctx.fillStyle = '#222';
+                    ctx.beginPath();
+                    ctx.arc(0, 0, 18, 0, Math.PI * 2);
+                    ctx.fill();
+                    ctx.fillStyle = '#95a5a6';
+                    ctx.beginPath();
+                    ctx.arc(0, 0, 11, 0, Math.PI * 2);
+                    ctx.fill();
+                    ctx.fillStyle = '#7f8c8d';
+                    ctx.beginPath();
+                    ctx.arc(0, 0, 4, 0, Math.PI * 2);
+                    ctx.fill();
+                }
+            } 
+        };
+
+        const wheelA = Bodies.circle(carX - 20, carY + 16, 18, wheelOptions);
+        const wheelB = Bodies.circle(carX + 50, carY + 16, 18, wheelOptions);
+
+        const spring1 = Constraint.create({ bodyA: bodyBack, bodyB: bodyFront, pointA: { x: 40, y: -5 }, pointB: { x: -25, y: -5 }, stiffness: 0.25, render: { strokeStyle: '#fff', lineWidth: 1 } });
+        const spring2 = Constraint.create({ bodyA: bodyBack, bodyB: bodyFront, pointA: { x: 40, y: 5 }, pointB: { x: -25, y: 5 }, stiffness: 0.25, render: { strokeStyle: '#fff', lineWidth: 1 } });
+        const axelA = Constraint.create({ bodyA: bodyBack, bodyB: wheelA, stiffness: 0.35, render: { strokeStyle: '#555', lineWidth: 2 } });
+        const axelB = Constraint.create({ bodyA: bodyFront, bodyB: wheelB, stiffness: 0.35, render: { strokeStyle: '#555', lineWidth: 2 } });
+        const exhaustConnect = Constraint.create({ bodyA: bodyBack, bodyB: exhaust, pointA: { x: -40, y: 5 }, pointB: { x: 0, y: 0 }, stiffness: 1, render: { visible: false } });
 
         mainBodies = [bodyBack, bodyFront, wheelA, wheelB, exhaust];
         carParts = [...mainBodies];
@@ -304,10 +508,38 @@
         document.getElementById('backToMenu').style.display = 'block';
         document.getElementById('dashboard').style.display = 'block';
 
+        // Настройка отображения информации о кнопках
+        if (currentMode === 'pc') {
+            document.getElementById('infoPc').style.display = 'block';
+            document.getElementById('infoMobile').style.display = 'none';
+            document.getElementById('mobileControls').style.display = 'none';
+        } else {
+            document.getElementById('infoPc').style.display = 'none';
+            document.getElementById('infoMobile').style.display = 'block';
+            document.getElementById('mobileControls').style.display = 'flex';
+        }
+
         initPhysics();
+        
+        Events.on(render, 'afterRender', () => {
+            const ctx = render.context;
+            const bodies = Composite.allBodies(engine.world);
+            
+            bodies.forEach(body => {
+                if (body.render && body.render.updater) {
+                    ctx.save();
+                    ctx.translate(body.position.x, body.position.y);
+                    ctx.rotate(body.angle);
+                    body.render.updater(ctx, body);
+                    ctx.restore();
+                }
+            });
+        });
+
         buildMap(mapType);
         car = spawnPlayerCar();
         setupEvents();
+        setupMobileControls();
         
         lastCalledTime = performance.now();
         requestAnimationFrame(updateFps);
@@ -315,10 +547,8 @@
 
     function updateFps(now) {
         if (document.getElementById('dashboard').style.display === 'none') return;
-        
         frameCount++;
         fpsInterval = now - lastCalledTime;
-        
         if (fpsInterval >= 1000) {
             let fps = Math.round((frameCount * 1000) / fpsInterval);
             document.getElementById('fpsVal').textContent = fps;
@@ -328,46 +558,77 @@
         requestAnimationFrame(updateFps);
     }
 
+    function setupMobileControls() {
+        const attachTouch = (id, keyName) => {
+            const btn = document.getElementById(id);
+            btn.addEventListener('touchstart', (e) => { e.preventDefault(); keys[keyName] = true; });
+            btn.addEventListener('touchend', (e) => { e.preventDefault(); keys[keyName] = false; });
+        };
+        
+        attachTouch('btnGas', 'ArrowRight');
+        attachTouch('btnBack', 'ArrowLeft');
+        attachTouch('btnTurbo', 'Space');
+
+        document.getElementById('btnRepair').addEventListener('touchstart', (e) => {
+            e.preventDefault();
+            car = spawnPlayerCar();
+        });
+    }
+
     function setupEvents() {
         window.addEventListener('keydown', (e) => {
+            if (currentMode !== 'pc') return; // Отключаем клавиши, если активен режим телефона
             if (e.code === 'Space') e.preventDefault();
             keys[e.code] = true;
             if (e.code === 'KeyR') car = spawnPlayerCar();
         });
-        window.addEventListener('keyup', (e) => keys[e.code] = false);
+        window.addEventListener('keyup', (e) => {
+            if (currentMode !== 'pc') return;
+            keys[e.code] = false;
+        });
 
         Events.on(engine, 'beforeUpdate', () => {
             if (isExploded || !car) return;
 
-            const speedKmh = Math.floor(Vector.magnitude(car.bodyFront.velocity) * 35); 
+            const currentPhysSpeed = Vector.magnitude(car.bodyFront.velocity);
+            let speedKmh = Math.floor(currentPhysSpeed * 35); 
+
+            if (keys['Space']) {
+                document.getElementById('turboText').style.display = 'block';
+                car.exhaust.render.fillStyle = '#ff4757';
+                
+                Body.setVelocity(car.bodyFront, { x: 11.75, y: car.bodyFront.velocity.y });
+                Body.setVelocity(car.bodyBack, { x: 11.75, y: car.bodyBack.velocity.y });
+                Body.setVelocity(car.wheelA, { x: 11.75, y: car.wheelA.velocity.y });
+                Body.setVelocity(car.wheelB, { x: 11.75, y: car.wheelB.velocity.y });
+                
+                Body.setAngularVelocity(car.wheelA, 1.8);
+                Body.setAngularVelocity(car.wheelB, 1.8);
+                speedKmh = 411;
+            } else {
+                document.getElementById('turboText').style.display = 'none';
+                if (car && car.exhaust) car.exhaust.render.fillStyle = 'rgba(0,0,0,0)';
+                
+                if (keys['ArrowRight']) {
+                    Body.setAngularVelocity(car.wheelA, 0.7);
+                    Body.setAngularVelocity(car.wheelB, 0.7);
+                    Body.applyForce(car.bodyBack, car.bodyBack.position, { x: 0.05, y: 0 });
+                }
+            }
+
             document.getElementById('speedVal').textContent = speedKmh;
 
             if (speedKmh >= 300) {
                 chargedForExplosion = true;
                 document.getElementById('speedometer').style.color = '#ff4757';
-            }
-
-            if (keys['ArrowRight']) {
-                Body.setAngularVelocity(car.wheelA, 0.95);
-                Body.setAngularVelocity(car.wheelB, 0.95);
-                Body.applyForce(car.bodyBack, car.bodyBack.position, { x: 0.08, y: 0 });
-            }
-
-            if (keys['Space']) {
-                document.getElementById('turboText').style.display = 'block';
-                car.exhaust.render.fillStyle = '#00a8ff';
-                Body.applyForce(car.bodyBack, car.bodyBack.position, { x: 0.28, y: 0 });
-                Body.setAngularVelocity(car.wheelA, 1.5);
-                Body.setAngularVelocity(car.wheelB, 1.5);
             } else {
-                document.getElementById('turboText').style.display = 'none';
-                if (car && car.exhaust) car.exhaust.render.fillStyle = 'rgba(0,0,0,0)';
+                document.getElementById('speedometer').style.color = 'white';
             }
 
             if (speedKmh >= 300) {
                 document.getElementById('flightStatus').style.opacity = '1';
-                Body.applyForce(car.bodyFront, car.bodyFront.position, { x: 0, y: -0.18 });
-                Body.applyForce(car.bodyBack, car.bodyBack.position, { x: 0, y: 0.06 });
+                Body.applyForce(car.bodyFront, car.bodyFront.position, { x: 0, y: -0.22 });
+                Body.applyForce(car.bodyBack, car.bodyBack.position, { x: 0, y: 0.07 });
             } else {
                 document.getElementById('flightStatus').style.opacity = '0';
             }
