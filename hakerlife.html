@@ -2,414 +2,244 @@
 <html lang="ru">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>2D Scooter Stunt: Pure Stunt Ride</title>
+    <title>GTA 2D Retro Prototype</title>
     <style>
-        body { margin: 0; background: #0b0b1a; color: white; font-family: 'Arial', sans-serif; overflow: hidden; touch-action: none; -webkit-user-select: none; user-select: none; }
-        #menu { position: absolute; top: 0; left: 0; width: 100vw; height: 100vh; background: #111122; display: flex; flex-direction: column; justify-content: center; align-items: center; z-index: 100; overflow-y: auto; padding: 20px 0; box-sizing: border-box; }
-        h1 { font-size: 26px; margin: 0 0 10px 0; text-shadow: 0 0 10px #ff4757; color: #ff4757; text-align: center; }
-        h2 { font-size: 14px; margin: 12px 0 6px 0; color: #a4b0be; text-transform: uppercase; letter-spacing: 1px; }
-        #wallet { font-size: 20px; font-weight: bold; color: #2ecc71; background: rgba(0,0,0,0.5); padding: 6px 20px; border-radius: 20px; border: 2px solid #2ecc71; margin-bottom: 10px; }
-        .block-container { display: flex; flex-wrap: wrap; justify-content: center; gap: 8px; margin-bottom: 5px; max-width: 600px; }
-        .btn-ui { background: #1e1e38; color: #bbb; border: 2px solid #333; padding: 8px 16px; font-size: 13px; font-weight: bold; border-radius: 6px; cursor: pointer; }
-        .btn-ui.active { background: #2ecc71; color: white; border-color: #2ecc71; box-shadow: 0 0 8px rgba(46, 204, 113, 0.4); }
-        .btn-shop { border-color: #f1c40f; color: #f1c40f; }
-        .btn-map { background: #ff4757; color: white; border: none; padding: 12px 35px; font-size: 16px; font-weight: bold; margin: 10px; border-radius: 6px; cursor: pointer; width: 280px; box-shadow: 0 0 15px rgba(255, 71, 87, 0.4); }
-        #backToMenu { position: absolute; top: 10px; right: 10px; background: #ff4757; color: white; border: none; padding: 8px 14px; font-size: 14px; border-radius: 4px; cursor: pointer; z-index: 110; display: none; }
-        #dashboard { position: absolute; bottom: 15px; right: 15px; background: rgba(11, 11, 26, 0.9); padding: 10px 15px; border-radius: 8px; border: 2px solid #333; z-index: 10; display: none; min-width: 160px; }
-        #speedometer { font-size: 26px; font-weight: bold; text-align: right; font-family: monospace; color: #fff; }
-        #cashCounter { font-size: 15px; color: #2ecc71; font-weight: bold; text-align: right; margin-top: 2px; }
-        #soundIndicator { font-size: 12px; color: #f1c40f; text-align: right; margin-top: 2px; font-weight: bold; }
-        #fpsCounter { font-size: 11px; color: #777; margin-top: 4px; text-align: right; font-family: monospace; }
-        #turboText { font-size: 11px; color: #ff4757; margin-top: 2px; text-align: right; font-weight: bold; }
-        #mobileControls { position: absolute; bottom: 15px; left: 0; width: 100vw; display: none; justify-content: space-between; padding: 0 20px; box-sizing: border-box; z-index: 80; }
-        .control-group { display: flex; gap: 8px; }
-        .touch-btn { width: 55px; height: 55px; background: rgba(255, 255, 255, 0.15); border: 2px solid rgba(255, 255, 255, 0.5); border-radius: 50%; color: white; font-size: 20px; font-weight: bold; display: flex; justify-content: center; align-items: center; cursor: pointer; }
+        body { margin: 0; background: #222; color: #fff; font-family: monospace; display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100vh; overflow: hidden; }
+        canvas { background: #34495e; border: 4px solid #2c3e50; box-shadow: 0 0 20px rgba(0,0,0,0.6); cursor: crosshair; }
+        .hud { width: 800px; display: flex; justify-content: space-between; margin-bottom: 5px; font-size: 16px; font-weight: bold; }
     </style>
 </head>
 <body>
 
-<div id="menu">
-    <h1>2.5D SCOOTER STUNT SIMULATOR</h1>
-    <div id="wallet">💰 0 руб.</div>
-
-    <h2>Оригинальные запчасти (Магазин)</h2>
-    <div class="block-container">
-        <button id="upCylinder" class="btn-ui btn-shop" onclick="buyComponent('cylinder', 150)">🔥 ЦПГ Malossi MHR 70cc</button>
-        <button id="upExhaust" class="btn-ui btn-shop" onclick="buyComponent('exhaust', 180)">🎺 Резонатор Yasuni R</button>
-        <button id="upCarb" class="btn-ui btn-shop" onclick="buyComponent('carburetor', 120)">⛽ Карб Dell'Orto 19mm</button>
-        <button id="upVariator" class="btn-ui btn-shop" onclick="buyComponent('variator', 130)">⚙️ Вариатор Malossi Multivar</button>
-        <button id="upStunt" class="btn-ui btn-shop" onclick="buyComponent('stunt', 200)">🏍️ Бугель & Руль Stage6</button>
+    <div class="hud">
+        <div id="wantedDisplay">РОЗЫСК: 🚨</div>
+        <div id="scoreDisplay">ЛИКВИДИРОВАНО: 0</div>
     </div>
-
-    <h2>Устройство ввода</h2>
-    <div class="block-container">
-        <button id="modePc" class="btn-ui active" onclick="setDevice('pc')">🖥️ Компьютер (ПК)</button>
-        <button id="modeMobile" class="btn-ui" onclick="setDevice('mobile')">📱 Смартфон (Сенсор)</button>
+    <canvas id="gtaCanvas" width="800" height="550"></canvas>
+    <div style="margin-top: 10px; color: #bbb; text-align: center;">
+        Перемещение: <b>W, A, S, D</b> | Поворот: <b>Мышь</b> | Стрельба: <b>Левая кнопка мыши (ЛКМ)</b>
     </div>
-
-    <h2>Выбери свой скутер</h2>
-    <div class="block-container">
-        <button id="vDio" class="btn-ui active" onclick="setScooter('honda_dio')">🛵 Honda Dio</button>
-        <button id="vJog" class="btn-ui" onclick="setScooter('yamaha_jog')">🔥 Yamaha Jog</button>
-        <button id="vTact" class="btn-ui" onclick="setScooter('honda_tact')">🛵 Honda Tact</button>
-    </div>
-
-    <h2>Запустить нелегальный заезд</h2>
-    <button class="btn-map" onclick="launchGame()">🌃 ВЫЕХАТЬ В НОЧНОЙ ГОРОД</button>
-</div>
-
-<button id="backToMenu" onclick="location.reload()">В меню</button>
-
-<div id="dashboard">
-    <div id="speedometer"><span id="speedVal">0</span> км/ч</div>
-    <div id="cashCounter">+0 руб.</div>
-    <div id="soundIndicator">ЗВУК: ДРИНЬ-ДРИНЬ 🔊</div>
-    <div id="turboText">АКТИВИРОВАНА ЗАКИСЬ АЗОТА 🔥</div>
-    <div id="fpsCounter">FPS: <span id="fpsVal">60</span></div>
-</div>
-
-<div id="mobileControls">
-    <div class="control-group">
-        <div class="touch-btn" id="btnBack">←</div>
-        <div class="touch-btn" id="btnUp">↑</div>
-        <div class="touch-btn" id="btnDown">↓</div>
-        <div class="touch-btn" id="btnRepair">R</div>
-    </div>
-    <div class="control-group">
-        <div class="touch-btn" id="btnTurbo">НИТРО</div>
-        <div class="touch-btn" id="btnGas">→</div>
-    </div>
-</div>
 
 <script>
-    let canvas, ctx;
-    let distanceTravelled = 0, currentSpeed = 0;
-    let stuntAngle = 0, stuntVelocity = 0;
-    let isLoopStarted = false;
-    let inputs = {}, controlMode = 'pc', currentModel = 'honda_dio';
-    let frames = 0, lastTick = performance.now(), currentFps = 60;
-    let exhaustParticles = [];
-    let earnedCash = 0, engineSoundTick = 0, moneyTimer = 0;
-    let sAngleVelocity = 0;
+const canvas = document.getElementById("gtaCanvas");
+const ctx = canvas.getContext("2d");
 
-    let saveState = {
-        cash: 0,
-        upgrades: { cylinder: 1, exhaust: 1, carburetor: 1, variator: 1, stunt: 1 }
-    };
+// Состояние игры
+let score = 0;
+let keys = {};
+let mouse = { x: 0, y: 0 };
+
+// Игрок (Угонщик / Наемник)
+const player = {
+    x: 400,
+    y: 400,
+    radius: 15,
+    speed: 3,
+    angle: 0
+};
+
+// Массивы объектов
+let bullets = [];
+let enemies = [];
+// Городские здания (препятствия)
+const buildings = [
+    { x: 100, y: 100, width: 150, height: 150 },
+    { x: 550, y: 100, width: 150, height: 150 },
+    { x: 320, y: 220, width: 160, height: 100 }
+];
+
+// Отслеживание клавиатуры и мыши
+window.addEventListener("keydown", e => keys[e.key.toLowerCase()] = true);
+window.addEventListener("keyup", e => keys[e.key.toLowerCase()] = false);
+canvas.addEventListener("mousemove", e => {
+    const rect = canvas.getBoundingClientRect();
+    mouse.x = e.clientX - rect.left;
+    mouse.y = e.clientY - rect.top;
+});
+
+// Стрельба по клику
+canvas.addEventListener("mousedown", e => {
+    if (e.button === 0) { // ЛКМ
+        const speed = 7;
+        bullets.push({
+            x: player.x + Math.cos(player.angle) * player.radius,
+            y: player.y + Math.sin(player.angle) * player.radius,
+            vx: Math.cos(player.angle) * speed,
+            vy: Math.sin(player.angle) * speed,
+            radius: 3
+        });
+    }
+});
+
+// Спавн полиции / врагов
+function spawnEnemy() {
+    const sides = [
+        { x: Math.random() * canvas.width, y: -20 },
+        { x: Math.random() * canvas.width, y: canvas.height + 20 },
+        { x: -20, y: Math.random() * canvas.height },
+        { x: canvas.width + 20, y: Math.random() * canvas.height }
+    ];
+    const spawnPoint = sides[Math.floor(Math.random() * sides.length)];
     
-    try {
-        if (localStorage.getItem('scooter_25d_save')) {
-            saveState = JSON.parse(localStorage.getItem('scooter_25d_save'));
-        }
-    } catch(e) {}
+    enemies.push({
+        x: spawnPoint.x,
+        y: spawnPoint.y,
+        radius: 12,
+        speed: 1.5 + Math.random() * 1
+    });
+    
+    // Частота спавна зависит от счета (уровня розыска)
+    setTimeout(spawnEnemy, Math.max(400, 2000 - score * 100));
+}
+setTimeout(spawnEnemy, 1000);
 
-    const profileSpecs = {
-        honda_dio: { baseMax: 290, nitroMax: 411, baseAccel: 0.8, baseColor: '#3498db' },
-        yamaha_jog: { baseMax: 300, nitroMax: 411, baseAccel: 1.1, baseColor: '#e74c3c' },
-        honda_tact: { baseMax: 280, nitroMax: 411, baseAccel: 0.6, baseColor: '#f1c40f' }
-    };
+// Проверка столкновения круг-прямоугольник (для зданий)
+function checkCircleRectCollision(circle, rect) {
+    let closestX = Math.max(rect.x, Math.min(circle.x, rect.x + rect.width));
+    let closestY = Math.max(rect.y, Math.min(circle.y, rect.y + rect.height));
+    let distX = circle.x - closestX;
+    let distY = circle.y - closestY;
+    let distance = Math.sqrt((distX * distX) + (distY * distY));
+    return distance < circle.radius;
+}
 
-    function save() {
-        localStorage.setItem('scooter_25d_save', JSON.stringify(saveState));
-        refreshUi();
+// Логика обновлений
+function update() {
+    let nextX = player.x;
+    let nextY = player.y;
+
+    // Считаем вектор движения
+    if (keys["w"]) nextY -= player.speed;
+    if (keys["s"]) nextY += player.speed;
+    if (keys["a"]) nextX -= player.speed;
+    if (keys["d"]) nextX += player.speed;
+
+    // Проверка коллизий игрока со зданиями (по оси X и Y отдельно для скольжения)
+    let collisionX = false;
+    let collisionY = false;
+    for (let b of buildings) {
+        if (checkCircleRectCollision({ x: nextX, y: player.y, radius: player.radius }, b)) collisionX = true;
+        if (checkCircleRectCollision({ x: player.x, y: nextY, radius: player.radius }, b)) collisionY = true;
     }
 
-    function refreshUi() {
-        document.getElementById('wallet').textContent = "💰 " + saveState.cash + " руб.";
-        document.getElementById('upCylinder').textContent = "🔥 Malossi 70cc (Лвл " + saveState.upgrades.cylinder + ") - " + (saveState.upgrades.cylinder * 150) + "р.";
-        document.getElementById('upExhaust').textContent = "🎺 Yasuni R (Лвл " + saveState.upgrades.exhaust + ") - " + (saveState.upgrades.exhaust * 180) + "р.";
-        document.getElementById('upCarb').textContent = "⛽ Dell'Orto 19mm (Лвл " + saveState.upgrades.carburetor + ") - " + (saveState.upgrades.carburetor * 120) + "р.";
-        document.getElementById('upVariator').textContent = "⚙️ Multivar (Лвл " + saveState.upgrades.variator + ") - " + (saveState.upgrades.variator * 130) + "р.";
-        document.getElementById('upStunt').textContent = "🏍️ Stage6 Кит (Лвл " + saveState.upgrades.stunt + ") - " + (saveState.upgrades.stunt * 200) + "р.";
-    }
+    if (!collisionX && nextX > player.radius && nextX < canvas.width - player.radius) player.x = nextX;
+    if (!collisionY && nextY > player.radius && nextY < canvas.height - player.radius) player.y = nextY;
 
-    function buyComponent(item, baseCost) {
-        let calculatedCost = saveState.upgrades[item] * baseCost;
-        if (saveState.cash >= calculatedCost) {
-            saveState.cash -= calculatedCost;
-            saveState.upgrades[item]++;
-            save();
-        } else {
-            alert("Не хватает рублей на покупку тюнинга!");
-        }
-    }
+    // Поворот игрока к прицелу мыши
+    player.angle = Math.atan2(mouse.y - player.y, mouse.x - player.x);
 
-    function setDevice(type) {
-        controlMode = type;
-        document.getElementById('modePc').className = 'btn-ui' + (type === 'pc' ? ' active' : '');
-        document.getElementById('modeMobile').className = 'btn-ui' + (type === 'mobile' ? ' active' : '');
-    }
+    // Движение пуль
+    for (let i = bullets.length - 1; i >= 0; i--) {
+        let b = bullets[i];
+        b.x += b.vx;
+        b.y += b.vy;
 
-    function setScooter(model) {
-        currentModel = model;
-        document.getElementById('vDio').className = 'btn-ui' + (model === 'honda_dio' ? ' active' : '');
-        document.getElementById('vJog').className = 'btn-ui' + (model === 'yamaha_jog' ? ' active' : '');
-        document.getElementById('vTact').className = 'btn-ui' + (model === 'honda_tact' ? ' active' : '');
-    }
-
-    function launchGame() {
-        if (isLoopStarted) return;
-        isLoopStarted = true;
-
-        document.getElementById('menu').style.display = 'none';
-        document.getElementById('backToMenu').style.display = 'block';
-        document.getElementById('dashboard').style.display = 'block';
-
-        if (controlMode === 'mobile') {
-            document.getElementById('mobileControls').style.display = 'flex';
+        // Удаление при выходе за экран
+        if (b.x < 0 || b.x > canvas.width || b.y < 0 || b.y > canvas.height) {
+            bullets.splice(i, 1);
+            continue;
         }
 
-        canvas = document.createElement('canvas');
-        canvas.id = 'gameCanvas';
-        canvas.width = window.innerWidth;
-        canvas.height = window.innerHeight;
-        document.body.appendChild(canvas);
-        ctx = canvas.getContext('2d');
-
-        distanceTravelled = 0; currentSpeed = 0;
-        stuntAngle = 0; stuntVelocity = 0; sAngleVelocity = 0; earnedCash = 0;
-        exhaustParticles = [];
-
-        bindInputEvents();
-        requestAnimationFrame(engineFrame);
-    }
-
-    function bindInputEvents() {
-        window.onkeydown = (e) => { if (controlMode === 'pc') { if (e.code === 'Space') e.preventDefault(); inputs[e.code] = true; } };
-        window.onkeyup = (e) => { if (controlMode === 'pc') inputs[e.code] = false; };
-
-        const bindBtn = (id, key) => {
-            const el = document.getElementById(id);
-            if (!el) return;
-            el.onpointerdown = (e) => { e.preventDefault(); inputs[key] = true; };
-            el.onpointerup = (e) => { e.preventDefault(); inputs[key] = false; };
-            el.onpointerout = (e) => { inputs[key] = false; };
-        };
-        
-        bindBtn('btnGas', 'ArrowRight');
-        bindBtn('btnBack', 'ArrowLeft');
-        bindBtn('btnTurbo', 'Space');
-        bindBtn('btnUp', 'ArrowUp');
-        bindBtn('btnDown', 'ArrowDown');
-
-        const repairBtn = document.getElementById('btnRepair');
-        if (repairBtn) repairBtn.onpointerdown = (e) => { e.preventDefault(); hardReset(); };
-    }
-
-    function hardReset() {
-        currentSpeed = 0; stuntAngle = 0; stuntVelocity = 0; sAngleVelocity = 0;
-        exhaustParticles = [];
-    }
-
-    function engineFrame(currentTime) {
-        frames++;
-        if (currentTime - lastTick >= 1000) {
-            currentFps = Math.round((frames * 1000) / (currentTime - lastTick));
-            document.getElementById('fpsVal').textContent = currentFps;
-            frames = 0; lastTick = currentTime;
-        }
-
-        const stats = profileSpecs[currentModel];
-        
-        let maxAllowedNormal = stats.baseMax + ((saveState.upgrades.cylinder - 1) * 15);
-        let currentAcceleration = stats.baseAccel + ((saveState.upgrades.carburetor - 1) * 0.08);
-        let dynamicStuntPower = 0.0025 + (saveState.upgrades.stunt - 1) * 0.0008;
-
-        if (inputs['Space']) {
-            if (currentSpeed < stats.nitroMax) currentSpeed += 4;
-            else currentSpeed = stats.nitroMax;
-            document.getElementById('turboText').style.display = 'block';
-            document.getElementById('soundIndicator').textContent = "ЗВУК: ВВВВВВВВВВВВ 🔥";
-        } else {
-            document.getElementById('turboText').style.display = 'none';
-            if (inputs['ArrowRight'] && currentSpeed < maxAllowedNormal) {
-                currentSpeed += currentAcceleration;
-                engineSoundTick++;
-                if (engineSoundTick % 4 === 0) document.getElementById('soundIndicator').textContent = "ЗВУК: ДЗИНЬ!";
-                else if (engineSoundTick % 4 === 2) document.getElementById('soundIndicator').textContent = "ЗВУК: ДРИНЬ!";
-            } else {
-                currentSpeed *= 0.97; 
-                document.getElementById('soundIndicator').textContent = "ЗВУК: ххххх...";
+        // Разрушение пули о здания
+        for (let block of buildings) {
+            if (b.x > block.x && b.x < block.x + block.width && b.y > block.y && b.y < block.y + block.height) {
+                bullets.splice(i, 1);
+                break;
             }
         }
-
-        distanceTravelled += currentSpeed * 0.1;
-
-        // ИСПРАВЛЕННЫЙ ВЫХЛОП: Вылетает четко из трубы наклоненного мопеда
-        if (currentSpeed > 5) {
-            let smokeDensity = inputs['Space'] ? 5 : (inputs['ArrowRight'] ? 2 : 1);
-            for (let i = 0; i < smokeDensity; i++) {
-                // Точка выхлопа теперь привязана к монолитной модели скутера
-                let baseWheelY = canvas.height - 85 + (stuntAngle * 25);
-                let exhaustX = canvas.width / 2 - 32;
-                let exhaustY = baseWheelY - 24 - (stuntAngle * 50);
-
-                exhaustParticles.push({
-                    x: exhaustX,
-                    y: exhaustY,
-                    size: 3 + Math.random() * 3,
-                    r: 155 + Math.floor(Math.random() * 20),
-                    g: 175 + Math.floor(Math.random() * 20),
-                    b: 210 + Math.floor(Math.random() * 30),
-                    opacity: 0.7,
-                    vx: -4 + Math.random() * 8,
-                    vy: -1 - Math.random() * 4,
-                    growth: 0.7 + (saveState.upgrades.exhaust * 0.15)
-                });
-            }
-        }
-
-        exhaustParticles.forEach((p, idx) => {
-            p.x += p.vx; p.y += p.vy; p.size += p.growth; p.opacity -= 0.015;
-            if (p.opacity <= 0 || p.size > 130) exhaustParticles.splice(idx, 1);
-        });
-
-        if (currentSpeed > 10) {
-            moneyTimer++;
-            if (moneyTimer % 10 === 0) {
-                let addCash = 50;
-                if (stuntAngle > 0.2) addCash += 100; 
-                earnedCash += addCash; saveState.cash += addCash;
-                try { localStorage.setItem('scooter_25d_save', JSON.stringify(saveState)); } catch(e){}
-                document.getElementById('cashCounter').textContent = "+" + earnedCash + " руб.";
-            }
-        }
-
-        // Физика станта
-        if (inputs['ArrowUp'] && currentSpeed > 5) {
-            sAngleVelocity += dynamicStuntPower;
-            if (sAngleVelocity > 0.025) sAngleVelocity = 0.025;
-        } else if (inputs['ArrowDown']) {
-            sAngleVelocity -= 0.008;
-        } else {
-            if (stuntAngle > 0) sAngleVelocity -= 0.002; 
-            else sAngleVelocity = 0;
-        }
-        
-        stuntAngle += sAngleVelocity;
-        
-        if (stuntAngle > 0.78) { stuntAngle = 0.78; sAngleVelocity = 0; }
-        if (stuntAngle < 0) { stuntAngle = 0; sAngleVelocity = 0; }
-
-        document.getElementById('speedVal').textContent = Math.floor(currentSpeed);
-        document.getElementById('speedometer').style.color = (currentSpeed >= 250) ? '#ff4757' : 'white';
-
-        ctx.fillStyle = '#070714'; 
-        ctx.fillRect(0, 0, canvas.width, canvas.height);
-
-        let horizonY = canvas.height * 0.45;
-
-        // Небоскребы
-        ctx.fillStyle = '#111124';
-        for (let i = 0; i < 15; i++) {
-            let bWidth = 90 + (i % 3) * 40;
-            let bHeight = 150 + (i % 2) * 100;
-            let bX = (i * 110 - (distanceTravelled * 0.1)) % (canvas.width + 200) - 100;
-            ctx.fillRect(bX, horizonY - bHeight, bWidth, bHeight);
-            ctx.fillStyle = (i % 2 === 0) ? 'rgba(241, 196, 15, 0.4)' : 'rgba(52, 152, 219, 0.4)';
-            ctx.fillRect(bX + 15, horizonY - bHeight + 20, 10, 15);
-            ctx.fillRect(bX + 45, horizonY - bHeight + 50, 10, 15);
-            ctx.fillStyle = '#111124';
-        }
-
-        // Дорога
-        let roadWidthStart = canvas.width * 0.08;
-        let roadWidthEnd = canvas.width * 0.75;
-        let linesOffset = (distanceTravelled) % 60;
-
-        for (let y = horizonY; y < canvas.height; y += 4) {
-            let percent = (y - horizonY) / (canvas.height - horizonY);
-            let currentRoadW = roadWidthStart + percent * (roadWidthEnd - roadWidthStart);
-            let leftX = (canvas.width / 2) - currentRoadW / 2;
-
-            ctx.fillStyle = '#1a1a2e'; ctx.fillRect(leftX, y, currentRoadW, 4);
-            ctx.fillStyle = '#141423'; ctx.fillRect(0, y, leftX, 4); ctx.fillRect(leftX + currentRoadW, y, canvas.width - (leftX + currentRoadW), 4);
-
-            if (Math.floor((y - linesOffset + 120) / 30) % 2 === 0) {
-                ctx.fillStyle = '#fff';
-                ctx.fillRect(canvas.width / 2 - (2 * percent), y, 4 * percent, 4);
-            }
-        }
-
-        // Дым рисуется ПЕРЕД мопедом
-        exhaustParticles.forEach(p => {
-            ctx.fillStyle = 'rgba(' + p.r + ',' + p.g + ',' + p.b + ',' + p.opacity + ')';
-            ctx.beginPath(); ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2); ctx.fill();
-        });
-
-        // МЕНТ ПОЛНОСТЬЮ УДАЛЕН ИЗ ЭТОГО БЛОКА
-
-        // МОНОЛИТНАЯ ГЕОМЕТРИЯ СКУТЕРА СЗАДИ (Все детали связаны жестко)
-        ctx.save();
-        // При вилли вся модель уходит чуть ниже, имитируя приседание на заднее колесо
-        let globalY = canvas.height - 85 + (stuntAngle * 25);
-        ctx.translate(canvas.width / 2, globalY);
-        ctx.scale(1.4, 1.4);
-
-        let liftY = stuntAngle * 65; // Подъем передка вверх по экрану
-        let wheelScale = 1 + (stuntAngle * 0.25); // Увеличение задней части
-
-        // 1. ЗАДНЕЕ КОЛЕСО (База)
-        ctx.fillStyle = '#111'; ctx.beginPath(); ctx.arc(0, 0, 14 * wheelScale, 0, Math.PI * 2); ctx.fill();
-        ctx.fillStyle = '#7f8c8d'; ctx.beginPath(); ctx.arc(0, 0, 6 * wheelScale, 0, Math.PI * 2); ctx.fill();
-
-        // 2. МОТОР И ВАРИАТОР (Связаны жестко с колесом)
-        ctx.fillStyle = '#222'; ctx.fillRect(-16, -14, 32, 16);
-        ctx.fillStyle = '#444'; ctx.fillRect(-12, -22, 10, 10); 
-
-        // 3. РЕЗОНАТОР YASUNI R (Жестко закреплен на картере, наклоняется вверх)
-        ctx.strokeStyle = '#f39c12'; ctx.lineWidth = 5;
-        ctx.beginPath(); ctx.moveTo(-16, -4); ctx.lineTo(-32, -24 - (liftY * 0.4)); ctx.stroke();
-
-        // 4. КОРПУС И ПЛАСТИК СКУТЕРА (Поднимаются монолитно)
-        ctx.fillStyle = stats.baseColor; ctx.fillRect(-18, -46 - liftY, 36, 34); 
-        ctx.fillStyle = '#222'; ctx.fillRect(-15, -52 - liftY, 30, 8); // Седло
-
-        // 5. РУЛЬ И ПЕРЕДНЯЯ ФАРА
-        ctx.fillStyle = stats.baseColor; ctx.fillRect(-12, -74 - liftY, 24, 24); 
-        ctx.fillStyle = '#fff'; ctx.fillRect(-6, -66 - liftY, 12, 5); // Фара
-        ctx.fillStyle = '#111'; ctx.fillRect(-22, -78 - liftY, 44, 4); // Стант-руль Stage6
-
-        // 6. ПЕРЕДНЕЕ КОЛЕСО (Взлетает вместе с вилкой)
-        ctx.fillStyle = '#111'; ctx.beginPath(); ctx.arc(26 * (1 - stuntAngle * 0.3), -27 - liftY, 14, 0, Math.PI * 2); ctx.fill();
-        ctx.fillStyle = '#7f8c8d'; ctx.beginPath(); ctx.arc(26 * (1 - stuntAngle * 0.3), -27 - liftY, 6, 0, Math.PI * 2); ctx.fill();
-
-        // 7. ЧЕЛО ВЕЧЕК (Жестко привязан к седлу)
-        ctx.save();
-        ctx.translate(0, -50 - liftY);
-
-        ctx.fillStyle = '#fff'; ctx.fillRect(-10, -26, 20, 26); // Футболка
-        ctx.fillStyle = '#34495e'; ctx.fillRect(-10, 0, 20, 10); // Шорты
-
-        // Ноги к подножкам скутера
-        ctx.strokeStyle = '#f39c12'; ctx.lineWidth = 5;
-        ctx.beginPath(); ctx.moveTo(-6, 8); ctx.lineTo(-12, 28 + (liftY * 0.15)); ctx.stroke();
-        ctx.beginPath(); ctx.moveTo(6, 8); ctx.lineTo(15, 28 + (liftY * 0.15)); ctx.stroke();
-        ctx.fillStyle = '#e74c3c'; ctx.fillRect(-15, 26 + (liftY * 0.15), 6, 5); ctx.fillRect(12, 26 + (liftY * 0.15), 6, 5); // Тапки
-
-        // Руки к рулю
-        ctx.strokeStyle = '#f39c12'; ctx.lineWidth = 4;
-        ctx.beginPath(); ctx.moveTo(-10, -20); ctx.lineTo(-18, -26); ctx.stroke();
-        ctx.beginPath(); ctx.moveTo(10, -20); ctx.lineTo(18, -26); ctx.stroke();
-
-        // Питбайк шлем
-        ctx.fillStyle = '#f39c12'; ctx.beginPath(); ctx.arc(0, -32, 7, 0, Math.PI * 2); ctx.fill();
-        ctx.fillStyle = '#e74c3c'; ctx.beginPath(); ctx.arc(0, -34, 10, 0, Math.PI * 2); ctx.fill(); 
-        ctx.fillStyle = '#111'; ctx.beginPath(); ctx.moveTo(4, -43); ctx.lineTo(16, -35); ctx.lineTo(6, -30); ctx.closePath(); ctx.fill();
-        ctx.fillStyle = '#111'; ctx.fillRect(-4, -36, 8, 4); 
-        ctx.restore();
-
-        if (inputs['Space']) {
-            ctx.fillStyle = '#ff4757'; ctx.beginPath(); ctx.moveTo(-22, -6); ctx.lineTo(-45, -2); ctx.lineTo(-22, -14); ctx.fill();
-        }
-
-        ctx.restore(); // Конец общей матрицы скутера
-
-        requestAnimationFrame(engineFrame);
     }
 
-    updateMenuUi();
+    // Поведение врагов (ИИ копов)
+    for (let i = enemies.length - 1; i >= 0; i--) {
+        let e = enemies[i];
+        let angleToPlayer = Math.atan2(player.y - e.y, player.x - e.x);
+        
+        // Копы бегут напрямую к игроку
+        e.x += Math.cos(angleToPlayer) * e.speed;
+        e.y += Math.sin(angleToPlayer) * e.speed;
+
+        // Попадание пули во врага
+        for (let j = bullets.length - 1; j >= 0; j--) {
+            let b = bullets[j];
+            let dist = Math.sqrt((b.x - e.x)**2 + (b.y - e.y)**2);
+            if (dist < e.radius + b.radius) {
+                enemies.splice(i, 1);
+                bullets.splice(j, 1);
+                score++;
+                document.getElementById("scoreDisplay").innerText = "ЛИКВИДИРОВАНО: " + score;
+                
+                // Динамическое обновление звезд розыска
+                let stars = Math.min(6, Math.floor(score / 5) + 1);
+                document.getElementById("wantedDisplay").innerText = "РОЗЫСК: " + "🚨".repeat(stars);
+                break;
+            }
+        }
+    }
+}
+
+// Отрисовка
+function draw() {
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+    // 1. Рисуем дороги / здания (Текстура города)
+    ctx.fillStyle = "#7f8c8d"; // Цвет асфальта вокруг зданий
+    ctx.fillRect(0,0, canvas.width, canvas.height);
+
+    ctx.fillStyle = "#2c3e50"; // Цвет бетонных кварталов
+    for (let b of buildings) {
+        ctx.fillRect(b.x, b.y, b.width, b.height);
+        ctx.strokeStyle = "#1a252f";
+        ctx.lineWidth = 4;
+        ctx.strokeRect(b.x, b.y, b.width, b.height);
+    }
+
+    // 2. Рисуем пули трассирующими линиями
+    ctx.fillStyle = "#f1c40f";
+    for (let b of bullets) {
+        ctx.beginPath();
+        ctx.arc(b.x, b.y, b.radius, 0, Math.PI * 2);
+        ctx.fill();
+    }
+
+    // 3. Рисуем копов (Красные круги с направлением)
+    ctx.fillStyle = "#e74c3c";
+    for (let e of enemies) {
+        ctx.beginPath();
+        ctx.arc(e.x, e.y, e.radius, 0, Math.PI * 2);
+        ctx.fill();
+    }
+
+    // 4. Рисуем игрока (Скины / Слои)
+    ctx.save();
+    ctx.translate(player.x, player.y);
+    ctx.rotate(player.angle);
+
+    // Руки / Оружие игрока
+    ctx.fillStyle = "#f39c12";
+    ctx.fillRect(10, 5, 15, 6); // Ствол автомата направлен вперед
+
+    // Тело игрока
+    ctx.fillStyle = "#2ecc71"; // Зеленая куртка (в стиле Си-Джея или Томми)
+    ctx.beginPath();
+    ctx.arc(0, 0, player.radius, 0, Math.PI * 2);
+    ctx.fill();
+
+    // Голова
+    ctx.fillStyle = "#ffdbac";
+    ctx.beginPath();
+    ctx.arc(0, 0, player.radius * 0.5, 0, Math.PI * 2);
+    ctx.fill();
+
+    ctx.restore();
+}
+
+function gameLoop() {
+    update();
+    draw();
+    requestAnimationFrame(gameLoop);
+}
+
+gameLoop();
 </script>
 </body>
 </html>
